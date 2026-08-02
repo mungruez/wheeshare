@@ -17,7 +17,7 @@ export default function HomeScreen() {
       <SafeAreaView style={{ flexDirection:"column", height: "100%", marginTop:19, opacity: 1}}>
          
         <View style={{backgroundColor: '#2f4f4f', flexDirection:"row", marginHorizontal:3, marginVertical:19, textAlign:"center", justifyContent:"space-between"}}>
-          <Text style={{color: "lightgray", fontWeight:"700",fontSize: 23, textAlign:"center", marginLeft:38, marginTop:10}}>Main Menu</Text>
+          <Text style={{color: "lightgray", fontWeight:"700",fontSize: 23, textAlign:"center", marginLeft: 38, marginTop: 10}}>Main Menu</Text>
           <ImageBackground style={ styles.icon } imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/icon.jpg')} /> 
         </View>
 
@@ -115,23 +115,9 @@ const styles = StyleSheet.create({
       marginTop: 4,
       color: 'white',
     },
-    imgBackground: {
-      width: '100%',
-      height: '100%',
-      maxHeight:"96%",
-      flex: 1,
-      opacity: .9, 
-    },
-    imgBackground2: {
-      width: '100%',
-      height: '100%',
-      flex: 1,
-      opacity: .9, 
-      margin:0,
-      marginBottom:-2,
-      padding:2,
-      backgroundColor:"transparent",
-      justifyContent:"flex-end"
-    },icon: { height: 76, width: 76, opacity: 1, marginTop: 3, textAlign: "center", marginBottom: 9 },
-  
+    imgBackground: { width: '100%', height: '100%', maxHeight:"96%", flex: 1},
+    imgBackground2: { width: '100%', height: '100%', flex: 1, opacity: 1, margin:0, marginBottom:-2, padding:2, backgroundColor:"transparent", justifyContent:"flex-end"},
+    icon: { height: 76, width: 76, opacity: 1, marginTop: 3, textAlign: "center", marginBottom: 9 },
+    buttonimage: { width: "67%", flex: 1, height: 67, alignItems: "center", justifyContent: "center", opacity: 1, alignSelf:"center" },
+    cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#5a4f07', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
   });

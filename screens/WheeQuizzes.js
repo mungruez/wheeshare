@@ -124,7 +124,7 @@ export default function WheeQuizzes() {
     return hQuizzes;
   };
   
-  // Safe filtering router - prevents home screen performance drops entirely
+
   const getQuizzes = (cat, quizzesList) => {
     if (!cat || cat.trim() === "" || !quizzesList) return [];
     let sQuizzes = quizzesList.filter(c => (cat === "allcategories" || c.category === cat));
@@ -132,42 +132,6 @@ export default function WheeQuizzes() {
     return sQuizzes;
   };
 
-  // Form hydration engine to load up quiz variables for editing or adding
-  const populateForEdit = (quizItem, mvcat) => {
-    if (quizItem === null) {
-      setSelectedIds([]);
-      setQuizTitle("");
-      setQuizDesc("");
-      setCurrentQuiz(null);
-      setQuizId(Date.now().toString());
-
-      if (mvcat === "allcategories") {
-        setPrevCategory("allcategories");
-        setQuizCategory("");
-      } else {
-        setQuizCategory(mvcat);
-      }
-
-      // Populate a fresh 4-option questionnaire framework
-      setQuestionsList([
-        { id: "q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-        { id: "q2", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-        { id: "q3", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-        { id: "q4", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
-      ]);
-      setPrevMode("list");
-      setMode("add");
-    } else {
-      setCurrentQuiz(quizItem);
-      setQuizId(quizItem.id);
-      setQuizTitle(quizItem.title);
-      setQuizCategory(mvcat);
-      setQuizDesc(quizItem.description || "");
-      setQuestionsList(quizItem.quiz || []);
-      setPrevMode("list");
-      setMode("add");
-    }
-  };
 
   const loadQuizzes = async () => {
     try {
@@ -177,12 +141,10 @@ export default function WheeQuizzes() {
  
       const fileUri = `${FileSystem.documentDirectory}wheequizzes.json`;
       const info = await FileSystem.getInfoAsync(fileUri);
-       
       if (info.exists) {
         const content = await FileSystem.readAsStringAsync(fileUri);
         let loadedQuizzes = JSON.parse(content || "[]");
-        
-        // Strict questionnaire format schema validation loop
+
         loadedQuizzes = loadedQuizzes.filter(c => 
           c && c.id && c.title && c.category &&
           c.title.trim() !== "" && c.category.trim() !== "" &&
@@ -214,8 +176,8 @@ export default function WheeQuizzes() {
       } else {
         setQuizzes([]);
         setHquizzes([]);
-        setMode("main");
         setQuizCategory("");
+        setMode("main");
       }
     } catch (e) {
       Alert.alert("Load Quizzes Failed", e.message || "Error loading Quizzes.");
@@ -227,30 +189,24 @@ export default function WheeQuizzes() {
   };
 
 
-  // Synchronous database-writing pipeline with update protection receipts
-  const saveQuizzesToStorage = async (quizzesData, activeCategory) => {
+
+  const saveQuizzesToStorage = async (quizzesData) => {
     try {
       const fileUri = `${FileSystem.documentDirectory}wheequizzes.json`;
       const trackingUri = `${FileSystem.documentDirectory}.quizzes_user_initialized`;
-      
-      // Stamp user modification marker to permanently block template restores on update
       await FileSystem.writeAsStringAsync(trackingUri, "true");
       await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(quizzesData));
-      
       setQuizzes(quizzesData);
       parseCategories(quizzesData, null);
-      
-      // Apply clean basement rule: suppress horizontal calculations on empty home dashboard
-      const targetCategory = activeCategory || "allcategories";
-      if (mode !== "main") setHquizzes(getQuizzes(targetCategory, quizzesData)); 
+      if (mode !== "main") setHquizzes(getQuizzes(prevCategory, quizzesData)); 
     } catch (e) {
       Alert.alert("Save Error", e.message || "Could not save your quiz list to disk.");
       throw e;
     }
   };
 
-  // Intermediate state dispatcher managing asynchronous layout synchronization
-  const handleSaveQuiz = async (newData, activeCategory) => {
+  
+  const handleSaveQuiz = async (newData) => {
     try {
       if (isLoadingRef.current) return;
       isLoadingRef.current = true;
@@ -268,7 +224,7 @@ export default function WheeQuizzes() {
         }
       });
 
-      await saveQuizzesToStorage(updatedList, activeCategory);
+      await saveQuizzesToStorage(updatedList);
       setMode('list');
     } catch (e) {
       Alert.alert('Save Failed', e.message);
@@ -396,7 +352,7 @@ export default function WheeQuizzes() {
         updatedAt: new Date().toISOString()
       };
 
-      await handleSaveQuiz(sanitizedQuizData, prevCategory);
+      await handleSaveQuiz(sanitizedQuizData);
       if(prevCategory === 'allcategories') setQuizCategory("allcategories");
       setCurrentQuiz(null);
       setMode(prevMode || 'main');
@@ -465,11 +421,47 @@ export default function WheeQuizzes() {
     }
   };
 
+
+  const populateForEdit = (quizItem, mvcat) => {
+    if (quizItem === null) {
+      setSelectedIds([]);
+      setQuizTitle("");
+      setQuizDesc("");
+      setCurrentQuiz(null);
+      setQuizId(Date.now().toString());
+
+      if (mvcat === "allcategories") {
+        setPrevCategory("allcategories");
+        setQuizCategory("");
+      } else {
+        setQuizCategory(mvcat);
+      }
+      
+      setQuestionsList([
+        { id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
+        { id: Date.now().toString()+"q2", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
+        { id: Date.now().toString()+"q3", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
+        { id: Date.now().toString()+"q4", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
+      ]);
+      setMode("add");
+    } else {
+      setCurrentQuiz(quizItem);
+      setQuizId(quizItem.id);
+      setQuizTitle(quizItem.title);
+      setQuizCategory(mvcat);
+      setQuizDesc(quizItem.description || "");
+      setQuestionsList(quizItem.quiz || []);
+      setMode("add");
+    }
+  };
+
+
   useFocusEffect(
     useCallback(() => {
       loadQuizzes();
     }, [quizCategory])
   );
+
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -477,12 +469,14 @@ export default function WheeQuizzes() {
         setMode('list');
         return true;
       }
+
       if (mode === 'add') {
         if (isLoadingRef.current) return true;
-        setMode('list');
+        setMode(prevMode || "main");
         resetForm();
         return true;
       }
+
       if (mode === 'list') {
         setSelectedIds([]);
         setQuizCategory('');
@@ -533,7 +527,7 @@ export default function WheeQuizzes() {
       
       await unzip(nakedZip, nakedDest);
       
-      let manifest = { count: 1 };
+      let manifest = { count: 0 };
       try {
         const manifestContent = await FileSystem.readAsStringAsync(`${extractDir}manifest.json`);
         manifest = JSON.parse(manifestContent);
@@ -542,7 +536,7 @@ export default function WheeQuizzes() {
       }
       
       const rawQuizzes = [];
-      const quizDirs = manifest.count > 1 
+      const quizDirs = manifest.count > 0 
         ? Array.from({length: manifest.count}, (_, i) => `quiz_${i}/`) 
         : [''];
       
@@ -577,8 +571,7 @@ export default function WheeQuizzes() {
       }));
       
       const updatedList = [...quizzes, ...finalQuizzes];
-      await saveQuizzesToStorage(updatedList, quizCategory);
-      
+      await saveQuizzesToStorage(updatedList);
       Alert.alert('Success', `${finalQuizzes.length} quiz(zes) imported!`);
     } catch (e) {
       Alert.alert('Import Failed', e.message || 'Failed to import quiz data package.');
@@ -596,10 +589,12 @@ export default function WheeQuizzes() {
     </View>
   );
 
+
   const QuizItemCard = ({ item }) => {
     const isSelected = selectedIds.includes(item.id);
     return (
       <TouchableOpacity 
+        style={[styles.chapterCard, isSelected && styles.selectedCard]}
         onLongPress={() => toggleSelect(item.id)}
         onPress={() => {
           if (selectedIds.length > 0) {
@@ -608,9 +603,7 @@ export default function WheeQuizzes() {
             setCurrentQuiz(item.quiz);
             setMode("play_active"); 
           }
-        }}
-        style={[styles.chapterCard, isSelected && styles.selectedCard]}
-      >
+        }}>
         <Text style={styles.chapterCardTitle} numberOfLines={1}>{item.title}</Text>
         <Text style={styles.chapterCardCount}>{`Contains: ${item.quiz.length} Questions`}</Text>
         { isSelected && selectedIds.length === 1 && ( <View style={styles.chapterCardFooter}>
@@ -677,11 +670,11 @@ export default function WheeQuizzes() {
         })}
       </View>
 
-      <Text style={styles.label}>Answer Explanation (Optional)</Text>
+      <Text style={styles.label}>Answer Explanation(Optional)</Text>
       <TextInput
         style={[styles.input, styles.descInput]}
-        placeholder="Provide background context explanation details..."
-        placeholderTextColor="#726b6b"
+        placeholder="Provide an explanation of the answer..."
+        placeholderTextColor="#a18e8e"
         value={qItem.explanation}
         onChangeText={(text) => {
           const updated = [...questionsList];
@@ -689,7 +682,7 @@ export default function WheeQuizzes() {
           setQuestionsList(updated);
         }}
         multiline
-        numberOfLines={2}
+        numberOfLines={3}
       />
     </View>
   );
@@ -722,10 +715,10 @@ export default function WheeQuizzes() {
           <View style={styles.myDojoHeader}>
             <Text style={styles.categoryHeaderText}>{quizCategory === "allcategories" ? "ALL DATA CATEGORIES" : `CATEGORY: ${quizCategory}`}</Text>
             <View style={{flexDirection:'row'}}>
-              <TouchableOpacity onPress={() => { setSelectedIds([]); setQuizCategory(""); setPrevCategory(""); setMode("main"); }} style={styles.plusIconAM}>
+              <TouchableOpacity onPress={() => { setSelectedIds([]); setQuizCategory(""); setPrevCategory(""); setMode("main"); setPrevMode("main"); }} style={styles.plusIconAM}>
                 <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/quizzes/redbackicon.png')}/>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => populateForEdit(null, quizCategory)} style={styles.plusIcon}>
+              <TouchableOpacity onPress={() => { setPrevMode("list"); populateForEdit(null, quizCategory); }} style={styles.plusIcon}>
                 <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/quizzes/addquizicon.png')}/>         
               </TouchableOpacity>
             </View>
@@ -737,7 +730,7 @@ export default function WheeQuizzes() {
               extraData={[selectedIds, quizzes]}
               keyExtractor={(item, index) => item.id || index.toString()}
               style={{ flex: 1 }}
-              contentContainerStyle={{ paddingBottom: 38, flexGrow: 1 }}
+              contentContainerStyle={{ paddingBottom: 57, flexGrow: 1 }}
               ListEmptyComponent={() => (
                 <View style={styles.emptyContainerView}>
                   <Text style={styles.emptyReloadText}>Reload Content</Text>
@@ -795,7 +788,7 @@ export default function WheeQuizzes() {
               <ImageBackground style={styles.iconAM} resizeMode='contain' source={currentQuiz ? require('../assets/quizzes/editquiztitle.png') : require('../assets/quizzes/addquiztitle.png')} /> 
             </View>
             
-            <TouchableOpacity onPress={() => { setMode('list'); resetForm(); }} style={styles.discardBtn}>
+            <TouchableOpacity onPress={() => { resetForm(); setMode(prevMode); }} style={styles.discardBtn}>
               <Text style={styles.discardText}>❌CANCEL</Text>
             </TouchableOpacity>
 
@@ -843,7 +836,7 @@ export default function WheeQuizzes() {
     );
   }
 
-  //DEFAULT CONTEXT MAIN DASHBOARD BASE ROUTE
+  
   return (
     <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/quizzes/quizzesbg.jpg')}>
       <StatusBar barStyle="dark-content"/>
@@ -870,7 +863,7 @@ export default function WheeQuizzes() {
           </View>
 
           <View style={styles.dashboardIconsControlsRow}>
-            <TouchableOpacity onPress={() => populateForEdit(null, "")} style={styles.plusIcon}>
+            <TouchableOpacity onPress={() => { setPrevMode("main"); populateForEdit(null, "allcategories"); }} style={styles.plusIcon}>
               <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/quizzes/addquizicon.png')}/>         
             </TouchableOpacity> 
             <TouchableOpacity onPress={handleImportQuizzes} style={styles.importIcon}>
@@ -900,7 +893,7 @@ export default function WheeQuizzes() {
                       { item.id === 'q-all' ? 
                         ( <Image
                           resizeMode="contain"
-                          style={{ height:"57%", width:"63%", alignSelf:"center"}}
+                          style={{ height: "57%", width: "63%", alignSelf:"center"}}
                           source={require('../assets/allstyles.png')}
                         /> ) : (
                           <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>{ item.category.length > 20 ? item.category.substring(0, 20) : item.category }</Text>
@@ -947,7 +940,7 @@ const styles = StyleSheet.create({
   silverDivider: { width: '99%', height: 10, alignSelf: 'center', marginVertical: 5 },
   smallGap: { height: 12 },
   card: { width: '100%', alignItems: 'center', marginVertical: 6 },
-  cardText: { fontSize: 16, fontWeight: 'bold', color: '#bddff3', paddingHorizontal: 5},
+  cardText: { fontSize: 16, fontWeight: 'bold', color: '#f3bdbd', paddingHorizontal: 5},
   categoryMenuSelectionRowItem: { width: '80%', height: 55, justifyContent: 'center', alignItems: 'center' },
   cardTextMenuTitle: { color: '#313030', fontWeight: 'bold', fontSize: 15, textAlign: 'center', width: '90%' },
   centerNotificationFlexPanel: { flex: 1, paddingHorizontal: 30, justifyContent: 'center', alignItems: 'center' },
@@ -955,19 +948,19 @@ const styles = StyleSheet.create({
   categoryHeaderText: { color: '#ca3838', fontSize: 13, fontWeight: '600', textAlign: 'center', textTransform: 'uppercase', marginVertical: 6 },
   flatlistContainer: { flex: 1, width: '100%' },
   emptyContainerView: { padding: 20, alignItems: 'center', justifyContent: 'center' },
-  emptyReloadText: { color: '#f3efbd', marginBottom: 12, fontWeight: 'bold', fontSize: 15 },
+  emptyReloadText: { color: '#facdcd', marginBottom: 12, fontWeight: 'bold', fontSize: 15 },
   sectionContainer: { marginVertical: 10, width: '100%' },
   sectionHeader: { color: '#ca3838', fontSize: 14, fontWeight: 'bold', marginLeft: 16, marginBottom: 8, textTransform: 'uppercase' },
   verticalWrapper: { width: '100%', alignItems: 'center', paddingVertical: 6 },
-  chapterCard: { width: CARD_WIDTH, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, padding: 14, marginHorizontal: 8, borderWidth: 1, borderColor: '#caaf38', elevation: 3 },
-  selectedCard: { borderColor: '#dc2626', backgroundColor: '#fef2f2', borderWidth: 2 },
-  chapterCardTitle: { fontSize: 15, fontWeight: 'bold', color: '#1e293b', marginBottom: 4 },
+  chapterCard: { width: CARD_WIDTH, backgroundColor: 'rgba(245, 195, 195, 0.76)', borderRadius: 12, padding: 14, marginHorizontal: 8, borderWidth: 1, borderColor: '#f14242', elevation: 3 },
+  selectedCard: { borderColor: '#dc2626', backgroundColor: '#fa6f6f8c', borderWidth: 2 },
+  chapterCardTitle: { fontSize: 14, fontWeight: 'bold', color: '#1e293b', marginBottom: 4 },
   chapterCardCount: { fontSize: 12, color: '#64748b', marginBottom: 10 },
   chapterCardFooter: { flexDirection: 'row', justifyContent: 'flex-end', width: '100%' },
-  editBtnCard: { backgroundColor: '#caaf38', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
+  editBtnCard: { backgroundColor: '#da4e36', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
   editBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 11 },
-  batchBar: { position: 'absolute', bottom: 20, left: '5%', right: '5%', height: 55, backgroundColor: '#1e293b', borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, borderWidth: 1.5, borderColor: '#caaf38', elevation: 10 },
-  batchText: { color: '#ca3838', fontWeight: 'bold', fontSize: 13 },
+  batchBar: { position: 'absolute', bottom: 57, left: 20, right: 20, height: 55, backgroundColor: '#19212e', borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 19, borderWidth: 1.5, borderColor: '#ca3838', elevation: 10 },
+  batchText: { color: '#e95757', fontWeight: 'bold', fontSize: 13 },
   shareIcon: { width: 35, height: 35 },
   myDojoDiscardIcon: { width: 35, height: 35 },
   myDojoDeleteIcon: { width: 35, height: 35 },
@@ -983,7 +976,7 @@ const styles = StyleSheet.create({
   discardBtn: { alignSelf: 'center', backgroundColor: 'rgba(220, 38, 38, 0.15)', borderWidth: 1, borderColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, marginBottom: 12 },
   discardText: { color: '#ef4444', fontWeight: 'bold', fontSize: 11 },
   formScroller: { flex: 1, paddingHorizontal: 16 },
-  label: { color: '#ca3838', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
+  label: { color: '#f04444', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
   input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#cbd5e1', marginBottom: 4 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
@@ -1001,4 +994,4 @@ const styles = StyleSheet.create({
   saveBtnFullBlock: { width: '100%', height: 50, borderRadius: 10, overflow: 'hidden', marginTop: 25, marginBottom: 20 },
   saveBtnTextInternal: { color: '#fff', fontWeight: 'bold', fontSize: 14, letterSpacing: 1 },
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.75)', justifyContent: 'center', alignItems: 'center', zIndex: 999 },
-  loadingText: { color: '#cc2727', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 } });
+  loadingText: { color: '#e02f2f', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 } });
