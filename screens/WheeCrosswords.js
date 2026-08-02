@@ -383,8 +383,8 @@ export default function WheeCrosswords() {
         );
  
         if (loadedCrosswords.length === 0) {
-          setMode("main");
           setHcrosswords([]);
+          setMode("main");
         } else {
           setCrosswords(loadedCrosswords || []);
           parseCategories(loadedCrosswords, null);
@@ -402,8 +402,8 @@ export default function WheeCrosswords() {
         setCrosswords([]);
         setScrosswords([]);
         setHcrosswords([]);
-        setMode("main");
         setCrosswordCategory("");
+        setMode("main");
       }
     } catch (e) {
       Alert.alert("Load Crosswords Failed", e.message || "Error loading Crosswords.");
@@ -425,7 +425,7 @@ export default function WheeCrosswords() {
     } catch (e) {
       Alert.alert('Save Error', 'Could not save Crosswords' + e.message);
       throw e;
-      }
+    }
   };
     
   const handleSaveCrossword = async (newData) => {
@@ -474,7 +474,6 @@ export default function WheeCrosswords() {
       }
 
       setQuestions([{answer: "", hint: "", startx: "", starty: "", orientation: "", position: 1}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: 2}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: 3}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: 4}]);
-      setPrevMode("list");
       setMode("add");
 
     } else {
@@ -484,7 +483,6 @@ export default function WheeCrosswords() {
       setCrosswordCategory(cwrdcat);
       setCrosswordDesc(cwrd.description || "");
       setQuestions(cwrd.questions || []);
-      setPrevMode("list");
       setMode("add");
     }
   };
@@ -552,7 +550,7 @@ export default function WheeCrosswords() {
       if (!isLoading) setIsLoading(true);
       await handleSaveCrossword(vCrossword);
       resetForm();
-      setMode(prevMode);
+      setMode(prevMode || "main");
     } catch (err) {
       Alert.alert("Save Error", err.message || "Failed to save Chapter");
     } finally {
@@ -598,7 +596,7 @@ export default function WheeCrosswords() {
                   setScrosswords([]);
                 }
                 setPrevCategory("");
-                setMode('main');
+                setMode("main");
               } else {
                 setHcrosswords(getCrosswords(prevCategory, updatedList));
               }
@@ -714,7 +712,7 @@ export default function WheeCrosswords() {
         return `${extractDir}${fileName}`;
       };
       
-      let manifest = { count: 1 };
+      let manifest = { count: 0 };
       try {
         const manifestContent = await FileSystem.readAsStringAsync(`${extractDir}manifest.json`);
         manifest = JSON.parse(manifestContent);
@@ -723,7 +721,7 @@ export default function WheeCrosswords() {
       }
       
       const rawCrosswords = [];
-      const crosswordDirs = manifest.count > 1 
+      const crosswordDirs = manifest.count > 0 
         ? Array.from({length: manifest.count}, (_, i) => `crossword_${i}/`) 
         : [''];
       
@@ -797,6 +795,7 @@ export default function WheeCrosswords() {
       }
     }
     setCwordList(crossList);
+    setPrevMode("list");
     setMode('view');
   };
 
@@ -898,7 +897,7 @@ export default function WheeCrosswords() {
               <ImageBackground style={ styles.iconAM } resizeMode='contain' imageStyle={{ opacity: 1 }} source={currentCrossword ? require('../assets/crosswords/editcrosswordtitle.png') : require('../assets/crosswords/addcrosswordtitle.png') } /> 
             </View>
   
-            <TouchableOpacity onPress={() => { resetForm(); setMode(prevMode); }} style={styles.discardBtn}>
+            <TouchableOpacity onPress={() => { resetForm(); setMode(prevMode || "main"); }} style={styles.discardBtn}>
               <ImageBackground style={{ alignSelf: 'center', height: 67, width: "100%", opacity: 1}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
               <Text style={styles.discardText}>CANCEL</Text>
             </TouchableOpacity>
@@ -1052,7 +1051,7 @@ export default function WheeCrosswords() {
                     <ImageBackground style={{ height: "100%", width: "100%", }} resizeMode='contain' source={ require('../assets/crosswords/greenbackicon.png') }/>
                   </TouchableOpacity>
           
-                  <TouchableOpacity onPress={() => populateForEdit(null, crosswordCategory)} style={ styles.plusIcon }>
+                  <TouchableOpacity onPress={() => { setPrevMode("main"); populateForEdit(null, crosswordCategory); }} style={ styles.plusIcon }>
                     <ImageBackground style={{ height: "100%", width: "100%", }} resizeMode='contain' source={ require('../assets/crosswords/addcrosswordicon.png') }/>         
                   </TouchableOpacity>
                 </View>
@@ -1060,11 +1059,11 @@ export default function WheeCrosswords() {
                  
               <View style = {styles.flatlistContainer}> 
                 <FlatList
-                  data={hcrosswords}
+                  data={hcrosswords || []}
                   keyExtractor={(item) => item.id}
                   style = {{ flex: 1 }}
                   nestedScrollEnabled={true}
-                  contentContainerStyle={{ paddingBottom: 30 }}
+                  contentContainerStyle={{ paddingBottom: 57 }}
                   showsVerticalScrollIndicator={false}
                   renderItem={({ item, index }) => (
                     <TouchableOpacity
@@ -1144,12 +1143,12 @@ export default function WheeCrosswords() {
     
             {scrosswords.length > 0 ? (
               <FlatList
-               data={scrosswords}
+               data={scrosswords || []}
                extraData={crosswords}
                style={{flex: 1}}
                keyExtractor={item => item.id}
                ListHeaderComponent={MyHeader}
-               contentContainerStyle = {{ paddingBottom: 30, flexGrow: 1 }}
+               contentContainerStyle = {{ paddingBottom: 38, flexGrow: 1 }}
                ItemSeparatorComponent={({ leadingItem }) => {
                 return <View style={{height: 12}} />;
                }}
@@ -1192,10 +1191,10 @@ const styles = StyleSheet.create({
   imgBackground: {flex: 1, opacity: 1, maxHeight: "91%", minWidth: "100%", height: Dimensions.get('window').height, marginTop: "7%",},
   header: { flexDirection: 'column', width: "95%", minHeight: 76, backgroundColor: 'rgba(195, 209, 223, 0.4)', borderWidth: 1, borderColor: '#c2cdd4',justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: 5, },
   myDojoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 15, backgroundColor: 'rgba(0,0,0,0.76)', opacity: 1 },
-  title: { fontSize: 17, fontWeight: 'bold', color: '#17a31e', height: 38, width: '100%', textAlign: 'center', marginBottom: 2 },
+  title: { fontSize: 17, fontWeight: 'bold', color: '#27bd2e', height: 38, width: '100%', textAlign: 'center', marginBottom: 2 },
   card: {  marginVertical: -4, alignSelf: 'center', borderRadius: 10, width: "100%", opacity: 1, alignItems: "center", justifyContent: "center", flex: 1 },
   cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#075a0e', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
-  infoText: { fontSize: 14, fontWeight: 'bold', color: '#1f921b', minHeight: 76, width: '94%', textAlign: 'center', marginTop: -95, paddingHorizontal: 19, backgroundColor: 'rgba(0,0,0,0.5)' },
+  infoText: { fontSize: 14, fontWeight: 'bold', color: '#3ab936', minHeight: 76, width: '94%', textAlign: 'center', marginTop: -95, paddingHorizontal: 19, backgroundColor: 'rgba(0,0,0,0.5)' },
   icon: { height: 57, width: '89%', alignSelf: 'center', textAlign: 'center', marginLeft: 19, marginBottom: 3, opacity: 1 },
   saveBtn: { width: 133, height: 114, borderRadius: 15, marginTop: -12, alignSelf:'center' },
   discardBtn: { marginBottom: 9, marginLeft: 12, height: 70, width: 67, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1},
@@ -1209,11 +1208,11 @@ const styles = StyleSheet.create({
   infoIcon: { height: 47, width: 47, marginLeft: 21, marginBottom: 5, opacity: 1 },
   importIcon: {height: 76, width: 67, borderRadius: 9, marginLeft: 12 },
   label: { fontWeight: 'bold', color: '#f3efbd', marginTop: 12, fontSize: 12, marginLeft:12 },
-  input: { borderWidth: 2.5, borderColor: '#089940', borderRadius: 12, padding: 5, marginTop: 7, backgroundColor: 'rgba(71, 235, 107, 0.62)', opacity: 1, fontWeight: "bold", fontSize: 13 },
+  input: { borderWidth: 2.5, borderColor: '#88df41', borderRadius: 12, padding: 5, marginTop: 7, backgroundColor: 'rgba(64, 219, 72, 0.57)', opacity: 1, fontWeight: "bold", fontSize: 13 },
   plusIconAM: { height: 51, width: 46, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 7, marginRight: 19, marginBottom: 2, opacity: 1},
   myDojoDeleteIcon: {height: 49, width: 49, borderRadius: 0,  alignItems: 'center', justifyContent: 'center' },
   myDojoDiscardIcon: {height: 49, width: 49, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
-  batchBar: { position: 'absolute', bottom: 49, left: 20, right: 20, flexDirection: 'row', backgroundColor: '#1a1a1a', padding: 15, borderRadius: 30, alignItems: 'center', justifyContent: 'space-around', borderWidth: 1, borderColor: '#b39514', elevation: 10 },
+  batchBar: { position: 'absolute', bottom: 57, left: 20, right: 20, flexDirection: 'row', backgroundColor: '#1a1a1a', padding: 15, borderRadius: 30, alignItems: 'center', justifyContent: 'space-around', borderWidth: 1, borderColor: '#88df41', elevation: 10 },
   batchText: { color: '#25b320', fontWeight: 'bold'},
   shareIcon: { height: 49, width: 49, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
   goldDivider: {width: '57%', height: 43, alignSelf: 'center', marginVertical: 15, shadowColor: '#edf7d6', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 10, opacity: 1},

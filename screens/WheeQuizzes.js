@@ -102,7 +102,7 @@ export default function WheeQuizzes() {
     }
   };
    
-  // Group objects horizontally into split style datasets
+
   const parseHQuizzes = (quizzesList) => {
     let hQuizzes = [];
     let categoriesSeen = [];
