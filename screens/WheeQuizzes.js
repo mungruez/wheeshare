@@ -7,6 +7,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { zip, unzip } from 'react-native-zip-archive';
 import WheeQuizScreen from "./WheeQuizScreen";
 import * as Sharing from 'expo-sharing';
+import { multiply } from 'react-native/types_generated/Libraries/Animated/AnimatedExports';
 
 const { height, width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.76;
@@ -34,6 +35,12 @@ export default function WheeQuizzes() {
   const [quizDesc, setQuizDesc] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [activePlayIndices, setActivePlayIndices] = useState([0, 0, 0, 0]); 
+  
+  const [multiplechoice, setMultipleChoice] = useState(true); 
+  const [truefalse, setTrueFalse] = useState(false); 
+  const [multipleanswers, setMultipleAnswers] = useState(false);
+  const [longanswer, setLongAnswer] = useState(false);
+
   const [questionsList, setQuestionsList] = useState([
     { id: "q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
     { id: "q2", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
@@ -53,6 +60,34 @@ export default function WheeQuizzes() {
       { cancelable: false } 
     );
   };
+
+  const handleMultipleChoiceClick = () => {
+    if(!multiplechoice) setMultipleChoice(true);
+    setTrueFalse(false);
+    setMultipleAnswers(false);
+    setLongAnswer(false);
+  }
+  
+  const handleTrueFalseClick = () => {
+    setMultipleChoice(false);
+    if(!truefalse) setTrueFalse(true);
+    setMultipleAnswers(false);
+    setLongAnswer(false);
+  }
+  
+  const handleMultipleAnswersClick = () => {
+    setMultipleChoice(false);
+    setTrueFalse(false);
+    if(!multipleanswers) setMultipleAnswers(true);
+    setLongAnswer(false);
+  }
+  
+  const handleLongAnswerClick = () => {
+    setMultipleChoice(false);
+    setTrueFalse(false);
+    setMultipleAnswers(false);
+    if(!longanswer) setLongAnswer(true);
+  }
 
 
   const parseCategories = (list, query) => {
@@ -456,6 +491,14 @@ export default function WheeQuizzes() {
   };
 
 
+  const addQuestionItem = () => { 
+    if(multiplechoice) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]); 
+    else if (truefalse) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["True", "False"], correctAnswerIndex: 0, explanation: "" }]);
+    else if (multipleanswers) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", ""], correctAnswerIndex: [-1,0], explanation: "" }]);
+    else setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: "", correctAnswerIndex: 0, explanation: "" }]);
+  };
+
+
   useFocusEffect(
     useCallback(() => {
       loadQuizzes();
@@ -619,20 +662,21 @@ export default function WheeQuizzes() {
   const renderFormQuestionEditor = (qItem, qIdx) => (
     <View key={qItem.id} style={styles.sectionContainerBlock}>
       <Text style={styles.sectionIndexLabel}>{`QUESTION ELEMENT #${qIdx + 1}`}</Text>
-      
+
       <Text style={styles.label}>Question Prompt</Text>
       <TextInput
         style={styles.input}
-        placeholder="Enter Question Prompt Statement..."
+        placeholder="Enter Question Prompt/Statement..."
         placeholderTextColor="#726b6b"
-        value={qItem.q}
+        value={qItem.question}
         onChangeText={(text) => {
           const updated = [...questionsList];
           updated[qIdx].question = text;
           setQuestionsList(updated);
         }}
       />
-
+      
+      { multiplechoice ? ( <View>
       <Text style={styles.label}>Answer Selection Options (Max 80 Chars Each)</Text>
       {qItem.options?.map((optValue, optIdx) => (
         <TextInput
@@ -684,6 +728,80 @@ export default function WheeQuizzes() {
         multiline
         numberOfLines={3}
       />
+      </View> ) : truefalse ? ( <View>
+        <Text style={styles.label}>Correct Option Index Selector</Text>
+        <View style={styles.changeTypeGrid}>
+          {[0, 1].map((idx) => {
+            const isActiveIndex = qItem.correctAnswerIndex === idx;
+            return (
+              <TouchableOpacity
+                key={idx}
+                style={[styles.changeTypeIconBtn, isActiveIndex && { backgroundColor: '#caaf38' }]}
+                onPress={() => {
+                  const updated = [...questionsList];
+                  updated[qIdx].correctAnswerIndex = idx;
+                  setQuestionsList(updated);
+                }}
+              >
+                <Text style={[styles.changeTypeIcon, isActiveIndex && { color: '#fff' }]}>{qItem.options[idx]}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View> ) : multipleanswers ? (<View>
+        <Text style={styles.label}>Answer Selection Options (Max 80 Chars Each)</Text>
+        {qItem.options?.map((optValue, optIdx) => (
+          <TextInput
+            key={optIdx}
+            style={styles.input}
+            placeholder={`Option ${String.fromCharCode(65 + optIdx)} (Max 76 chars)`}
+            placeholderTextColor="#726b6b"
+            maxLength={76}
+            value={optValue}
+            onChangeText={(text) => {
+              const updated = [...questionsList];
+              updated[qIdx].options[optIdx] = text;
+              setQuestionsList(updated);
+            }}
+          />
+        ))}
+
+        <Text style={styles.label}>Correct Option Index Selector</Text>
+        <View style={styles.changeTypeGrid}>
+          {[0, 1, 2, 3].map((idx) => {
+            const isActiveIndex = qItem.correctAnswerIndex === idx;
+            return (
+              <TouchableOpacity
+                key={idx}
+                style={[styles.changeTypeIconBtn, isActiveIndex && { backgroundColor: '#caaf38' }]}
+                onPress={() => {
+                  const updated = [...questionsList];
+                  updated[qIdx].correctAnswerIndex = idx;
+                  setQuestionsList(updated);
+                }}
+              >
+                <Text style={[styles.changeTypeIcon, isActiveIndex && { color: '#fff' }]}>{qItem.options[idx]}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+        
+      </View> ) : ( <View>
+        <Text style={styles.label}>Long Answer</Text>
+        <TextInput
+          style={[styles.input, styles.descInput]}
+          placeholder="Provide a Long Answer..."
+          placeholderTextColor="#a18e8e"
+          value={qItem.correctAnswerIndex}
+          onChangeText={(text) => {
+            const updated = [...questionsList];
+            updated[qIdx].correctAnswerIndex = text;
+            setQuestionsList(updated);
+          }}
+          multiline
+          numberOfLines={3}
+        />
+      </View> ) }
     </View>
   );
   
@@ -778,6 +896,7 @@ export default function WheeQuizzes() {
     );
   }
 
+
   if (mode === 'add') {
     return (
       <ImageBackground source={require('../assets/quizzes/addquizbg.png')} style={styles.imgBackground} resizeMode='cover' >
@@ -823,6 +942,18 @@ export default function WheeQuizzes() {
               />
 
               {questionsList.map((section, index) => renderFormQuestionEditor(section, index))}
+              
+              <Text style={{marginLeft: 2, color: "#001414", fontSize: 15, fontWeight: "600", textAlign: "center"}}>Question Type:</Text>
+              <View style={{ flexDirection: "row", flex: 1, maxHeight: 57, justifyContent: "center", alignItems: "center", marginBottom: 19}}> 
+                <CheckBox onPress={handleMultipleChoiceClick} title="Multiple Choice" isChecked={multiplechoice} /> 
+                <CheckBox onPress={handleTrueFalseClick} title="True/False" isChecked={truefalse} /> 
+                <CheckBox onPress={handleMultipleAnswersClick} title="Multiple Answers" isChecked={multipleanswers} /> 
+                <CheckBox onPress={handleLongAnswerClick} title="Long Answer" isChecked={longanswer} />
+              </View>
+              
+              <TouchableOpacity onPress={addQuestionItem} style={styles.addQuestionBtn}>
+                <ImageBackground style={{ height: 45, width: "100%", opacity: 1, borderRadius: 19 }} imageStyle={{ opacity: 1, borderRadius: 19 }} resizeMode='contain' source={require('../assets/addquestionbtn.png')} />
+              </TouchableOpacity>
 
               <TouchableOpacity style={styles.saveBtnFullBlock} onPress={saveQuiz}>
                 <ImageBackground style={{ height: 50, width: "100%", justifyContent: 'center', alignItems: 'center' }} resizeMode='cover' source={require('../assets/quizzes/savequizbtn.png')}>
@@ -927,6 +1058,7 @@ const styles = StyleSheet.create({
   centerLogoWrapper: { marginBottom: 5, marginTop: -19, justifyContent: 'center', alignItems: 'center' },
   icon: { height: 70, width: width * 0.9 },
   iconAM: { height: 60, width: width * 0.8 },
+  addQuestionBtn: { width: 177, height: 55, borderRadius: 19, marginTop: 7, alignSelf:'center' },
   header: { paddingHorizontal: 16, marginBottom: 10, width: '100%' },
   searchRow: { flexDirection: 'row', paddingHorizontal: 9, paddingVertical: 4, gap: 8, marginBottom: 7, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 9, alignItems: 'center', justifyContent: 'center', width: '100%', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
   searchInput: { height: 38, width: '70%', backgroundColor: 'rgba(255, 255, 255, 0.79)', borderRadius: 8, paddingHorizontal: 8, color: 'black', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', fontSize: 11 },
