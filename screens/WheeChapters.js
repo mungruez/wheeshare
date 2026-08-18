@@ -508,7 +508,7 @@ export default function Chapters() {
         return `${extractDir}${fileName}`;
       };
       
-      let manifest = { count: 1 };
+      let manifest = { count: 0 };
       try {
         const manifestContent = await FileSystem.readAsStringAsync(`${extractDir}manifest.json`);
         manifest = JSON.parse(manifestContent);
@@ -517,7 +517,7 @@ export default function Chapters() {
       }
       
       const rawChapters = [];
-      const chapterDirs = manifest.count > 1 
+      const chapterDirs = manifest.count > 0 
         ? Array.from({length: manifest.count}, (_, i) => `chapter_${i}/`) 
         : [''];
       
@@ -1032,7 +1032,6 @@ export default function Chapters() {
   }, [mode]);
 
 
-
   const ChapterCard = ({ item }) => (
     <TouchableOpacity 
       onLongPress={() => toggleSelect(item.id)}
@@ -1102,7 +1101,7 @@ export default function Chapters() {
         <StatusBar barStyle="dark-content"/>
         <View style={styles.vcHeader}>
 
-          <Text style={styles.vcTitle} numberOfLines={1} ellipsizeMode="clip">{currentChapter.title}</Text>
+          <Text style={currentChapter.title.length < 32 ? styles.vcTitle : styles.vcTitleTwo} numberOfLines={1} ellipsizeMode="clip">{currentChapter.title}</Text>
           <TouchableOpacity onPress={() => setVcDropdownVisible(!vcDropdownVisible)} style={styles.vcToggleBtn}>
             <Text style={styles.vcToggleText}>
               {!vcDropdownVisible ? '▼' : '▲'}
@@ -1183,7 +1182,7 @@ export default function Chapters() {
               extraData = {[selectedIds, chapters]}
               keyExtractor = {(item, index) => item.id || index.toString()}
               style = {{ flex: 1 }}
-              contentContainerStyle = {{ paddingBottom: 38, flexGrow: 1, minHeight: 200 * Math.max(hchapters.length, 1) }}
+              contentContainerStyle = {{ paddingBottom: 57, flexGrow: 1, minHeight: 200 * Math.max(hchapters.length, 1) }}
               ListEmptyComponent = {() => {
                 return (
                   <View style={{padding: 19, alignItems: 'center'}}>
@@ -1569,11 +1568,11 @@ thumbPdf: { width: "100%", height: 76, resizeMode: 'contain', backgroundColor: '
 myDojoDeleteIcon: {height: 49, width: 49, borderRadius: 0,  alignItems: 'center', justifyContent: 'center' },
 pillRow: { backgroundColor: 'rgba(43, 37, 0, 0.5)',flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 12, marginTop: 5, borderRadius: 9, opacity: 1, marginBottom: 9 },
 typePill: { backgroundColor: 'rgba(190, 190, 190, 0.19)', color: '#e6cc5a', fontSize: 10, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 5 },
-batchBar: { position: 'absolute', bottom: 49, left: 20, right: 20, flexDirection: 'row', backgroundColor: '#1a1a1a', padding: 15, borderRadius: 30, alignItems: 'center', justifyContent: 'space-around', borderWidth: 1, borderColor: '#b39514', elevation: 10 },
+batchBar: { position: 'absolute', bottom: 57, left: 20, right: 20, flexDirection: 'row', backgroundColor: '#1a1a1a', padding: 15, borderRadius: 30, alignItems: 'center', justifyContent: 'space-around', borderWidth: 1, borderColor: '#b39514', elevation: 10 },
 batchText: { color: '#b39020', fontWeight: 'bold'},
 shareIcon: { height: 49, width: 49, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
 banner: { width: '100%', height: 57, borderRadius: 12, marginBottom: 10 },
-header: { flexDirection: 'column', width: "95%", minHeight: 76, backgroundColor: 'rgba(195, 209, 223, 0.4)', borderWidth: 1, borderColor: '#c2cdd4',justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: 5, },
+header: { flexDirection: 'column', width: "95%", minHeight: 76, backgroundColor: 'rgba(195, 209, 223, 0.4)', borderWidth: 1, borderColor: '#c2cdd4',justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: 5, borderRadius: 9},
 myDojoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 15, backgroundColor: 'rgba(0,0,0,0.76)', opacity: 1 },
 title: { fontSize: 17, fontWeight: 'bold', color: '#a08016', height: 38, width: '100%', textAlign: 'center', marginBottom: 2 },
 infoText: { fontSize: 14, fontWeight: 'bold', color: '#c29d26', minHeight: 76, width: '94%', textAlign: 'center', marginTop: -95, paddingHorizontal: 19, backgroundColor: 'rgba(0,0,0,0.5)' },
@@ -1629,7 +1628,8 @@ clearBtn: { width: 32, height: 32, backgroundColor: '#31303080', borderRadius: 8
 vcToggleBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#8d7f30', justifyContent: 'center', alignItems: 'center',},
 vcToggleText: {color: 'white', fontSize: 16, fontWeight: 'bold'},
 vcHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#0c1429a9', paddingHorizontal: 16, paddingVertical: 3, borderWidth: 2, borderColor: '#99840f', borderBottomWidth: 2.5, borderBottomColor: '#99840f', borderRadius: 10, marginBottom: 2 },
-vcTitle: { flex: 1, color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginHorizontal: 10 },
+vcTitle: { flex: 1, color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginHorizontal: 4 },
+vcTitleTwo: { flex: 1, color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center', marginHorizontal: 4 },
 vcDropdownContainer: {width: '96%', minHeight: height * 0.19, maxHeight: height * 0.21, alignSelf: 'center', backgroundColor: '#1e293b', borderRadius: 10, padding: 3, marginTop: 5, borderWidth: 1, borderColor: '#99840f', overflow: 'hidden', flexDirection: "row", alignItems: 'flex-start'},
 vcInfoRow: { alignItems: 'center', marginBottom: 4, width: '100%'},
 vcInfoLabel: { color: '#8d7f30',  fontSize: 11, fontWeight: 'bold', width: "100%", textAlign:"center", alignSelf: 'center'},

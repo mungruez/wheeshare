@@ -5,9 +5,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
 import * as FileSystem from 'expo-file-system/legacy';
 import { zip, unzip } from 'react-native-zip-archive';
+import * as DocumentPicker from 'expo-document-picker';
 import WheeQuizScreen from "./WheeQuizScreen";
 import * as Sharing from 'expo-sharing';
-import { multiply } from 'react-native/types_generated/Libraries/Animated/AnimatedExports';
 
 const { height, width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.76;
@@ -185,7 +185,7 @@ export default function WheeQuizzes() {
           c.title.trim() !== "" && c.category.trim() !== "" &&
           Array.isArray(c.quiz) && c.quiz.length === 4 &&
           c.quiz.every(qItem => 
-            qItem && qItem.q?.trim() !== "" && 
+            qItem && qItem.question?.trim() !== "" && 
             Array.isArray(qItem.options) && qItem.options.length === 4 &&
             qItem.options.every(opt => opt?.trim() !== "")
           )
@@ -217,7 +217,7 @@ export default function WheeQuizzes() {
     } catch (e) {
       Alert.alert("Load Quizzes Failed", e.message || "Error loading Quizzes.");
       setQuizzes([]);
-    } {
+    } finally {
       isLoadingRef.current = false;
       setIsLoading(false);
     }
@@ -490,6 +490,24 @@ export default function WheeQuizzes() {
     }
   };
 
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const resetForm = () => {
+    setCurrentQuiz(null);
+    setQuizId(Date.now().toString());
+    setQuizTitle("");
+    setQuizDesc("");
+    if (prevCategory === "allcategories") setQuizCategory("allcategories");
+    setQuestionsList([
+      { id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
+      { id: Date.now().toString()+"q2", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
+      { id: Date.now().toString()+"q3", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
+      { id: Date.now().toString()+"q4", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
+    ]);
+  };
+
 
   const addQuestionItem = () => { 
     if(multiplechoice) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]); 
@@ -613,8 +631,8 @@ export default function WheeQuizzes() {
         updatedAt: new Date().toISOString()
       }));
       
-      const updatedList = [...quizzes, ...finalQuizzes];
-      await saveQuizzesToStorage(updatedList);
+      // Save only the newly imported quizzes using existing save handler
+      await handleSaveQuiz(finalQuizzes);
       Alert.alert('Success', `${finalQuizzes.length} quiz(zes) imported!`);
     } catch (e) {
       Alert.alert('Import Failed', e.message || 'Failed to import quiz data package.');
@@ -810,7 +828,7 @@ export default function WheeQuizzes() {
   if (mode === "play_active" && currentQuiz) {
     return (
       <WheeQuizScreen 
-        data={currentQuiz.quiz || []} 
+        data={currentQuiz || []} 
         onBackToDashboard={() => {
           setMode("list");
           setCurrentQuiz(null);

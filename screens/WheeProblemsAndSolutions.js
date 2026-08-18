@@ -156,7 +156,7 @@ export default function ProblemAndSolution() {
         hItemsList[mIndex].data.push(psItem);
       }
     }
-    return hChapters;
+    return hItemsList;
   };
   
   // Safe filtering router - completely drops home screen calculation overhead
@@ -647,7 +647,7 @@ export default function ProblemAndSolution() {
       }
 
       const destinationCategory = prevCategory || 'allcategories';
-      setChapterCategory(destinationCategory);
+      setPsItemCategory(destinationCategory);
       
       await handleSavePSItem(psItemData, destinationCategory);
     } catch (err) {
@@ -820,7 +820,7 @@ export default function ProblemAndSolution() {
       
       const rawItems = [];
       const itemDirs = manifest.count > 1 
-        ? Array.from({length: manifest.count}, (_, i) => `item_${i}/`) 
+          ? Array.from({length: manifest.count}, (_, i) => `item_${i}/`) 
         : [''];
       
       for (const dir of itemDirs) {

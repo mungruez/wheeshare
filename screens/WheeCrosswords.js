@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
 import * as FileSystem from 'expo-file-system/legacy';
 import { zip, unzip } from 'react-native-zip-archive';
+import * as DocumentPicker from 'expo-document-picker';
 import CrosswordGrid from "./CrosswordGrid";
 import * as Sharing from 'expo-sharing';
 
@@ -17,7 +18,6 @@ export default function WheeCrosswords() {
   const [crosswordCategory, setCrosswordCategory] = useState("");
   const [currentCrossword, setCurrentCrossword] = useState(null);
   const [crosswordTitle, setCrosswordTitle] = useState("");
-  const [crosswordDesc, setCrosswordDesc] = useState("");
   const [crosswordId, setCrosswordId] = useState(null);  
   const [prevCategory, setPrevCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,7 +72,7 @@ export default function WheeCrosswords() {
 
   const isValidCrossword = (crossW) => {
     for (let wI=0; wI < 4; wI++) { 
-      if(crossW.questions[wI].startx == -1 || crossW.questions[wI].starty == -1 || !crossW.questions[wI].orientaion) return false;
+      if(crossW.questions[wI].startx == -1 || crossW.questions[wI].starty == -1 || !crossW.questions[wI].orientation) return false;
     }
     return true;
   }
@@ -87,8 +87,9 @@ export default function WheeCrosswords() {
     }
 
     for (let wI=0; wI<wordNum; wI++) {           
-      let wI_wNum = getIntersections(crossW[wI].answer, crossW[wordNum-1].answer);
+     let wI_wNum = getIntersections(crossW[wI].answer, crossW[wordNum-1].answer);
 
+     for (let i=0; i<wI_wNum.x.length && i<wI_wNum.y.length; i++) {
       if (wI_wNum.x[i]<0 || (crossW[wordNum-1].answer.length - wI_wNum.y[i]>12) || wI_wNum.y[i]>12) {
         continue;
       }
@@ -136,7 +137,7 @@ export default function WheeCrosswords() {
           crossW[wordNum-1].startx = wIrdY;
           crossW[wordNum-1].starty = crossW[wI].starty-wI_wNum.y[i];
           crossW[wordNum-1].orientation ="down";
-          if(wordNum==4) return crossW;
+          if(wordNum == 4) return crossW;
 
           let vCrossword = recCrossword(crossW, gridT, wordNum+1);
           if(isValidCrossword(vCrossword)) return vCrossword;
@@ -181,7 +182,7 @@ export default function WheeCrosswords() {
             crossW[wordNum-1].startx=crossW[wI].startx-wI_wNum.y[i];
             crossW[wordNum-1].starty=wIrdY;
             crossW[wordNum-1].orientation="across";
-            if(wordNum==4) return crossW;
+            if(wordNum == 4) return crossW;
 
             let vCrossword = recCrossword(crossW, gridT, wordNum+1);
             if(isValidCrossword(vCrossword)) return vCrossword;
@@ -192,6 +193,7 @@ export default function WheeCrosswords() {
             }
           }    
         }
+       }
       }
       
       return crossW;
@@ -207,7 +209,7 @@ export default function WheeCrosswords() {
       let int2To4 = getIntersections(questions[1].answer, questions[3].answer);
       let int3To4 = getIntersections(questions[2].answer, questions[3].answer);
 
-      let crossW = { id: crosswordId || currentCrossword?.id || Date.now().toString(), title : crosswordTitle.trim(), category: crosswordCategory.trim(), desc: crosswordDesc || "", updatedAt: new Date().toISOString(),
+      let crossW = { id: crosswordId || currentCrossword?.id || Date.now().toString(), title : crosswordTitle.trim(), category: crosswordCategory.trim(), updatedAt: new Date().toISOString(),
 			  questions: [ { answer: questions[0].answer.trim(), hint: questions[0].hint.trim(), startx: 1, starty: 12, orientation: 'across', position: 1 },
           { answer: questions[1].answer.trim(), hint: questions[1].hint.trim(), startx: -1, starty: -1, orientation: 'down', position: 2 },
           { answer: questions[2].answer.trim(), hint: questions[2].hint.trim(), startx: -1, starty: -1, orientation: '', position: 3 },
@@ -389,7 +391,7 @@ export default function WheeCrosswords() {
           setCrosswords(loadedCrosswords || []);
           parseCategories(loadedCrosswords, null);
  
-          const filtered = getCrosswords(chapterCategory, loadedCrosswords);
+          const filtered = getCrosswords(crosswordCategory, loadedCrosswords);
           if (filtered.length === 0 && mode === "list") {
             setHcrosswords([]);
             setMode("main");
@@ -420,8 +422,8 @@ export default function WheeCrosswords() {
       const fileUri = `${FileSystem.documentDirectory}wheecrosswords.json`;
       await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(crosswordsData));
       setCrosswords(crosswordsData);
-      parseCategories(updatedList, null);
-      if (mode !== "main") setHcrosswords(getCrosswords(prevCategory, updatedList));
+      parseCategories(crosswordsData, null);
+      if (mode !== "main") setHcrosswords(getCrosswords(prevCategory, crosswordsData));
     } catch (e) {
       Alert.alert('Save Error', 'Could not save Crosswords' + e.message);
       throw e;
@@ -461,7 +463,6 @@ export default function WheeCrosswords() {
     if(cwrd === null) {
       setSelectedIds([]);
       setCrosswordTitle("");
-      setCrosswordDesc("");
       setCurrentCrossword(null);
       setCrosswordId(Date.now().toString());
 
@@ -481,7 +482,6 @@ export default function WheeCrosswords() {
       setCrosswordId(cwrd.id);
       setCrosswordTitle(cwrd.title);
       setCrosswordCategory(cwrdcat);
-      setCrosswordDesc(cwrd.description || "");
       setQuestions(cwrd.questions || []);
       setMode("add");
     }
@@ -496,22 +496,27 @@ export default function WheeCrosswords() {
 
 
   const getGridT = (crossW) => {
-    let grid = Array(12).fill(0).map(() => Array(25).fill(' '));
-    for (let wI=0; wI < 4; wI++) { 
-      if(crossW.questions[wI].startx == -1 || crossW.questions[wI].starty == -1 || !crossW.questions[wI].orientaion) continue;
-      else {
-        if(crossW.questions[wI].orientation === "across" ) {
-          for (let xI = 0; xI < crossW.questions[wI].length; xI++) {
-            grid[crossW.questions[wI].startx + xI][crossW.questions[wI].starty] = crossW.questions[xI];
-          }
-        } else {
-          for (let yI = 0; yI < crossW.questions[wI].length; yI++) {
-            grid[crossW.questions[wI].startx][crossW.questions[wI].starty + yI] = crossW.questions[yI];
-          }
+    const grid = Array(12).fill(0).map(() => Array(25).fill('.'));
+    if (!crossW || !Array.isArray(crossW.questions)) return grid;
+    for (let wI = 0; wI < crossW.questions.length; wI++) {
+      const q = crossW.questions[wI];
+      if (!q || q.startx == -1 || q.starty == -1 || !q.orientation) continue;
+      const ans = q.answer || '';
+      if (q.orientation === 'across') {
+        for (let xI = 0; xI < ans.length; xI++) {
+          const x = q.startx + xI;
+          const y = q.starty;
+          if (x >= 0 && x < 12 && y >= 0 && y < 25) grid[x][y] = ans[xI];
+        }
+      } else {
+        for (let yI = 0; yI < ans.length; yI++) {
+          const x = q.startx;
+          const y = q.starty + yI;
+          if (x >= 0 && x < 12 && y >= 0 && y < 25) grid[x][y] = ans[yI];
         }
       }
     }
-    return grid; 
+    return grid;
   };
 
 
@@ -519,7 +524,7 @@ export default function WheeCrosswords() {
     if (isLoadingRef.current || loading) return;
 
     if (!crosswordTitle.trim()) {
-      Alert.alert("Missing Category Field", "A Crossword Category is required. Please fill in the Category field."); 
+      Alert.alert("Missing Title Field", "A Crossword Title is required. Please fill in the Title field."); 
       return;
     }
 
@@ -573,13 +578,13 @@ export default function WheeCrosswords() {
         {text: 'Delete', style: 'destructive',
           onPress: async () => {
             try {
-              const crosswordsToDelete = chapters.filter(m => cleanIdsToDelete.includes(String(m.id)));
+              const crosswordsToDelete = crosswords.filter(m => cleanIdsToDelete.includes(String(m.id)));
               for (const crossword of crosswordsToDelete) {
                 const folderUri = `${FileSystem.documentDirectory}wheecrosswords/${crossword.id}/`;
                 try {
                   await FileSystem.deleteAsync(folderUri, { idempotent: true });
                 } catch (err) {
-                  Alert.alert("Delete Error", err.message || "Could not delete file from storage.");
+                  // ignore per-item deletion errors
                 }
               }
               const updatedList = crosswords.filter(m => !cleanIdsToDelete.includes(String(m.id)));
@@ -765,7 +770,7 @@ export default function WheeCrosswords() {
       }
       
       const updatedList = [...crosswords, ...finalCrosswords];
-      await handleSaveCrossword(updatedList);
+      await handleSaveCrossword(finalCrosswords);
       setCrosswords(updatedList);
       parseCategories(updatedList, null); 
       Alert.alert('Success', `${finalCrosswords.length} crossword(s) imported!`);
@@ -1129,7 +1134,7 @@ export default function WheeCrosswords() {
               </View>
     
               <View style={{flexDirection:'row', alignItems:'center', justifyContent: 'center', marginBottom: 1, minHeight: 73, width:"100%"}}>
-                <TouchableOpacity onPress={() => { setCurrentCrossword(null); setCrosswordTitle(""); setCrosswordCategory(""); setCrosswordDesc(""); setSelectedIds([]); setQuestions([{answer: "", hint: "", startx: "", starty: "", orientation: "", position: "1"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "2"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "3"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "4"}]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
+                <TouchableOpacity onPress={() => { setCurrentCrossword(null); setCrosswordTitle(""); setCrosswordCategory(""); setSelectedIds([]); setQuestions([{answer: "", hint: "", startx: "", starty: "", orientation: "", position: "1"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "2"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "3"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "4"}]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
                   <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/crosswords/addcrosswordicon.png')}/>         
                 </TouchableOpacity> 
                 <TouchableOpacity onPress={handleImportCrosswords} style={styles.importIcon}>
@@ -1223,30 +1228,8 @@ const styles = StyleSheet.create({
   questionText: { color: '#175f05', fontSize: 11, fontWeight: 'bold', marginBottom: 5 },
   typeBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginBottom: 3 },
   typeText: { color: 'honeydew', fontSize: 9, fontWeight: 'bold' },
-  grid: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 10,
-  },
-  row: {
-    flexDirection: 'row', // Places cells next to each other horizontally
-  },
-  cell: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#f0f4f8',
-    borderWidth: 1,
-    borderColor: '#cbd5e1',
-    borderRadius: 8,
-    margin: 4, // Spacing between grid cells
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cellText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
+  grid: {flex: 1,justifyContent: 'center',alignItems: 'center',backgroundColor: '#fff',padding: 10},
+  row: {flexDirection: 'row'},
+  cell: {width: 60,height: 60,backgroundColor: '#f0f4f8',borderWidth: 1,borderColor: '#cbd5e1',borderRadius: 8,margin: 4, justifyContent: 'center',alignItems: 'center'},
+  cellText: {fontSize: 24,fontWeight: 'bold',color: '#1e293b'},
 });
