@@ -12,13 +12,16 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <ImageBackground style={ styles.imgBackground } imageStyle={{ opacity: 0.9 }} resizeMode='cover' source={require('../assets/homescreen.jpg')}>
+    <ImageBackground style={ styles.imgBackground } imageStyle={{ opacity: 1.0 }} resizeMode='cover' source={require('../assets/homescreen.png')}>
       <StatusBar barStyle="dark-content"/>
       <SafeAreaView style={{ flexDirection:"column", height: "100%", marginTop:19, opacity: 1}}>
+
+        <View style={{ marginBottom: 5, marginTop: -19, justifyContent: 'center', alignItems: 'center' }}>
+          <ImageBackground style={{ height: 70, width: width * 0.95 }} resizeMode='contain' source={require('../assets/quizzes/quizzestitle.png')} /> 
+        </View>
          
-        <View style={{backgroundColor: '#2f4f4f', flexDirection:"row", marginHorizontal:3, marginVertical:19, textAlign:"center", justifyContent:"space-between"}}>
-          <Text style={{color: "lightgray", fontWeight:"700",fontSize: 23, textAlign:"center", marginLeft: 38, marginTop: 10}}>Main Menu</Text>
-          <ImageBackground style={ styles.icon } imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/icon.jpg')} /> 
+        <View style={{ flexDirection:"row", justifyContent:"center"}}>
+          <ImageBackground style={ styles.menubar } imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/menubar.png')} /> 
         </View>
 
         <ScrollView style={{ flexDirection:"column", marginTop: 30}}>
@@ -60,64 +63,14 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-    searchcontainer: {
-      flexDirection: 'row',
-      marginTop: "57",
-      alignItems:'center', 
-      justifyContent:'center', 
-      alignSelf: 'center',
-      width:'100%',
-      marginBottom:"76",
-      padding: 5,
-      
-    },
-    search: {
-      flexDirection: 'row',
-      flex: 1,
-      marginLeft: "19",
-      fontSize: 19,
-      padding: "8", 
-      alignItems:'center', 
-      justifyContent:'center', 
-      alignSelf: 'center',
-    },
-    title: {
-      fontSize: 30, 
-      padding: 30,
-      color:'#000',
-      borderColor:'#000',
-      fontWeight:"400",
-      borderWidth: 2,
-      backgroundColor:'#228B22'
-    },
-    button: {
-      alignItems: 'center',
-      flexDirection: "row",
-      justifyContent: 'center',
-      paddingVertical: 8,
-      paddingHorizontal: 16,
-      borderRadius: 5,
-      elevation: 3,
-      color: "#fff",
-      backgroundColor: '#228B22',
-      marginBottom: 7,
-      marginLeft:19,
-      height: 57,
-      width: 348,
-      fontWeight: 'bold',
-      opacity:3 
-    },
-    buttontext: {
-      fontSize: 16,
-      lineHeight: 21,
-      fontWeight: '800',
-      letterSpacing: 0.25,
-      marginTop: 4,
-      color: 'white',
-    },
+    searchcontainer: {flexDirection: 'row',marginTop: "57",alignItems:'center', justifyContent:'center', alignSelf: 'center',width:'100%',marginBottom:"76",padding: 5},
+    search: {flexDirection: 'row',flex: 1,marginLeft: "19",fontSize: 19,padding: "8", alignItems:'center', justifyContent:'center', alignSelf: 'center'},
+    title: {fontSize: 30, padding: 30, color:'#000',borderColor:'#000',fontWeight:"400",borderWidth: 2,backgroundColor:'#228B22'},
+    button: {alignItems: 'center',flexDirection: "row",justifyContent: 'center',paddingVertical: 8,paddingHorizontal: 16,borderRadius: 5,elevation: 3,color: "#fff",backgroundColor: '#228B22',marginBottom: 7,marginLeft:19,height: 57,width: 348,fontWeight: 'bold',opacity:3 },
+    buttontext: { fontSize: 16, lineHeight: 21, fontWeight: '800', letterSpacing: 0.25,marginTop: 4, color: 'white'},
     imgBackground: { width: '100%', height: '100%', maxHeight:"96%", flex: 1},
     imgBackground2: { width: '100%', height: '100%', flex: 1, opacity: 1, margin:0, marginBottom:-2, padding:2, backgroundColor:"transparent", justifyContent:"flex-end"},
-    icon: { height: 76, width: 76, opacity: 1, marginTop: 3, textAlign: "center", marginBottom: 9 },
+    menubar: { height: 76, width: "98%", opacity: 1, marginTop: 3, alignSelf: "center", marginBottom: 9 },
     buttonimage: { width: "67%", flex: 1, height: 67, alignItems: "center", justifyContent: "center", opacity: 1, alignSelf:"center" },
     cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#5a4f07', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
   });

@@ -490,9 +490,11 @@ export default function WheeQuizzes() {
     }
   };
 
+
   const toggleSelect = (id) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
+
 
   const resetForm = () => {
     setCurrentQuiz(null);
@@ -548,15 +550,10 @@ export default function WheeQuizzes() {
     });
     return () => backHandler.remove();
   }, [mode, loading]);
-  //useEffect Hook: initializes crossword list when component mounts
-    //(1) Fetch all crosswords from json file in App directory 
-    //(2) render horizontal list for each topic
-    //(3) plus sign and edit button to navigate to add/edit a crossword, 
-    //(4) show delete dialog here then save............................
-    //(5) Share button to share the crossword as a json text file.......
-    //(6) Download button to load a shared crossword....................
-    //(7) Help them figure out why a crossword may not be valid.........chek if we get 3 words 
-    const handleImportQuizzes = async () => {
+  
+
+
+  const handleImportQuizzes = async () => {
     let extractDir = null;
     let tempZipPath = null;
 
@@ -592,9 +589,7 @@ export default function WheeQuizzes() {
       try {
         const manifestContent = await FileSystem.readAsStringAsync(`${extractDir}manifest.json`);
         manifest = JSON.parse(manifestContent);
-      } catch (e) {
-      
-      }
+      } catch (e) { }
       
       const rawQuizzes = [];
       const quizDirs = manifest.count > 0 
@@ -617,7 +612,6 @@ export default function WheeQuizzes() {
         if (!quizItem || typeof quizItem !== 'object') continue;
         if (!quizItem.title?.trim() || !quizItem.category?.trim()) continue;
         if (!Array.isArray(quizItem.quiz) || quizItem.quiz.length !== 4) continue;
-        
         rawQuizzes.push(quizItem);
       }
       
@@ -631,7 +625,6 @@ export default function WheeQuizzes() {
         updatedAt: new Date().toISOString()
       }));
       
-      // Save only the newly imported quizzes using existing save handler
       await handleSaveQuiz(finalQuizzes);
       Alert.alert('Success', `${finalQuizzes.length} quiz(zes) imported!`);
     } catch (e) {
@@ -823,7 +816,6 @@ export default function WheeQuizzes() {
     </View>
   );
   
-
     
   if (mode === "play_active" && currentQuiz) {
     return (
@@ -838,6 +830,16 @@ export default function WheeQuizzes() {
   }
 
 
+  if (loading) return ( 
+    <View style={styles.loadingOverlay}>
+      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <Image style={{ height: 57, width: 76, elevation: 4, marginBottom: 24, opacity: 1 } } resizeMode='contain' source={require('../assets/wheeshareicon.jpg')} />
+        <ActivityIndicator size="large" color="#b41919" style={{ transform: [{ scale: 1.9 }], marginBottom: 17,  }} />
+        <Text style={styles.loadingText}>Please Wait...</Text>
+      </View>
+    </View>
+  );
+
 
   if (mode === 'list') {
     return (
@@ -849,13 +851,13 @@ export default function WheeQuizzes() {
           </View>
     
           <View style={styles.myDojoHeader}>
-            <Text style={styles.categoryHeaderText}>{quizCategory === "allcategories" ? "ALL DATA CATEGORIES" : `CATEGORY: ${quizCategory}`}</Text>
+            <Text style={styles.categoryHeaderText}>{quizCategory === "allcategories" ? "ALL CATEGORIES" : `CATEGORY: ${quizCategory}`}</Text>
             <View style={{flexDirection:'row'}}>
               <TouchableOpacity onPress={() => { setSelectedIds([]); setQuizCategory(""); setPrevCategory(""); setMode("main"); setPrevMode("main"); }} style={styles.plusIconAM}>
-                <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/quizzes/redbackicon.png')}/>
+                <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/quizzes/redbackbtn.png')}/>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => { setPrevMode("list"); populateForEdit(null, quizCategory); }} style={styles.plusIcon}>
-                <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/quizzes/addquizicon.png')}/>         
+                <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/quizzes/addquizbtn.png')}/>         
               </TouchableOpacity>
             </View>
           </View>
@@ -899,13 +901,13 @@ export default function WheeQuizzes() {
             <View style={styles.batchBar}>
               <Text style={styles.batchText}>{`${selectedIds.length} Selected`}</Text>
               <TouchableOpacity onPress={() => shareQuizzes(selectedIds)} style={styles.shareIcon}>
-                <ImageBackground style={{height: "100%", width: "100%"}} resizeMode='contain' source={require('../assets/quizzes/sharequizicon.png')}/>         
+                <ImageBackground style={{height: "100%", width: "100%"}} resizeMode='contain' source={require('../assets/quizzes/sharequizbtn.png')}/>         
               </TouchableOpacity>
               <TouchableOpacity onPress={() => deleteQuizzes(selectedIds)} style={styles.myDojoDiscardIcon}>
                 <ImageBackground style={{height: "100%", width: "100%"}} resizeMode='contain' source={require('../assets/discardicon.png')}/> 
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setSelectedIds([])} style={styles.myDojoDeleteIcon}>
-                <ImageBackground style={{height: "100%", width: "100%"}} resizeMode='contain' source={require('../assets/quizzes/deletequizicon.png')}/>         
+                <ImageBackground style={{height: "100%", width: "100%"}} resizeMode='contain' source={require('../assets/quizzes/deletequizbtn.png')}/>         
               </TouchableOpacity>
             </View>
           )}
@@ -1013,7 +1015,7 @@ export default function WheeQuizzes() {
 
           <View style={styles.dashboardIconsControlsRow}>
             <TouchableOpacity onPress={() => { setPrevMode("main"); populateForEdit(null, "allcategories"); }} style={styles.plusIcon}>
-              <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/quizzes/addquizicon.png')}/>         
+              <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/quizzes/addquizbtn.png')}/>         
             </TouchableOpacity> 
             <TouchableOpacity onPress={handleImportQuizzes} style={styles.importIcon}>
               <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/importmoveicon.png')}/>         
@@ -1069,6 +1071,7 @@ export default function WheeQuizzes() {
     </ImageBackground>
   );
 } 
+
 
 const styles = StyleSheet.create({
   imgBackground: { flex: 1, width: '100%', height: '100%' },

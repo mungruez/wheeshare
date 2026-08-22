@@ -22,46 +22,39 @@ const SECTION_TYPES = {
 };
 
 export default function ProblemAndSolution() {
-  // Navigation and Global Layout Modes
-  const [mode, setMode] = useState("main"); // 'main', 'list', 'view', 'add'
+  const [mode, setMode] = useState("main");
   const [prevMode, setPrevMode] = useState("main");
   const navigation = useNavigation();
 
-  // Core Data Lists and Arrays (Standardized to PSItem)
-  const [psItems, setPsItems] = useState([]); // Holds all consolidated Problem & Solution database items
-  const [currentPSItem, setCurrentPSItem] = useState(null); // Active item layout instance
-  const [sPsItems, setSPsItems] = useState([]); // Grouped category array tracker for main view
-  const [hPsItems, setHPsItems] = useState([]); // Structured lists collection matching active visibility
+  const [psItems, setPsItems] = useState([]);
+  const [currentPSItem, setCurrentPSItem] = useState(null);
+  const [sPsItems, setSPsItems] = useState([]); 
+  const [hPsItems, setHPsItems] = useState([]); 
 
-  // Selection & UI Management
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [vcDropdownVisible, setVcDropdownVisible] = useState(true);
   const [openpdfViewer, setOpenpdfViewer] = useState(null);
   
-  // Asynchronous Interaction Flow Blockers (Race-Condition Blockers)
   const [isPicking, setIsPicking] = useState(false);
   const isPickingRef = useRef(false);
   const isLoadingRef = useRef(false);
   const isOffline = useNetInfo().isConnected === false;
 
-  // Active Form Structural Variables (PSItem Specific)
   const [psItemId, setPsItemId] = useState(null);
   const [psItemTitle, setPsItemTitle] = useState("");
   const [psItemCategory, setPsItemCategory] = useState("");
   const [prevCategory, setPrevCategory] = useState("");
   const [psItemDesc, setPsItemDesc] = useState("");
 
-  // Dual-Chapter Multi-Section Forms
-  // Instead of a single sections array, we track problem and solution section arrays independently
   const [problemSections, setProblemSections] = useState([]);
   const [solutionSections, setSolutionSections] = useState([]);
   const [activeSectionId, setActiveSectionId] = useState(null);
 
   const bgColor = ['khaki', 'sandybrown', 'bisque', 'honeydew', 'darkkhaki', 'oldlace', 'papayawhip', 'lavender', 'wheat', 'mintcream', 'aliceblue', 'goldenrod', 'tan', 'lightsteelblue', 'burlywood', 'palegoldenrod', 'beige', 'azure'];
 
-  // Static Instruction Dialog Mapping
+  
   const showInstructions = () => {
     Alert.alert(
       "My Dojo Problems & Solutions List",
@@ -71,7 +64,7 @@ export default function ProblemAndSolution() {
     );
   };
 
-  // Helper extension utility mapping media properties
+  
   const getMediaFileExtension = (uri, type) => {
     if (!uri || typeof uri !== 'string') return '';
     const nameFromUri = uri.split('/').pop()?.split('?')[0] || '';
@@ -86,7 +79,6 @@ export default function ProblemAndSolution() {
   };
 
   
-  // Group categories and manage query terms
   const parseCategories = (list, query) => {
     if (!Array.isArray(list)) {
       Alert.alert("Data Error", "Data is not an array, skipping parse.");
@@ -137,7 +129,7 @@ export default function ProblemAndSolution() {
     }
   };
    
-  // Group objects horizontally into split data arrays
+  
   const parseHPsItems = (itemsList) => {
     let hItemsList = [];
     let categoriesSeen = [];
@@ -159,7 +151,7 @@ export default function ProblemAndSolution() {
     return hItemsList;
   };
   
-  // Safe filtering router - completely drops home screen calculation overhead
+  
   const getPsItems = (cat, itemsList) => {
     if (!cat || cat.trim() === "" || !itemsList) return [];
     let sItemsList = itemsList.filter(m => (cat === "allcategories" || m.category === cat));
@@ -167,7 +159,7 @@ export default function ProblemAndSolution() {
     return sItemsList;
   };
 
-  // Populate data forms for updating or adding fresh pairs
+
   const populateForEdit = (psItem, mvcat) => {
     if (psItem === null) {
       setSelectedIds([]);
@@ -208,7 +200,7 @@ export default function ProblemAndSolution() {
     setSolutionSections([]);
   };
 
-  // Add individual stream element types
+
   const addSection = (type, stream) => {
     if (isPickingRef.current || isPicking) return;
     const newSection = {
@@ -332,8 +324,6 @@ export default function ProblemAndSolution() {
       
       const info = await FileSystem.getInfoAsync(fileUri);
       const trackingInfo = await FileSystem.getInfoAsync(trackingUri);
-    
-      // Safety initialization barrier to block unmanaged bundles from rewriting user data
       if (!info.exists && !trackingInfo.exists) {
         await FileSystem.writeAsStringAsync(fileUri, JSON.stringify([]));
         await FileSystem.writeAsStringAsync(trackingUri, "true");
@@ -343,8 +333,6 @@ export default function ProblemAndSolution() {
       if (currentInfo.exists) {
         const content = await FileSystem.readAsStringAsync(fileUri);
         let loadedItems = JSON.parse(content || "[]");
-        
-        // Clean filter to strip away corrupt or structurally missing data payloads
         loadedItems = loadedItems.filter(m => 
           m && 
           m.id && 
@@ -371,7 +359,6 @@ export default function ProblemAndSolution() {
             setHPsItems(filtered);
           }
 
-          // --- GLOBAL STORAGE GARBAGE COLLECTOR ---
           setTimeout(async () => {
             try {
               const baseDir = `${FileSystem.documentDirectory}problem_solution/`;
@@ -590,7 +577,6 @@ export default function ProblemAndSolution() {
         }
       };
 
-      // Process Problem Chapter Streams
       const processedProblemSections = await Promise.all(
         problemSections.map(async (section) => {
           const newSection = { ...section };
@@ -604,7 +590,6 @@ export default function ProblemAndSolution() {
         })
       );
 
-      // Process Solution Chapter Streams
       const processedSolutionSections = await Promise.all(
         solutionSections.map(async (section) => {
           const newSection = { ...section };
@@ -633,7 +618,6 @@ export default function ProblemAndSolution() {
         updatedAt: new Date().toISOString(),
       };
 
-      // Precise storage optimization loop
       try {
         const existingFiles = await FileSystem.readDirectoryAsync(permanentDirUri);
         for (const file of existingFiles) {
@@ -814,9 +798,7 @@ export default function ProblemAndSolution() {
       try {
         const manifestContent = await FileSystem.readAsStringAsync(`${extractDir}manifest.json`);
         manifest = JSON.parse(manifestContent);
-      } catch (e) {
-        // Fallback manifest definition
-      }
+      } catch (e) {}
       
       const rawItems = [];
       const itemDirs = manifest.count > 1 
@@ -936,7 +918,7 @@ export default function ProblemAndSolution() {
     }
   };
 
-  // --- SUB-RENDER COMPONENTS FOR UI INTERFACES ---
+  
   const MyHeader = () => (
     <View style={styles.silverDivider}>
       <ImageBackground style={{width: "100%", height: "100%"}} resizeMode="cover" source={require('../assets/silverdivider.png')}/>
@@ -1088,21 +1070,21 @@ export default function ProblemAndSolution() {
 
   if (mode === 'list') {
      return (
-      <ImageBackground style={{flex: 1, width: '100%', height: '100%'}} resizeMode='cover' source={require('../assets/chapterslistbg.png')}>
+      <ImageBackground style={{flex: 1, width: '100%', height: '100%'}} resizeMode='cover' source={require('../assets/problems/problemsbg.png')}>
         <StatusBar barStyle="light-content"/>
         <SafeAreaView style={{ flex: 1}}>
           <View style={styles.centerLogoWrapper}>
-            <ImageBackground style={styles.icon} resizeMode='contain' source={require('../assets/chapterslisttitle.png')} /> 
+            <ImageBackground style={styles.icon} resizeMode='contain' source={require('../assets/problems/problemslisttitle.png')} /> 
           </View>
     
           <View style={styles.myDojoHeader}>
-            <Text style={styles.categoryHeaderText}>{psItemCategory === "allcategories" ? "ALL DATA CATEGORIES" : `CATEGORY: ${psItemCategory}`}</Text>
+            <Text style={styles.categoryHeaderText}>{psItemCategory === "allcategories" ? "ALL CATEGORIES" : `CATEGORY: ${psItemCategory}`}</Text>
             <View style={{flexDirection:'row'}}>
               <TouchableOpacity onPress={() => { setSelectedIds([]); setMode("main"); }} style={styles.plusIconAM}>
-                <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/backgold.png')}/>
+                <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/backpurple.png')}/>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => populateForEdit(null, psItemCategory)} style={styles.plusIcon}>
-                <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/addchaptericon.png')}/>         
+                <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/problems/addproblembtn.png')}/>         
               </TouchableOpacity>
             </View>
           </View>
@@ -1146,13 +1128,13 @@ export default function ProblemAndSolution() {
             <View style={styles.batchBar}>
               <Text style={styles.batchText}>{`${selectedIds.length} Selected`}</Text>
               <TouchableOpacity onPress={() => sharePsItems(selectedIds)} style={styles.shareIcon}>
-                <ImageBackground style={{height: "100%", width: "100%"}} resizeMode='contain' source={require('../assets/sharechaptericon.png')}/>         
+                <ImageBackground style={{height: "100%", width: "100%"}} resizeMode='contain' source={require('../assets/problems/purplesharearrow.png')}/>         
               </TouchableOpacity>
               <TouchableOpacity onPress={() => deletePsItems(selectedIds)} style={styles.myDojoDiscardIcon}>
                 <ImageBackground style={{height: "100%", width: "100%"}} resizeMode='contain' source={require('../assets/discardicon.png')}/> 
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setSelectedIds([])} style={styles.myDojoDeleteIcon}>
-                <ImageBackground style={{height: "100%", width: "100%"}} resizeMode='contain' source={require('../assets/deletechaptericon.png')}/>         
+                <ImageBackground style={{height: "100%", width: "100%"}} resizeMode='contain' source={require('../assets/problems/deleteproblembtn.png')}/>         
               </TouchableOpacity>
             </View>
           )}
@@ -1163,12 +1145,12 @@ export default function ProblemAndSolution() {
 
   if (mode === 'add') {
      return (
-      <ImageBackground source={require('../assets/chaptersbg.png')} style={styles.imgBackground} resizeMode='cover' >
+      <ImageBackground source={require('../assets/problems/problemsbg.png')} style={styles.imgBackground} resizeMode='cover' >
         <StatusBar barStyle="dark-content" />
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
           <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.formHeaderTitleRow}>
-              <ImageBackground style={styles.iconAM} resizeMode='contain' source={currentPSItem ? require('../assets/editchaptericon.png') : require('../assets/addchaptericon.png')} /> 
+              <ImageBackground style={styles.iconAM} resizeMode='contain' source={currentPSItem ? require('../assets/problems/editproblemtitle.png') : require('../assets/problems/addproblemtitle.png')} /> 
             </View>
             
             <TouchableOpacity onPress={() => { if (isPicking || isPickingRef.current) return; setMode('list'); resetForm(); }} style={styles.discardBtn}>
@@ -1205,7 +1187,6 @@ export default function ProblemAndSolution() {
                 numberOfLines={3}
               />
 
-              {/* PROBLEM MATRIX STREAM BUILDER */}
               <Text style={styles.formStreamSectionDivider}>⚠️ PROBLEM SECTIONS BUILDER</Text>
               {problemSections.map((section, index) => renderSectionItem(section, index, 'problem'))}
               
@@ -1218,7 +1199,6 @@ export default function ProblemAndSolution() {
                 </TouchableOpacity>
               </View>
 
-              {/* SOLUTION MATRIX STREAM BUILDER */}
               <Text style={styles.formStreamSectionDivider}>✅ SOLUTION SECTIONS BUILDER</Text>
               {solutionSections.map((section, index) => renderSectionItem(section, index, 'solution'))}
               
@@ -1232,7 +1212,7 @@ export default function ProblemAndSolution() {
               </View>
 
               <TouchableOpacity style={styles.saveBtnFullBlock} onPress={savePSItem}>
-                <ImageBackground style={{ height: 50, width: "100%", justifyContent: 'center', alignItems: 'center' }} resizeMode='cover' source={require('../assets/savechapterbtn.png')}>
+                <ImageBackground style={{ height: 50, width: "100%", justifyContent: 'center', alignItems: 'center' }} resizeMode='cover' source={require('../assets/problems/saveproblemandsolutionbtn.png')}>
                   <Text style={styles.saveBtnTextInternal}>COMMIT WORKSPACE SAVE</Text>
                 </ImageBackground>
               </TouchableOpacity>
@@ -1245,11 +1225,11 @@ export default function ProblemAndSolution() {
 
 
   return (
-    <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/chaptersbg.png')}>
+    <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/problems/problemsbg.png')}>
       <StatusBar barStyle="dark-content"/>
       <SafeAreaView style={{flex: 1}}>
         <View style={styles.centerLogoWrapper}>
-          <ImageBackground style={styles.icon} resizeMode='contain' source={require('../assets/chapterstitle.png')} /> 
+          <ImageBackground style={styles.icon} resizeMode='contain' source={require('../assets/problems/problemstitle.png')} /> 
         </View>
 
         <View style={styles.header}>
@@ -1271,7 +1251,7 @@ export default function ProblemAndSolution() {
 
           <View style={styles.dashboardIconsControlsRow}>
             <TouchableOpacity onPress={() => populateForEdit(null, "")} style={styles.plusIcon}>
-              <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/addchaptericon.png')}/>         
+              <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/problems/addproblembtn.png')}/>         
             </TouchableOpacity> 
             <TouchableOpacity onPress={handleImportPSItems} style={styles.importIcon}>
               <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/importmoveicon.png')}/>         
@@ -1357,42 +1337,42 @@ const styles = StyleSheet.create({
   cardTextMenuTitle: { color: '#313030', fontWeight: 'bold', fontSize: 15, textAlign: 'center', width: '90%' },
   centerNotificationFlexPanel: { flex: 1, paddingHorizontal: 30, justifyContent: 'center', alignItems: 'center' },
   infoTextDashboardFallback: { color: '#f3efbd', textAlign: 'center', fontSize: 13, lineHeight: 18 },
-  categoryHeaderText: { color: '#caaf38', fontSize: 13, fontWeight: '600', textAlign: 'center', textTransform: 'uppercase', marginVertical: 6 },
+  categoryHeaderText: { color: '#ae2ab3', fontSize: 13, fontWeight: '600', textAlign: 'center', textTransform: 'uppercase', marginVertical: 6 },
   flatlistContainer: { flex: 1, width: '100%' },
   emptyContainerView: { padding: 20, alignItems: 'center', justifyContent: 'center' },
   emptyReloadText: { color: '#f3efbd', marginBottom: 12, fontWeight: 'bold', fontSize: 15 },
   sectionContainer: { marginVertical: 10, width: '100%' },
-  sectionHeader: { color: '#caaf38', fontSize: 14, fontWeight: 'bold', marginLeft: 16, marginBottom: 8, textTransform: 'uppercase' },
+  sectionHeader: { color: '#ae2ab3', fontSize: 14, fontWeight: 'bold', marginLeft: 16, marginBottom: 8, textTransform: 'uppercase' },
   verticalWrapper: { width: '100%', alignItems: 'center', paddingVertical: 6 },
-  chapterCard: { width: CARD_WIDTH, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, padding: 14, marginHorizontal: 8, borderWidth: 1, borderColor: '#caaf38', elevation: 3 },
-  selectedCard: { borderColor: '#dc2626', backgroundColor: '#fef2f2', borderWidth: 2 },
+  chapterCard: { width: CARD_WIDTH, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, padding: 14, marginHorizontal: 8, borderWidth: 1, borderColor: '#a926dc', elevation: 3 },
+  selectedCard: { borderColor: '#a926dc', backgroundColor: '#fef2f2', borderWidth: 2 },
   chapterCardTitle: { fontSize: 15, fontWeight: 'bold', color: '#1e293b', marginBottom: 4 },
   chapterCardCount: { fontSize: 12, color: '#64748b', marginBottom: 10 },
   chapterCardFooter: { flexDirection: 'row', justifyContent: 'flex-end', width: '100%' },
-  editBtnCard: { backgroundColor: '#caaf38', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
+  editBtnCard: { backgroundColor: '#b238cab4', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
   editBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 11 },
-  batchBar: { position: 'absolute', bottom: 20, left: '5%', right: '5%', height: 55, backgroundColor: '#1e293b', borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, borderWidth: 1.5, borderColor: '#caaf38', elevation: 10 },
-  batchText: { color: '#caaf38', fontWeight: 'bold', fontSize: 13 },
+  batchBar: { position: 'absolute', bottom: 20, left: '5%', right: '5%', height: 55, backgroundColor: '#1e293b', borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, borderWidth: 1.5, borderColor: '#a926dc', elevation: 10 },
+  batchText: { color: '#ae2ab3', fontWeight: 'bold', fontSize: 13 },
   shareIcon: { width: 35, height: 35 },
   myDojoDiscardIcon: { width: 35, height: 35 },
   myDojoDeleteIcon: { width: 35, height: 35 },
-  vcHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#0c1429a9', paddingHorizontal: 16, paddingVertical: 8, borderWidth: 2, borderColor: '#99840f', borderRadius: 10, margin: 8 },
+  vcHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#0c1429a9', paddingHorizontal: 16, paddingVertical: 8, borderWidth: 2, borderColor: '#a926dc', borderRadius: 10, margin: 8 },
   vcTitle: { flex: 1, color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginHorizontal: 10 },
-  vcToggleBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#8d7f30', justifyContent: 'center', alignItems: 'center' },
+  vcToggleBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#8d3081', justifyContent: 'center', alignItems: 'center' },
   vcToggleText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
-  vcDropdownContainer: { width: '95%', maxHeight: height * 0.2, alignSelf: 'center', backgroundColor: '#1e293b', borderRadius: 10, padding: 10, marginBottom: 8, borderWidth: 1, borderColor: '#99840f' },
-  vcInfoLabel: { color: '#caaf38', fontSize: 12, fontWeight: 'bold', textAlign: 'center', marginBottom: 6 },
+  vcDropdownContainer: { width: '95%', maxHeight: height * 0.2, alignSelf: 'center', backgroundColor: '#1e293b', borderRadius: 10, padding: 10, marginBottom: 8, borderWidth: 1, borderColor: '#9a926dc90f1a' },
+  vcInfoLabel: { color: '#ae2ab3', fontSize: 12, fontWeight: 'bold', textAlign: 'center', marginBottom: 6 },
   vcDescScroll: { flexGrow: 1, marginTop: 4 },
   vcDescText: { color: 'honeydew', fontSize: 12, lineHeight: 16 },
   streamHeadingDivider: { color: '#fff', backgroundColor: '#1e293b', fontSize: 13, fontWeight: 'bold', paddingVertical: 6, paddingHorizontal: 16, marginVertical: 12, letterSpacing: 1 },
   formHeaderTitleRow: { width: '100%', alignItems: 'center', marginVertical: 10 },
-  discardBtn: { alignSelf: 'center', backgroundColor: 'rgba(220, 38, 38, 0.15)', borderWidth: 1, borderColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, marginBottom: 12 },
+  discardBtn: { alignSelf: 'center', backgroundColor: 'rgba(220, 38, 190, 0.15)', borderWidth: 1, borderColor: '#a926dc', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, marginBottom: 12 },
   discardText: { color: '#ef4444', fontWeight: 'bold', fontSize: 11 },
   formScroller: { flex: 1, paddingHorizontal: 16 },
-  label: { color: '#caaf38', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
+  label: { color: '#ae2ab3', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
   input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#cbd5e1', marginBottom: 4 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
-  formStreamSectionDivider: { color: '#caaf38', fontSize: 13, fontWeight: 'bold', marginTop: 22, marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#caaf38', paddingBottom: 4 },
+  formStreamSectionDivider: { color: '#ae2ab3', fontSize: 13, fontWeight: 'bold', marginTop: 22, marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#a926dc', paddingBottom: 4 },
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   sectionIndexLabel: { color: '#fff', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
   mediaPickerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 6, gap: 10 },
@@ -1403,14 +1383,14 @@ const styles = StyleSheet.create({
   changeTypeContainer: { flex: 1 },
   changeTypeLabel: { color: '#f3efbd', fontSize: 11, fontWeight: '600', marginBottom: 4 },
   changeTypeGrid: { flexDirection: 'row', gap: 6 },
-  changeTypeIconBtn: { width: 36, height: 36, borderRadius: 8, backgroundColor: 'rgba(202, 175, 56, 0.15)', borderWidth: 1, borderColor: 'rgba(202, 175, 56, 0.4)', alignItems: 'center', justifyContent: 'center' },
+  changeTypeIconBtn: { width: 36, height: 36, borderRadius: 8, backgroundColor: 'rgba(202, 102, 56, 0.15)', borderWidth: 1, borderColor: 'rgba(202, 56, 178, 0.4)', alignItems: 'center', justifyContent: 'center' },
   changeTypeIcon: { fontSize: 18 },
   removeStepIcon: { justifyContent: 'center', alignItems: 'center' },
   addSectionButtonsContainer: { flexDirection: 'row', justifyContent: 'center', gap: 12, marginVertical: 10, width: '100%' },
-  miniAddBtn: { flex: 1, height: 38, backgroundColor: 'rgba(202, 175, 56, 0.2)', borderWidth: 1, borderColor: '#caaf38', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
-  miniAddBtnText: { color: '#caaf38', fontWeight: 'bold', fontSize: 11 },
+  miniAddBtn: { flex: 1, height: 38, backgroundColor: 'rgba(202, 56, 178, 0.2)', borderWidth: 1, borderColor: '#a926dc', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
+  miniAddBtnText: { color: '#a838ca', fontWeight: 'bold', fontSize: 11 },
   saveBtnFullBlock: { width: '100%', height: 50, borderRadius: 10, overflow: 'hidden', marginTop: 25, marginBottom: 20 },
   saveBtnTextInternal: { color: '#fff', fontWeight: 'bold', fontSize: 14, letterSpacing: 1 },
-  loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.75)', justifyContent: 'center', alignItems: 'center', zIndex: 999 },
-  loadingText: { color: '#caaf38', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 }
+  loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.76)', justifyContent: 'center', alignItems: 'center', zIndex: 999 },
+  loadingText: { color: '#ae2ab3', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 }
 });
