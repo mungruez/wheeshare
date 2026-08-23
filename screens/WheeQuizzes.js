@@ -830,15 +830,17 @@ export default function WheeQuizzes() {
   }
 
 
-  if (loading) return ( 
+  if (loading) { 
+   return ( 
     <View style={styles.loadingOverlay}>
-      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-        <Image style={{ height: 57, width: 76, elevation: 4, marginBottom: 24, opacity: 1 } } resizeMode='contain' source={require('../assets/wheeshareicon.jpg')} />
+      <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
+        <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24, opacity: 1, borderRadius: 12 } } resizeMode='contain' source={require('../assets/wheeshareicon.jpg')} />
         <ActivityIndicator size="large" color="#b41919" style={{ transform: [{ scale: 1.9 }], marginBottom: 17,  }} />
         <Text style={styles.loadingText}>Please Wait...</Text>
       </View>
     </View>
-  );
+   );
+  }
 
 
   if (mode === 'list') {

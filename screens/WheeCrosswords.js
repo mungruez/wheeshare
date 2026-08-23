@@ -12,7 +12,6 @@ import * as Sharing from 'expo-sharing';
 const { height, width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.76;
 
-
 export default function WheeCrosswords() {
   const [questions, setQuestions] = useState([{answer: "", hint: "", startx: "", starty: "", orientation: "", position: "1"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "2"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "3"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "4"}]);
   const [crosswordCategory, setCrosswordCategory] = useState("");
@@ -41,7 +40,7 @@ export default function WheeCrosswords() {
   const showInstructions = () => {
     Alert.alert(
       "WheeShare Crosswords",
-      "Instructions: Save, Edit, View, Share, Delete and Import Crossword using WheeShare. You may add any number of Crossword your phone memory allows. Click the binoculars icon to search Crossword by the search term entered. After a search another search can be done by using backspace to remove the search term instead of the silver reload icon.\n(1) Use the green, plus(+) icon in the top menu bar to Add Crossword. Every Crossword must contain four Questions that form a valid crossword, and a Title and a Category. Each of the four words can be ten characters long at most.\n The default allcategories, will be used when a Crossword Category is not entered.\n(2) Click on one of the gold and white buttons on the Crossword Screen to see all Crossword with the same Category. The first Category button in the list is All Categories in gold.\n(3) On the list screen press and hold a Crossword card to see the Batch Bar appear, after select all Crossword to Share or Delete and click on the Share or Delete button in the Batch Bar to share or delete Crossword. Use the green Edit button at the bottom of each Crossword card in the list to edit a Crossword, and to view any Crossword just click on its Crossword card. Crosswords can only be shared and imported with the WheeShare App.\n(4) Scroll horizontally and vertically on the All categories list screen to view All your Crosswords. On the Add Crossword Screen fill out the form and click the Save button to save a Crossword. Thank you for using our App.",
+      "Instructions: Save, Edit, View, Share, Delete and Import Crosswords using WheeShare. You may add any number of Crosswords your phone memory allows. Click the binoculars icon to search Crosswords by the search term entered. After a search another search can be done by using backspace to remove the search term instead of the silver reload icon.\n(1) Use the green, plus(+) icon in the top menu bar to Add Crossword. Every Crossword must contain four Questions that form a valid crossword, and a Title and a Category. Each of the four words can be ten characters long at most.\n The default allcategories, will be used when a Crossword Category is not entered.\n(2) Click on one of the gold and white buttons on the Crossword Screen to see all Crossword with the same Category. The first Category button in the list is All Categories in gold.\n(3) On the list screen press and hold a Crossword card to see the Batch Bar appear, after select all Crossword to Share or Delete and click on the Share or Delete button in the Batch Bar to share or delete Crossword. Use the green Edit button at the bottom of each Crossword card in the list to edit a Crossword, and to view any Crossword just click on its Crossword card. Crosswords can only be shared and imported with the WheeShare App.\n(4) Scroll horizontally and vertically on the All categories list screen to view All your Crosswords. On the Add Crossword Screen fill out the form and click the Save button to save a Crossword. Thank you for using our App.",
       [ { text: "OK",
         onPress: () => setMode("main"),
         style: "cancel" 
@@ -200,6 +199,7 @@ export default function WheeCrosswords() {
     }
 
 
+
     const checkCrossword = () => {
       let initialGrid = Array(12).fill(0).map(() => Array(25).fill('.'));
       let int1To2 = getIntersections(questions[0].answer, questions[1].answer);
@@ -328,6 +328,7 @@ export default function WheeCrosswords() {
   };
    
   
+  
   const parseHCrosswords = (crosswordsList) => {
     let hCrosswords = [];
     let categoriesSeen = [];
@@ -430,6 +431,7 @@ export default function WheeCrosswords() {
     }
   };
     
+
   const handleSaveCrossword = async (newData) => {
     try {
       if (isLoadingRef.current) return;
@@ -583,9 +585,7 @@ export default function WheeCrosswords() {
                 const folderUri = `${FileSystem.documentDirectory}wheecrosswords/${crossword.id}/`;
                 try {
                   await FileSystem.deleteAsync(folderUri, { idempotent: true });
-                } catch (err) {
-                  // ignore per-item deletion errors
-                }
+                } catch (err) { }
               }
               const updatedList = crosswords.filter(m => !cleanIdsToDelete.includes(String(m.id)));
               const fileUri = `${FileSystem.documentDirectory}wheecrosswords.json`;
@@ -791,7 +791,6 @@ export default function WheeCrosswords() {
   };
   
   
-  // VIEW MODE - Play crosswrd
   const viewCrossword = (viewCategory) => {
     let crossList = [];
     for (let cNum = 0; cNum < crosswords.length; cNum++) {
@@ -825,14 +824,6 @@ export default function WheeCrosswords() {
   };
 
 
-  //useEffect Hook: initializes crossword list when component mounts
-    //(1) Fetch all crosswords from json file in App directory 
-    //(2) render horizontal list for each topic
-    //(3) plus sign and edit button to navigate to add/edit a crossword, 
-    //(4) show delete dialog here then save............................
-    //(5) Share button to share the crossword as a json text file.......
-    //(6) Download button to load a shared crossword....................
-    //(7) Help them figure out why a crossword may not be valid.........chek if we get 3 words 
   useFocusEffect(
     useCallback(() => {
       loadCrosswords();
@@ -890,6 +881,16 @@ export default function WheeCrosswords() {
     );
   }
 
+  
+  if(loading) { 
+    return ( <View style={styles.loadingOverlay}>
+      <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
+        <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24,  borderRadius: 12, opacity: 1 } } resizeMode='contain' source={require('../assets/wheeshareicon.jpg')} />
+        <ActivityIndicator size="large" color="#b1b419" style={{ transform: [{ scale: 1.9 }], marginBottom: 17,  }} />
+        <Text style={styles.loadingText}>Please Wait...</Text>
+      </View>
+    </View> );
+  }
 
 
   if (mode === "add" ) {
@@ -1038,7 +1039,6 @@ export default function WheeCrosswords() {
   };  
 
 
-
   if (mode === 'list') {
     return (
       <ImageBackground style={{flex: 1, width: '100%', height: '100%', opacity: 1}} resizeMode='cover' imageStyle={{ opacity: 0.9 }} source={require('../assets/crosswords/crosswordslistbg.png')}>
@@ -1053,11 +1053,11 @@ export default function WheeCrosswords() {
                   
                 <View style={{flexDirection:'row'}}>
                   <TouchableOpacity onPress={() => { setSelectedIds([]); setPrevMode("main"); setMode("main");} } style={styles.plusIconAM}>
-                    <ImageBackground style={{ height: "100%", width: "100%", }} resizeMode='contain' source={ require('../assets/crosswords/greenbackicon.png') }/>
+                    <ImageBackground style={{ height: "100%", width: "100%", }} resizeMode='contain' source={ require('../assets/crosswords/greenbackbtn.png') }/>
                   </TouchableOpacity>
           
                   <TouchableOpacity onPress={() => { setPrevMode("main"); populateForEdit(null, crosswordCategory); }} style={ styles.plusIcon }>
-                    <ImageBackground style={{ height: "100%", width: "100%", }} resizeMode='contain' source={ require('../assets/crosswords/addcrosswordicon.png') }/>         
+                    <ImageBackground style={{ height: "100%", width: "100%", }} resizeMode='contain' source={ require('../assets/crosswords/addcrosswordbtn.png') }/>         
                   </TouchableOpacity>
                 </View>
               </View>
@@ -1093,13 +1093,13 @@ export default function WheeCrosswords() {
                 <View style={styles.batchBar}>
                   <Text style={styles.batchText}>{selectedIds.length} Selected</Text>
                   <TouchableOpacity onPress={() => shareCrosswords(selectedIds)} style={styles.shareIcon}>
-                    <ImageBackground style={{height: "100%", width: "100%", borderRadius: 4}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={ require('../assets/crosswords/sharecrosswordicon.png') }/>         
+                    <ImageBackground style={{height: "100%", width: "100%", borderRadius: 4}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={ require('../assets/crosswords/sharecrosswordbtn.png') }/>         
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => deleteCrosswords(selectedIds)} style={styles.myDojoDiscardIcon}>
                     <ImageBackground style={{height: "100%", width: "100%", }} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png') }/> 
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => setSelectedIds([])} style={styles.myDojoDeleteIcon}>
-                    <ImageBackground style={{height: "100%", width: "100%", }} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/crosswords/deletecrosswordicon.png') }/>         
+                    <ImageBackground style={{height: "100%", width: "100%", }} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/crosswords/deletecrosswordbtn.png') }/>         
                   </TouchableOpacity>
                 </View> ) }
           </SafeAreaView>
@@ -1135,7 +1135,7 @@ export default function WheeCrosswords() {
     
               <View style={{flexDirection:'row', alignItems:'center', justifyContent: 'center', marginBottom: 1, minHeight: 73, width:"100%"}}>
                 <TouchableOpacity onPress={() => { setCurrentCrossword(null); setCrosswordTitle(""); setCrosswordCategory(""); setSelectedIds([]); setQuestions([{answer: "", hint: "", startx: "", starty: "", orientation: "", position: "1"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "2"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "3"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "4"}]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
-                  <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/crosswords/addcrosswordicon.png')}/>         
+                  <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/crosswords/addcrosswordbtn.png')}/>         
                 </TouchableOpacity> 
                 <TouchableOpacity onPress={handleImportCrosswords} style={styles.importIcon}>
                   <ImageBackground style={{ height:"100%", width:"100%",}} resizeMode='contain' source={require('../assets/importmoveicon.png')}/>         
@@ -1213,7 +1213,7 @@ const styles = StyleSheet.create({
   infoIcon: { height: 47, width: 47, marginLeft: 21, marginBottom: 5, opacity: 1 },
   importIcon: {height: 76, width: 67, borderRadius: 9, marginLeft: 12 },
   label: { fontWeight: 'bold', color: '#f3efbd', marginTop: 12, fontSize: 12, marginLeft:12 },
-  input: { borderWidth: 2.5, borderColor: '#88df41', borderRadius: 12, padding: 5, marginTop: 7, backgroundColor: 'rgba(64, 219, 72, 0.57)', opacity: 1, fontWeight: "bold", fontSize: 13 },
+  input: { borderWidth: 2.5, borderColor: '#88df41', borderRadius: 12, padding: 5, marginTop: 7, backgroundColor: 'rgba(100, 219, 64, 0.46)', opacity: 1, fontWeight: "bold", fontSize: 13 },
   plusIconAM: { height: 51, width: 46, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 7, marginRight: 19, marginBottom: 2, opacity: 1},
   myDojoDeleteIcon: {height: 49, width: 49, borderRadius: 0,  alignItems: 'center', justifyContent: 'center' },
   myDojoDiscardIcon: {height: 49, width: 49, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
@@ -1225,7 +1225,7 @@ const styles = StyleSheet.create({
   listRow: { flexDirection: 'row', height: 133 },
   infoBox: { flex: 1, padding: 7, justifyContent: 'center' },
   crosswordTitle: { color: '#308d38', fontSize: 12, fontWeight: 'bold', marginBottom: 4 },
-  questionText: { color: '#175f05', fontSize: 11, fontWeight: 'bold', marginBottom: 5 },
+  questionText: { color: '#2b8814', fontSize: 11, fontWeight: 'bold', marginBottom: 5 },
   typeBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginBottom: 3 },
   typeText: { color: 'honeydew', fontSize: 9, fontWeight: 'bold' },
   grid: {flex: 1,justifyContent: 'center',alignItems: 'center',backgroundColor: '#fff',padding: 10},

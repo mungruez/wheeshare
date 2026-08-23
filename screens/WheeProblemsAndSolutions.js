@@ -1068,6 +1068,20 @@ export default function ProblemAndSolution() {
     );
   }
 
+
+  if(loading) { 
+    return ( 
+      <View style={styles.loadingOverlay}>
+        <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
+          <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24,  borderRadius: 12, opacity: 1 } } resizeMode='contain' source={require('../assets/wheeshareicon.jpg')} />
+          <ActivityIndicator size="large" color="#7a0891" style={{ transform: [{ scale: 1.9 }], marginBottom: 17,  }} />
+          <Text style={styles.loadingText}>Please Wait...</Text>
+        </View>
+      </View> 
+    );
+  }
+
+
   if (mode === 'list') {
      return (
       <ImageBackground style={{flex: 1, width: '100%', height: '100%'}} resizeMode='cover' source={require('../assets/problems/problemsbg.png')}>
