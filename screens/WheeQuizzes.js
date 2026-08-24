@@ -16,8 +16,9 @@ const CARD_WIDTH = width * 0.76;
 export default function WheeQuizzes() {
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [quizzes, setQuizzes] = useState([{ id: "", title: "", category: "", description: "", quiz: { question: "", options: ["", "", "", "" ], correctAnswerIndex: 0, explanation: "" } }]);
+  const [quizzes, setQuizzes] = useState([]);
   const [hquizzes, setHquizzes] = useState([]);
+  
   const [squizzes, setSquizzes] = useState([]);
   const navigation = useNavigation();
   const isOffline = useNetInfo().isConnected === false;
@@ -341,51 +342,70 @@ export default function WheeQuizzes() {
       return;
     }
 
-    for (let i = 0; i < questionsList.length; i++) {
-      const qItem = questionsList[i];
-      if (!qItem.question?.trim()) {
-        Alert.alert('Required', `Question #${i + 1} needs a Question statement`);
-        return;
-      }
-      if (qItem.question?.trim().length > 570) {
-        Alert.alert('Required', `Question #${i + 1} needs a Question statement`);
-        return;
-      }
-      if (!Array.isArray(qItem.options) || qItem.options.length !== 4) {
-        Alert.alert('Required', `Question #${i + 1} requires exactly 4 options`);
+        for (let i = 0; i < questionsList.length; i++) {
+      const qitem = questionsList[i];
+      if (!Array.isArray(qitem.options) || qitem.options.length === 0) {
+        Alert.alert('Required', `Question #${i + 1} must contain answer options`);
         return;
       }
       
-      for (let j = 0; j < qItem.options.length; j++) {
-        const optionText = qItem.options[j]?.trim();
-        if (!optionText) {
+      const totalOptionsCount = qitem.options.length;
+      const isLongTextLayout = totalOptionsCount === 1;
+      const isTrueFalseLayout = totalOptionsCount === 2;
+      const isSingleChoiceLayout = totalOptionsCount === 4;
+      const isMultipleAnswersLayout = totalOptionsCount > 4;
+      if (!isLongTextLayout && !isTrueFalseLayout && !isSingleChoiceLayout && !isMultipleAnswersLayout) {
+        Alert.alert('Layout Error', `Question #${i + 1} has an invalid choice configuration (${totalOptionsCount} options). Valid setups are: 1 (Long Text), 2 (True/False), 4 (Single Choice), or 5+ (Multiple Answers).`);
+        return;
+      }
+
+      for (let j = 0; j < qitem.options.length; j++) {
+        const optionText = qitem.options[j]?.trim();
+        if (!optionText && !isLongTextLayout) {
           Alert.alert('Required', `Question #${i + 1}, Option #${j + 1} cannot be empty`);
           return;
         }
-        if (optionText.length > 95) {
-          Alert.alert('Limit Exceeded', `Question #${i + 1}, Option #${j + 1} ("${optionText}") is too long! Maximum allowed is 95 characters.`);
+        if (optionText && optionText.length > 95) {
+          Alert.alert('Limit Exceeded', `Question #${i + 1} Option #${j + 1} is too long! Maximum allowed is 95 characters.`);
           return;
         }
       }
     }
 
+
     try {
       setLoading(true);
       const activeId = quizId || currentQuiz?.id || Date.now().toString();
-
       const sanitizedQuizData = {
         id: activeId,
         title: quizTitle.trim(),
         category: quizCategory.trim() || "allcategories",
         description: quizDesc.trim(),
-        quiz: questionsList.map(item => ({
-          question: item.question.trim(),
-          options: item.options.map(o => o.trim()),
-          correctAnswerIndex: parseInt(String(item.correctAnswerIndex), 10) || 0,
-          explanation: item.explanation?.trim() || ""
-        })),
+        quiz: questionsList.map(item => {
+          const totalOpts = Array.isArray(item.options) ? item.options.length : 0;
+          let finalSanitizedAnswerKey = item.correctAnswerIndex;
+          if (totalOpts === 4 || totalOpts === 2) {
+            finalSanitizedAnswerKey = parseInt(String(item.correctAnswerIndex), 10) || 0;
+          } else if (totalOpts > 4) {
+            finalSanitizedAnswerKey = Array.isArray(item.correctAnswerIndex) 
+              ? item.correctAnswerIndex.map(val => parseInt(String(val), 10)) 
+              : [];
+          } else if (totalOpts === 1) {
+            finalSanitizedAnswerKey = typeof item.correctAnswerIndex === 'string' 
+              ? item.correctAnswerIndex.trim() 
+              : String(item.correctAnswerIndex).trim();
+          }
+
+          return {
+            question: item.question.trim(),
+            options: totalOpts === 1 ? [""] : item.options.map(o => o.trim()),
+            correctAnswerIndex: finalSanitizedAnswerKey,
+            explanation: item.explanation?.trim() || ""
+          };
+        }),
         updatedAt: new Date().toISOString()
       };
+
 
       await handleSaveQuiz(sanitizedQuizData);
       if(prevCategory === 'allcategories') setQuizCategory("allcategories");
@@ -512,10 +532,10 @@ export default function WheeQuizzes() {
 
 
   const addQuestionItem = () => { 
-    if(multiplechoice) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]); 
-    else if (truefalse) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["True", "False"], correctAnswerIndex: 0, explanation: "" }]);
-    else if (multipleanswers) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", ""], correctAnswerIndex: [-1,0], explanation: "" }]);
-    else setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: "", correctAnswerIndex: 0, explanation: "" }]);
+    if(multiplechoice) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(38).substring(2, 5), question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]); 
+    else if (truefalse) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(38).substring(2, 5), question: "", options: ["True", "False"], correctAnswerIndex: 0, explanation: "" }]);
+    else if (multipleanswers) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(38).substring(2, 5), question: "", options: ["", "", "", "",""], correctAnswerIndex: [-1,0], explanation: "" }]);
+    else setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(38).substring(2, 5), question: "", options: [""], correctAnswerIndex: 0, explanation: "" }]);
   };
 
 
@@ -834,7 +854,7 @@ export default function WheeQuizzes() {
    return ( 
     <View style={styles.loadingOverlay}>
       <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
-        <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24, opacity: 1, borderRadius: 12 } } resizeMode='contain' source={require('../assets/wheeshareicon.jpg')} />
+        <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24, opacity: 1, borderRadius: 12 } } resizeMode='contain' source={require('../assets/wheesharelogo.png')} />
         <ActivityIndicator size="large" color="#b41919" style={{ transform: [{ scale: 1.9 }], marginBottom: 17,  }} />
         <Text style={styles.loadingText}>Please Wait...</Text>
       </View>
@@ -974,7 +994,7 @@ export default function WheeQuizzes() {
               </View>
               
               <TouchableOpacity onPress={addQuestionItem} style={styles.addQuestionBtn}>
-                <ImageBackground style={{ height: 45, width: "100%", opacity: 1, borderRadius: 19 }} imageStyle={{ opacity: 1, borderRadius: 19 }} resizeMode='contain' source={require('../assets/addquestionbtn.png')} />
+                <ImageBackground style={{ height: 45, width: "100%", opacity: 1, borderRadius: 19 }} imageStyle={{ opacity: 1, borderRadius: 19 }} resizeMode='contain' source={require('../assets/quizzes/addquestionbtn.png')} />
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.saveBtnFullBlock} onPress={saveQuiz}>

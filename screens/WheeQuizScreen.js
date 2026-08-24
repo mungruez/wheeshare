@@ -35,7 +35,19 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     if (thirty) return 30;
     if (fourty) return 40;
     return 5;
-  }; 
+  };
+  
+  const getInferredType = (question) => {
+    if (!question || !Array.isArray(question.options)) return "long";
+    
+    const optionsCount = question.options.length;
+    if (optionsCount === 1) return "long";
+    if (optionsCount === 2) return "truefalse";
+    if (optionsCount === 4) return "single";
+    if (optionsCount > 4)  return "multiple";
+    
+    return "single";
+  };
   
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -72,7 +84,20 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 
   useEffect(() => {
     if (selectedAnswerIndex !== null && currentQuestion) {
-      const isCorrect = selectedAnswerIndex === currentQuestion.correctAnswerIndex;
+      const qType = getInferredType(currentQuestion);
+      let isCorrect = false;
+
+      if (qType === "single" || qType === "truefalse") {
+        isCorrect = selectedAnswerIndex === currentQuestion.correctAnswerIndex;
+      } else if (qType === "multiple") {
+        const selections = Array.isArray(selectedAnswerIndex) ? selectedAnswerIndex : [];
+        const targets = Array.isArray(currentQuestion.correctAnswerIndex) ? currentQuestion.correctAnswerIndex : [];
+          isCorrect = selections.length === targets.length && selections.every(v => targets.includes(v));
+      } else if (qType === "long") {
+        const userText = typeof selectedAnswerIndex === "string" ? selectedAnswerIndex.trim().toLowerCase() : "";
+        const targetText = String(currentQuestion.correctAnswerIndex).trim().toLowerCase();
+        isCorrect = userText === targetText && targetText !== "";
+      }
       
       if (isCorrect) {
         setPoints((prevPoints) => prevPoints + 10);
@@ -87,13 +112,15 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
         q: currentQuestion.title || currentQuestion.q || "Question Title",
         explanation: currentQuestion.explanation || "",
         corra: currentQuestion.correctAnswerIndex,
-        curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : ["", "", "", ""],
-        a: selectedAnswerIndex
+        curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : [],
+        a: selectedAnswerIndex,
+        inferredType: qType
       };
 
       setAnswers((prevAnswers) => [...prevAnswers, newAnswerRecord]);
     }
   }, [selectedAnswerIndex]);
+
   
  
   
@@ -106,14 +133,20 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
       }
       if (counter === 0) {
         if (selectedAnswerIndex === null && currentQuestion) {
+          const qType = getInferredType(currentQuestion);
+          let timeoutAns = -1;
+          if (qType === "multiple") timeoutAns = [];
+          if (qType === "long") timeoutAns = "";
+
           const timeoutRecord = {
             question: index + 1,
             answer: false,
             q: currentQuestion.title || currentQuestion.q || "Question Title",
             explanation: currentQuestion.explanation || "Time limit exceeded.",
             corra: currentQuestion.correctAnswerIndex,
-            curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : ["", "", "", ""],
-            a: -1 
+            curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : [],
+            a: timeoutAns,
+            inferredType: qType
           };
           setAnswers((prevAnswers) => [...prevAnswers, timeoutRecord]);
         }
@@ -222,26 +255,99 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
           </Text>
           
           <View style={{ marginTop: 6, gap: 10 }}>
-            {Array.isArray(currentQuestion?.options) && currentQuestion.options.map((item, optIdx) => (
-              <Pressable 
-                key={`opt-${optIdx}-${item}`}
-                disabled={selectedAnswerIndex !== null}
-                onPress={() => selectedAnswerIndex === null && setSelectedAnswerIndex(optIdx)} 
-                style={ selectedAnswerIndex === optIdx && optIdx === currentQuestion.correctAnswerIndex ? styles.correctAnswer
-                  : selectedAnswerIndex != null && selectedAnswerIndex === optIdx ? styles.incorrectAnswer
-                  : styles.unselectedAnswer
-                }
-              >
-                {selectedAnswerIndex === optIdx && optIdx === currentQuestion.correctAnswerIndex ? (
-                  <AntDesign style={styles.correctAnswerIndex} name="check" size={20} color="white" />
-                ) : selectedAnswerIndex != null && selectedAnswerIndex === optIdx ? (
-                  <AntDesign style={styles.options} name="closecircle" size={20} color="white" />
-                ) : (
-                  <Text style={styles.options}>{optIdx === 0 ? "A" : optIdx === 1 ? "B" : optIdx === 2 ? "C" : "D"}</Text>
+            {Array.isArray(currentQuestion?.options) && currentQuestion.options.length === 1 ? (
+              <View>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Type your response here..."
+                  editable={answerStatus === null}
+                  value={typeof selectedAnswerIndex === 'string' ? selectedAnswerIndex : ""}
+                  onChangeText={(txt) => answerStatus === null && setSelectedAnswerIndex(txt)}
+                  multiline
+                />
+                {answerStatus === null && (
+                  <Pressable 
+                    onPress={() => {
+                      if (typeof selectedAnswerIndex === 'string' && selectedAnswerIndex.trim() !== "") {
+                        setSelectedAnswerIndex(selectedAnswerIndex);
+                      }
+                    }} 
+                    style={styles.compositeSubmitBtn}
+                  >
+                    <Text style={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Submit Answer</Text>
+                  </Pressable>
                 )}
-                  <Text style={{ marginLeft: 10, fontSize: 14, color: "#334155", fontWeight: "600", flex: 1 }}>{item}</Text>
-              </Pressable>
-            ))}
+              </View>
+            ) : (
+              <>
+                {Array.isArray(currentQuestion?.options) && currentQuestion.options.map((item, optIdx) => {
+                  const totalOpts = currentQuestion.options.length;
+                  const isMultiple = totalOpts > 4;
+                  
+                  const isSelected = isMultiple
+                    ? (Array.isArray(selectedAnswerIndex) && selectedAnswerIndex.includes(optIdx))
+                    : selectedAnswerIndex === optIdx;
+
+                  let optionStyle = styles.unselectedAnswer;
+                  if (isSelected) {
+                    optionStyle = isMultiple ? styles.selectedMultipleAnswer : styles.incorrectAnswer;
+                  }
+
+                  if (answerStatus !== null) {
+                    if (isMultiple) {
+                      const correctSet = Array.isArray(currentQuestion.correctAnswerIndex) ? currentQuestion.correctAnswerIndex : [];
+                      if (correctSet.includes(optIdx)) optionStyle = styles.correctAnswer;
+                    } else {
+                      if (optIdx === currentQuestion.correctAnswerIndex) optionStyle = styles.correctAnswer;
+                    }
+                  }
+
+                  return (
+                    <Pressable 
+                      key={`opt-${optIdx}-${item}`}
+                      disabled={answerStatus !== null || (!isMultiple && selectedAnswerIndex !== null)}
+                      onPress={() => {
+                        if (isMultiple) {
+                          setSelectedAnswerIndex((prev) => {
+                            const arr = Array.isArray(prev) ? prev : [];
+                            return arr.includes(optIdx) ? arr.filter(i => i !== optIdx) : [...arr, optIdx];
+                          });
+                        } else {
+                          setSelectedAnswerIndex(optIdx);
+                        }
+                      }} 
+                      style={optionStyle}
+                    >
+                      {answerStatus !== null && ((!isMultiple && optIdx === currentQuestion.correctAnswerIndex) || (isMultiple && Array.isArray(currentQuestion.correctAnswerIndex) && currentQuestion.correctAnswerIndex.includes(optIdx))) ? (
+                        <AntDesign style={styles.correctAnswerIndex} name="check" size={20} color="white" />
+                      ) : answerStatus !== null && isSelected ? (
+                        <AntDesign style={styles.options} name="closecircle" size={20} color="white" />
+                      ) : (
+                        <Text style={styles.options}>
+                          {isMultiple ? (isSelected ? "☑" : "☐") : (optIdx === 0 ? "A" : optIdx === 1 ? "B" : optIdx === 2 ? "C" : "D")}
+                        </Text>
+                      )}
+                      <Text style={{ marginLeft: 10, fontSize: 14, color: "#334155", fontWeight: "600", flex: 1 }}>{item}</Text>
+                    </Pressable>
+                  );
+                })}
+
+                {Array.isArray(currentQuestion?.options) && currentQuestion.options.length > 4 && answerStatus === null && (
+                  <Pressable 
+                    onPress={() => {
+                      if (Array.isArray(selectedAnswerIndex)) {
+                        setSelectedAnswerIndex([...selectedAnswerIndex]); 
+                      } else {
+                        setSelectedAnswerIndex([]);
+                      }
+                    }} 
+                    style={styles.compositeSubmitBtn}
+                  >
+                    <Text style={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Submit Selections</Text>
+                  </Pressable>
+                )}
+              </>
+            )}
           </View>
         </View>
 
@@ -249,6 +355,13 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
           {answerStatus === null ? null : (
             <Text style={{ fontSize: 15, textAlign: "center", fontWeight: "bold", color: answerStatus ? "green" : "red" }}>
               {!!answerStatus ? "✓ Correct Answer" : "✗ Wrong Answer"}
+            </Text>
+          )}
+
+          {/* Displays target verification string text block specifically for essays */}
+          {answerStatus !== null && Array.isArray(currentQuestion?.options) && currentQuestion.options.length === 1 && (
+            <Text style={{ fontSize: 13, textAlign: 'center', marginVertical: 4, color: '#334155', fontWeight: '600' }}>
+              Expected Answer: "{currentQuestion.correctAnswerIndex}"
             </Text>
           )}
 
@@ -273,6 +386,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
               <Text style={{ color: "white", textAlign: "center", fontWeight: "bold" }}>Next Question</Text>
             </Pressable>
           )}
+
         </View>
       </SafeAreaView>
     );
@@ -305,51 +419,62 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
                 return item.question?.toString() || index.toString();
               }}
               contentContainerStyle={{ paddingBottom: 120 }}
-              renderItem={({ item, i }) => (
-                <View key={item.question} style={styles.questionContainer}>
-                  <Text style={{ flexDirection: "row" }}>{item.question + ". " + item.q}</Text>
-                  
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", backgroundColor: "#f2f2f2", marginBottom: 1 }}>
-                    <Text>{"(A)" + " " + item.curra[0]}</Text>
-                    {item.corra == 0 ? (
-                      <AntDesign style={{ marginLeft: -5 }} name="checkcircle" size={20} color="green" />
-                    ) : item.answer == false && item.a == 0 ? (
-                      <AntDesign style={{ marginLeft: -5 }} name="closecircle" size={20} color="red" />
-                    ) : <></>}
+              renderItem={({ item }) => {
+                const isLongText = !Array.isArray(item.curra) || item.curra.length === 1;
+                const isMultipleAns = Array.isArray(item.curra) && item.curra.length > 4;
+
+                return (
+                  <View style={styles.questionContainer}>
+                    <Text style={{ fontSize: 14, fontWeight: "bold", color: "#1e293b", marginBottom: 6 }}>
+                      {item.question}. {item.q}
+                    </Text>
+                    
+                    {isLongText ? (
+                      <View style={{ backgroundColor: "#f8fafc", padding: 10, borderRadius: 6, borderWidth: 1, borderColor: item.answer ? "green" : "red" }}>
+                        <Text style={{ fontSize: 12, color: "#475569" }}>
+                          <Text style={{ fontWeight: "bold" }}>Your Entry:</Text> {item.a === "" ? "[Timed Out/Blank]" : `"${item.a}"`}
+                        </Text>
+                        <Text style={{ fontSize: 12, color: "green", marginTop: 2 }}>
+                          <Text style={{ fontWeight: "bold" }}>Correct Keyword:</Text> "{item.corra}"
+                        </Text>
+                      </View>
+                    ) : (
+                      <View style={{ gap: 4 }}>
+                        {item.curra.map((opt, optIdx) => {
+                          const isCorrectOption = isMultipleAns 
+                            ? (Array.isArray(item.corra) && item.corra.includes(optIdx))
+                            : Number(item.corra) === optIdx;
+
+                          const isUserSelected = isMultipleAns
+                            ? (Array.isArray(item.a) && item.a.includes(optIdx))
+                            : Number(item.a) === optIdx;
+
+                          return (
+                            <View key={`rev-opt-${optIdx}`} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: "#f2f2f2", padding: 8, borderRadius: 4 }}>
+                              <Text style={{ fontSize: 13, color: "#334155" }}>
+                                {item.inferredType === "truefalse" ? "" : (optIdx === 0 ? "(A) " : optIdx === 1 ? "(B) " : optIdx === 2 ? "(C) " : "(D) " || `(${optIdx + 1}) `)} 
+                                {opt}
+                              </Text>
+                              {isCorrectOption ? (
+                                <AntDesign name="checkcircle" size={18} color="green" />
+                              ) : (!item.answer && isUserSelected) ? (
+                                <AntDesign name="closecircle" size={18} color="red" />
+                              ) : null}
+                            </View>
+                          );
+                        })}
+                      </View>
+                    )}
+                    
+                    {!!item.explanation && (
+                      <Text style={{ fontSize: 11, fontStyle: "italic", color: "#64748b", marginTop: 4 }}>
+                        Note: {item.explanation}
+                      </Text>
+                    )}
                   </View>
-                  
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", backgroundColor: "#f2f2f2", marginBottom: 1 }}>
-                    <Text>{"(B)" + " " + item.curra[1]}</Text>
-                    {item.corra == 1 ? (
-                      <AntDesign style={{ marginLeft: -5 }} name="checkcircle" size={20} color="green" />
-                    ) : item.answer == false && item.a == 1 ? (
-                      <AntDesign style={{ marginLeft: -5 }} name="closecircle" size={20} color="red" />
-                    ) : <></>}
-                  </View>
-                  
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", backgroundColor: "#f2f2f2", marginBottom: 1 }}>
-                    <Text>{"(C)" + " " + item.curra[2]}</Text>
-                    {item.corra == 2 ? (
-                      <AntDesign style={{ marginLeft: -5 }} name="checkcircle" size={20} color="green" />
-                    ) : item.answer === false && item.a == 2 ? (
-                      <AntDesign style={{ marginLeft: -5 }} name="closecircle" size={20} color="red" />
-                    ) : <></>}
-                  </View>
-                  
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", backgroundColor: "#f2f2f2", marginBottom: 3 }}>
-                    <Text>{"(D)" + " " + item.curra[3]}</Text>
-                    {item.corra == 3 ? (
-                      <AntDesign style={{ marginLeft: -5 }} name="checkcircle" size={20} color="green" />
-                    ) : item.answer === false && item.a == 3 ? (
-                      <AntDesign style={{ marginLeft: -5 }} name="closecircle" size={20} color="red" />
-                    ) : <></>}
-                  </View>
-                  
-                  {item.answer == false ? (
-                    <Text style={{ backgroundColor: "#e6e6e6", padding: 4, fontStyle: "italic" }}>{"Explanation: " + item.explanation}</Text>
-                  ) : <></>}
-                </View>
-              )}
+                );
+              }}
+
             />
           </View>         
 

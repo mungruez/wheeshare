@@ -1070,7 +1070,7 @@ export default function Chapters() {
   if (loading) return ( 
     <View style={styles.loadingOverlay}>
       <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
-        <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24, opacity: 1, borderRadius: 12 } } resizeMode='contain' source={require('../assets/wheeshareicon.jpg')} />
+        <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24, opacity: 1, borderRadius: 12 } } resizeMode='contain' source={require('../assets/wheesharelogo.png')} />
         <ActivityIndicator size="large" color="#b4b119" style={{ transform: [{ scale: 1.9 }], marginBottom: 17,  }} />
         <Text style={styles.loadingText}>Please Wait...</Text>
       </View>
@@ -1171,7 +1171,7 @@ export default function Chapters() {
                 </TouchableOpacity>
         
                 <TouchableOpacity onPress={() => populateForEdit(null, chapterCategory)} style={ styles.plusIcon }>
-                  <ImageBackground style={{ height: "100%", width: "100%", }} resizeMode='contain' source={ require('../assets/addchaptericon.png') }/>         
+                  <ImageBackground style={{ height: "100%", width: "100%", }} resizeMode='contain' source={ require('../assets/addchapterbtn.png') }/>         
                 </TouchableOpacity>
               </View>
             </View>
@@ -1231,13 +1231,13 @@ export default function Chapters() {
               <View style={styles.batchBar}>
                 <Text style={styles.batchText}>{selectedIds.length} Selected</Text>
                 <TouchableOpacity onPress={() => shareChapters(selectedIds)} style={styles.shareIcon}>
-                  <ImageBackground style={{height: "100%", width: "100%", borderRadius: 4}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={ require('../assets/sharechaptericon.png') }/>         
+                  <ImageBackground style={{height: "100%", width: "100%", borderRadius: 4}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={ require('../assets/sharechapterbtn.png') }/>         
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => deleteChapters(selectedIds)} style={styles.myDojoDiscardIcon}>
                   <ImageBackground style={{height: "100%", width: "100%", }} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png') }/> 
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setSelectedIds([])} style={styles.myDojoDeleteIcon}>
-                  <ImageBackground style={{height: "100%", width: "100%", }} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/deletechaptericon.png') }/>         
+                  <ImageBackground style={{height: "100%", width: "100%", }} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/deletechapterbtn.png') }/>         
                 </TouchableOpacity>
               </View> ) }
         </SafeAreaView>
@@ -1497,7 +1497,7 @@ export default function Chapters() {
 
           <View style={{flexDirection:'row', alignItems:'center', justifyContent: 'center', marginBottom: 1, minHeight: 73, width:"100%"}}>
             <TouchableOpacity onPress={() => { setCurrentChapter(null); setChapterTitle(""); setPrevCategory(""); setChapterCategory(""); setChapterDesc(""); setSelectedIds([]); setSections([]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
-              <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/addchaptericon.png')}/>         
+              <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/addchapterbtnn.png')}/>         
             </TouchableOpacity> 
             <TouchableOpacity onPress={handleImportChapters} style={styles.importIcon}>
               <ImageBackground style={{ height:"100%", width:"100%",}} resizeMode='contain' source={require('../assets/importmoveicon.png')}/>         

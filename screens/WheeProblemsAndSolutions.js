@@ -1073,7 +1073,7 @@ export default function ProblemAndSolution() {
     return ( 
       <View style={styles.loadingOverlay}>
         <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
-          <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24,  borderRadius: 12, opacity: 1 } } resizeMode='contain' source={require('../assets/wheeshareicon.jpg')} />
+          <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24,  borderRadius: 12, opacity: 1 } } resizeMode='contain' source={require('../assets/wheesharelogo.png')} />
           <ActivityIndicator size="large" color="#7a0891" style={{ transform: [{ scale: 1.9 }], marginBottom: 17,  }} />
           <Text style={styles.loadingText}>Please Wait...</Text>
         </View>
@@ -1095,7 +1095,7 @@ export default function ProblemAndSolution() {
             <Text style={styles.categoryHeaderText}>{psItemCategory === "allcategories" ? "ALL CATEGORIES" : `CATEGORY: ${psItemCategory}`}</Text>
             <View style={{flexDirection:'row'}}>
               <TouchableOpacity onPress={() => { setSelectedIds([]); setMode("main"); }} style={styles.plusIconAM}>
-                <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/backpurple.png')}/>
+                <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/problems/backpurple.png')}/>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => populateForEdit(null, psItemCategory)} style={styles.plusIcon}>
                 <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/problems/addproblembtn.png')}/>         

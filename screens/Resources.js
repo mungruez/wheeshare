@@ -23,7 +23,7 @@ export default function Resources() {
 
 
   return (
-    <ImageBackground style={ styles.imgBackground } resizeMode='stretch' source={require('../assets/homescreen.jpg')}>
+    <ImageBackground style={ styles.imgBackground } resizeMode='stretch' source={require('../assets/homescreen.png')}>
       <StatusBar barStyle="light-content"/>
       <SafeAreaView style={{ flex: 1, height: "100%", marginTop:7, backgroundColor: 'transparent',}}>
 
