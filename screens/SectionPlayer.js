@@ -224,7 +224,7 @@ export default function SectionPlayer({ section, index, isActive, onActivate, on
             </TouchableOpacity>
           ) : isFullscreen && section.type !== 'video' ? (
             <TouchableOpacity onPress={() => handleShareSection(section)} style={styles.shareiconBtn}>
-              <Image source={ section.type === 'image' ? require('../assets/grnsharearrow.png') : require('../assets/purplesharearrow.png')} style={{ width: "71%", height: "71%" }} resizeMode='contain' />
+              <Image source={ section.type === 'image' ? require('../assets/greensharearrow.png') : require('../assets/purplesharearrow.png')} style={{ width: "71%", height: "71%" }} resizeMode='contain' />
             </TouchableOpacity>
             )  : ( <Text style={styles.activeSectionLabel}>Section {index + 1}: {section.type.toUpperCase()}</Text> ) 
           }

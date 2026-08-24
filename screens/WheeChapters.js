@@ -1497,7 +1497,7 @@ export default function Chapters() {
 
           <View style={{flexDirection:'row', alignItems:'center', justifyContent: 'center', marginBottom: 1, minHeight: 73, width:"100%"}}>
             <TouchableOpacity onPress={() => { setCurrentChapter(null); setChapterTitle(""); setPrevCategory(""); setChapterCategory(""); setChapterDesc(""); setSelectedIds([]); setSections([]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
-              <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/addchapterbtnn.png')}/>         
+              <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/addchapterbtn.png')}/>         
             </TouchableOpacity> 
             <TouchableOpacity onPress={handleImportChapters} style={styles.importIcon}>
               <ImageBackground style={{ height:"100%", width:"100%",}} resizeMode='contain' source={require('../assets/importmoveicon.png')}/>         
