@@ -1,7 +1,7 @@
 import { View, ScrollView, Text, StyleSheet, Dimensions, TouchableOpacity, StatusBar, ActivityIndicator } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect, useRef} from 'react';
-import Pdf from 'react-native-pdf';
+//import Pdf from 'react-native-pdf';
 
 const { height } = Dimensions.get('window');
 const { width } = Dimensions.get('window');

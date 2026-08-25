@@ -8,10 +8,10 @@ import { zip, unzip } from 'react-native-zip-archive';
 import * as DocumentPicker from 'expo-document-picker';
 import WheeQuizScreen from "./WheeQuizScreen";
 import * as Sharing from 'expo-sharing';
+import CheckBox from "./CheckBox";
 
 const { height, width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.76;
-
 
 export default function WheeQuizzes() {
   const [loading, setLoading] = useState(false);
@@ -492,12 +492,7 @@ export default function WheeQuizzes() {
         setQuizCategory(mvcat);
       }
       
-      setQuestionsList([
-        { id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-        { id: Date.now().toString()+"q2", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-        { id: Date.now().toString()+"q3", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-        { id: Date.now().toString()+"q4", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
-      ]);
+      setQuestionsList([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
       setMode("add");
     } else {
       setCurrentQuiz(quizItem);
@@ -522,20 +517,15 @@ export default function WheeQuizzes() {
     setQuizTitle("");
     setQuizDesc("");
     if (prevCategory === "allcategories") setQuizCategory("allcategories");
-    setQuestionsList([
-      { id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-      { id: Date.now().toString()+"q2", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-      { id: Date.now().toString()+"q3", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-      { id: Date.now().toString()+"q4", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
-    ]);
+    setQuestionsList([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
   };
 
 
   const addQuestionItem = () => { 
-    if(multiplechoice) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(38).substring(2, 5), question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]); 
-    else if (truefalse) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(38).substring(2, 5), question: "", options: ["True", "False"], correctAnswerIndex: 0, explanation: "" }]);
-    else if (multipleanswers) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(38).substring(2, 5), question: "", options: ["", "", "", "",""], correctAnswerIndex: [-1,0], explanation: "" }]);
-    else setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(38).substring(2, 5), question: "", options: [""], correctAnswerIndex: 0, explanation: "" }]);
+    if(multiplechoice) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]); 
+    else if (truefalse) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["True", "False"], correctAnswerIndex: 0, explanation: "" }]);
+    else if (multipleanswers) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", "",""], correctAnswerIndex: [-1,0], explanation: "" }]);
+    else setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: [""], correctAnswerIndex: 0, explanation: "" }]);
   };
 
 
@@ -708,66 +698,51 @@ export default function WheeQuizzes() {
       />
       
       { multiplechoice ? ( <View>
-      <Text style={styles.label}>Answer Selection Options (Max 80 Chars Each)</Text>
-      {qItem.options?.map((optValue, optIdx) => (
-        <TextInput
-          key={optIdx}
-          style={styles.input}
-          placeholder={`Option ${String.fromCharCode(65 + optIdx)} (Max 76 chars)`}
-          placeholderTextColor="#726b6b"
-          maxLength={76}
-          value={optValue}
-          onChangeText={(text) => {
-            const updated = [...questionsList];
-            updated[qIdx].options[optIdx] = text;
-            setQuestionsList(updated);
-          }}
-        />
-      ))}
+        <Text style={styles.label}>4 Multiple Choice Options (Max 80 Chars Each)</Text>
+        {qItem.options?.map((optValue, optIdx) => (
+          <TextInput
+            key={optIdx}
+            style={styles.optionsinput}
+            placeholder={`Option ${String.fromCharCode(65 + optIdx)} (Max 80 chars)`}
+            placeholderTextColor="#726b6b"
+            maxLength={80}
+            value={optValue}
+            onChangeText={(text) => {
+              const updated = [...questionsList];
+              updated[qIdx].options[optIdx] = text;
+              setQuestionsList(updated);
+            }}
+          />
+        ))}
 
-      <Text style={styles.label}>Correct Option Index Selector</Text>
-      <View style={styles.changeTypeGrid}>
-        {[0, 1, 2, 3].map((idx) => {
-          const isActiveIndex = qItem.correctAnswerIndex === idx;
-          return (
-            <TouchableOpacity
-              key={idx}
-              style={[styles.changeTypeIconBtn, isActiveIndex && { backgroundColor: '#caaf38' }]}
-              onPress={() => {
-                const updated = [...questionsList];
-                updated[qIdx].correctAnswerIndex = idx;
-                setQuestionsList(updated);
-              }}
-            >
-              <Text style={[styles.changeTypeIcon, isActiveIndex && { color: '#fff' }]}>{String.fromCharCode(65 + idx)}</Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-      <Text style={styles.label}>Answer Explanation(Optional)</Text>
-      <TextInput
-        style={[styles.input, styles.descInput]}
-        placeholder="Provide an explanation of the answer..."
-        placeholderTextColor="#a18e8e"
-        value={qItem.explanation}
-        onChangeText={(text) => {
-          const updated = [...questionsList];
-          updated[qIdx].explanation = text;
-          setQuestionsList(updated);
-        }}
-        multiline
-        numberOfLines={3}
-      />
+        <Text style={styles.label}>Correct Option Selector</Text>
+        <View style={styles.changeTypeGrid}>
+          {[0, 1, 2, 3].map((idx) => {
+            const isActiveIndex = qItem.correctAnswerIndex === idx;
+            return (
+              <TouchableOpacity
+                key={idx}
+                style={[styles.changeTypeIconBtn, isActiveIndex && { backgroundColor: '#ca3838' }]}
+                onPress={() => {
+                  const updated = [...questionsList];
+                  updated[qIdx].correctAnswerIndex = idx;
+                  setQuestionsList(updated);
+                }}
+              >
+                <Text style={[styles.changeTypeIcon, isActiveIndex && { color: '#fff' }]}>{String.fromCharCode(65 + idx)}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View> ) : truefalse ? ( <View>
-        <Text style={styles.label}>Correct Option Index Selector</Text>
+        <Text style={styles.label}>True or False Selector</Text>
         <View style={styles.changeTypeGrid}>
           {[0, 1].map((idx) => {
             const isActiveIndex = qItem.correctAnswerIndex === idx;
             return (
               <TouchableOpacity
                 key={idx}
-                style={[styles.changeTypeIconBtn, isActiveIndex && { backgroundColor: '#caaf38' }]}
+                style={[styles.changeTypeIconBtn, isActiveIndex && { backgroundColor: '#ca3838' }]}
                 onPress={() => {
                   const updated = [...questionsList];
                   updated[qIdx].correctAnswerIndex = idx;
@@ -784,7 +759,7 @@ export default function WheeQuizzes() {
         {qItem.options?.map((optValue, optIdx) => (
           <TextInput
             key={optIdx}
-            style={styles.input}
+            style={styles.optionsinput}
             placeholder={`Option ${String.fromCharCode(65 + optIdx)} (Max 76 chars)`}
             placeholderTextColor="#726b6b"
             maxLength={76}
@@ -804,7 +779,7 @@ export default function WheeQuizzes() {
             return (
               <TouchableOpacity
                 key={idx}
-                style={[styles.changeTypeIconBtn, isActiveIndex && { backgroundColor: '#caaf38' }]}
+                style={[styles.changeTypeIconBtn, isActiveIndex && { backgroundColor: '#ca3838' }]}
                 onPress={() => {
                   const updated = [...questionsList];
                   updated[qIdx].correctAnswerIndex = idx;
@@ -816,7 +791,6 @@ export default function WheeQuizzes() {
             );
           })}
         </View>
-        
       </View> ) : ( <View>
         <Text style={styles.label}>Long Answer</Text>
         <TextInput
@@ -833,6 +807,21 @@ export default function WheeQuizzes() {
           numberOfLines={3}
         />
       </View> ) }
+
+      <Text style={styles.label}>Answer Explanation(Optional)</Text>
+      <TextInput
+        style={[styles.input, styles.descInput]}
+        placeholder="Provide an explanation of the answer..."
+        placeholderTextColor="#a18e8e"
+        value={qItem.explanation}
+        onChangeText={(text) => {
+          const updated = [...questionsList];
+          updated[qIdx].explanation = text;
+          setQuestionsList(updated);
+        }}
+        multiline
+        numberOfLines={3}
+      />
     </View>
   );
   
@@ -942,7 +931,7 @@ export default function WheeQuizzes() {
   if (mode === 'add') {
     return (
       <ImageBackground source={require('../assets/quizzes/addquizbg.png')} style={styles.imgBackground} resizeMode='cover' >
-        <StatusBar barStyle="dark-content" />
+        <StatusBar barStyle="light-content" />
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
           <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.formHeaderTitleRow}>
@@ -950,6 +939,7 @@ export default function WheeQuizzes() {
             </View>
             
             <TouchableOpacity onPress={() => { resetForm(); setMode(prevMode); }} style={styles.discardBtn}>
+              <ImageBackground style={{ height: 67, width: "100%", opacity: 1, marginBottom: 4}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
               <Text style={styles.discardText}>❌CANCEL</Text>
             </TouchableOpacity>
 
@@ -975,7 +965,7 @@ export default function WheeQuizzes() {
               <Text style={styles.label}>Description (Optional)</Text>
               <TextInput
                 style={[styles.input, styles.descInput]}
-                placeholder="Enter Questionnaire Summary..."
+                placeholder="Enter Quiz Summary..."
                 placeholderTextColor="#726b6b"
                 value={quizDesc}
                 onChangeText={setQuizDesc}
@@ -998,9 +988,7 @@ export default function WheeQuizzes() {
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.saveBtnFullBlock} onPress={saveQuiz}>
-                <ImageBackground style={{ height: 50, width: "100%", justifyContent: 'center', alignItems: 'center' }} resizeMode='cover' source={require('../assets/quizzes/savequizbtn.png')}>
-                  <Text style={styles.saveBtnTextInternal}>COMMIT QUIZ SAVE</Text>
-                </ImageBackground>
+                <ImageBackground style={{ height: 57, width: "100%",justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/savequizbtn.png')} />
               </TouchableOpacity>
             </ScrollView>
           </SafeAreaView>
@@ -1012,7 +1000,7 @@ export default function WheeQuizzes() {
   
   return (
     <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/quizzes/quizzesbg.jpg')}>
-      <StatusBar barStyle="dark-content"/>
+      <StatusBar barStyle="light-content"/>
       <SafeAreaView style={{flex: 1}}>
         <View style={styles.centerLogoWrapper}>
           <ImageBackground style={styles.icon} resizeMode='contain' source={require('../assets/quizzes/quizzestitle.png')} /> 
@@ -1079,7 +1067,7 @@ export default function WheeQuizzes() {
           />
         ) : (
           <View style={styles.centerNotificationFlexPanel}>
-            <Text style={styles.infoTextDashboardFallback}>Tap the red (+) icon to design a fresh Quiz questionnaire.</Text>
+            <Text style={styles.infoTextDashboardFallback}>Tap the red (+) icon to design a new Quiz..</Text>
           </View>
         )}
 
@@ -1098,16 +1086,16 @@ export default function WheeQuizzes() {
 const styles = StyleSheet.create({
   imgBackground: { flex: 1, width: '100%', height: '100%' },
   viewLayoutContainer: { flex: 1, backgroundColor: '#1e293b', width: '100%', height: '100%' },
-  centerLogoWrapper: { marginBottom: 5, marginTop: -19, justifyContent: 'center', alignItems: 'center' },
+  centerLogoWrapper: { marginBottom: 19, marginTop: 19, justifyContent: 'center', alignItems: 'center' },
   icon: { height: 70, width: width * 0.9 },
   iconAM: { height: 60, width: width * 0.8 },
   addQuestionBtn: { width: 177, height: 55, borderRadius: 19, marginTop: 7, alignSelf:'center' },
   header: { paddingHorizontal: 16, marginBottom: 10, width: '100%' },
-  searchRow: { flexDirection: 'row', paddingHorizontal: 9, paddingVertical: 4, gap: 8, marginBottom: 7, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 9, alignItems: 'center', justifyContent: 'center', width: '100%', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
+  searchRow: { flexDirection: 'row', paddingHorizontal: 9, paddingVertical: 4, gap: 8, marginBottom: .5, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 9, alignItems: 'center', justifyContent: 'center', width: '100%', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
   searchInput: { height: 38, width: '70%', backgroundColor: 'rgba(255, 255, 255, 0.79)', borderRadius: 8, paddingHorizontal: 8, color: 'black', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', fontSize: 11 },
   searchBtn: { width: 39, height: 37, backgroundColor: '#e7f5ed4f', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
   clearBtn: { width: 32, height: 32, backgroundColor: '#31303080', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
-  dashboardIconsControlsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 1, minHeight: 50, width: '100%', gap: 15 },
+  dashboardIconsControlsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 1, minHeight: 50, width: '100%', gap: 19, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 9},
   plusIcon: { width: 45, height: 45 },
   plusIconAM: { width: 40, height: 40, marginRight: 10 },
   importIcon: { width: 45, height: 45 },
@@ -1148,11 +1136,12 @@ const styles = StyleSheet.create({
   vcDescScroll: { flexGrow: 1, marginTop: 4 },
   vcDescText: { color: 'honeydew', fontSize: 12, lineHeight: 16 },
   formHeaderTitleRow: { width: '100%', alignItems: 'center', marginVertical: 10 },
-  discardBtn: { alignSelf: 'center', backgroundColor: 'rgba(220, 38, 38, 0.15)', borderWidth: 1, borderColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, marginBottom: 12 },
+  discardBtn: { alignSelf: 'flex-start', backgroundColor: 'rgba(220, 38, 38, 0.15)', borderWidth: 1, borderColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 8, marginBottom: 9, marginLeft: 12, height: 70, width: 67, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1 },
   discardText: { color: '#ef4444', fontWeight: 'bold', fontSize: 11 },
   formScroller: { flex: 1, paddingHorizontal: 16 },
   label: { color: '#f04444', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
   input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#cbd5e1', marginBottom: 4 },
+  optionsinput: { height: 38, backgroundColor: '#cbd5e1', borderRadius: 8, paddingHorizontal: 5, color: '#000', borderWidth: 1, borderColor: '#8a3c40cc', marginBottom: 2 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   sectionIndexLabel: { color: '#fff', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
@@ -1166,7 +1155,6 @@ const styles = StyleSheet.create({
   explanationBoxView: { marginTop: 10, padding: 10, backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
   explanationLabelText: { color: '#cf2323', fontSize: 12, fontWeight: 'bold' },
   explanationBodyText: { color: '#cbd5e1', fontSize: 12, marginTop: 4 },
-  saveBtnFullBlock: { width: '100%', height: 50, borderRadius: 10, overflow: 'hidden', marginTop: 25, marginBottom: 20 },
-  saveBtnTextInternal: { color: '#fff', fontWeight: 'bold', fontSize: 14, letterSpacing: 1 },
+  saveBtnFullBlock: { width: 125, height: 97, borderRadius: 15, marginTop: 7, alignSelf:'center', alignItems: 'center', justifyContent:'center', },
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.75)', justifyContent: 'center', alignItems: 'center', zIndex: 999 },
   loadingText: { color: '#e02f2f', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 } });

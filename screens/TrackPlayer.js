@@ -3,25 +3,9 @@ import { View, Text, StyleSheet, ActivityIndicator, Pressable } from 'react-nati
 import { DeviceEventEmitter } from 'react-native'; 
 import React, { useEffect, useRef, useState } from 'react';
 
-const LOCAL_AUDIO_MAP = {
-  0: require('../assets/freeyourmind/freeyourmind(part1).mp3'),
-  1: require('../assets/freeyourmind/freeyourmind(part2).mp3'),
-  2: require('../assets/freeyourmind/freeyourmind(part3).mp3'),
-  3: require('../assets/freeyourmind/freeyourmind(part4).mp3'),
-  4: require('../assets/freeyourmind/freeyourmind(part5).mp3'),
-  5: require('../assets/freeyourmind/freeyourmind(part6).mp3'),
-  6: require('../assets/freeyourmind/freeyourmind(part7).mp3'),
-  7: require('../assets/freeyourmind/freeyourmind(part8).mp3'),
-  8: require('../assets/freeyourmind/freeyourmind(part9).mp3'),
-  9: require('../assets/freeyourmind/theuniverseforcesyoutoletgo(part1).mp3'),
-  10: require('../assets/freeyourmind/theuniverseforcesyoutoletgo(part2).mp3'),
-  11: require('../assets/freeyourmind/theuniverseforcesyoutoletgo(part3).mp3'),
-};
-
-
 export default function TrackPlayer({ track }) {
   const isMounted = useRef(true);
-  const source = track.id <= 11 ? LOCAL_AUDIO_MAP[track.id] : track.uri;
+  const source = track.uri;
   const player = useAudioPlayer(source);
   const status = useAudioPlayerStatus(player);
 

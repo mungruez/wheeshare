@@ -1,5 +1,6 @@
-import { Image,StyleSheet,SafeAreaView,View,Text,ScrollView,TextInput,TouchableOpacity,ImageBackground,StatusBar } from 'react-native'
+import { Image,StyleSheet,View,Text,ScrollView,TextInput,TouchableOpacity,ImageBackground,StatusBar } from 'react-native'
 import React, {useLayoutEffect} from 'react'
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native'
 
 export default function HomeScreen() {
@@ -13,18 +14,18 @@ export default function HomeScreen() {
 
   return (
     <ImageBackground style={ styles.imgBackground } imageStyle={{ opacity: 1.0 }} resizeMode='cover' source={require('../assets/homescreen.png')}>
-      <StatusBar barStyle="dark-content"/>
-      <SafeAreaView style={{ flexDirection:"column", height: "100%", marginTop:19, opacity: 1}}>
+      <StatusBar barStyle="light-content"/>
+      <SafeAreaView style={{ flexDirection:"column", height: "100%", marginTop: 19, opacity: 1}}>
 
-        <View style={{ marginBottom: 5, marginTop: -19, justifyContent: 'center', alignItems: 'center' }}>
-          <ImageBackground style={{ height: 70, width: width * 0.95 }} resizeMode='contain' source={require('../assets/quizzes/quizzestitle.png')} /> 
+        <View style={{ marginBottom: 5, marginTop: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ImageBackground style={{ height: 70, width: "95%" }} resizeMode='contain' source={require('../assets/wheesharetitle.png')} /> 
         </View>
          
-        <View style={{ flexDirection:"row", justifyContent:"center"}}>
+        <View style={{ flexDirection:" row", justifyContent: "center"}}>
           <ImageBackground style={ styles.menubar } imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/menubar.png')} /> 
         </View>
 
-        <ScrollView style={{ flexDirection:"column", marginTop: 30}}>
+        <ScrollView style={{ flexDirection:"column", marginTop: 19}}>
             <TouchableOpacity
               style={styles.buttonimage}
               onPress={()=> navigation.navigate('Quizzes')}>
@@ -41,13 +42,7 @@ export default function HomeScreen() {
               </ImageBackground>
             </TouchableOpacity>
 
-             <TouchableOpacity
-              style={styles.buttonimage}
-              onPress={()=> navigation.navigate('FightersList')}>
-              <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
-                <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>FIGHTERS LIST</Text>
-              </ImageBackground>
-            </TouchableOpacity>
+
             
             <TouchableOpacity
               style={styles.buttonimage}
@@ -70,7 +65,7 @@ const styles = StyleSheet.create({
     buttontext: { fontSize: 16, lineHeight: 21, fontWeight: '800', letterSpacing: 0.25,marginTop: 4, color: 'white'},
     imgBackground: { width: '100%', height: '100%', maxHeight:"96%", flex: 1},
     imgBackground2: { width: '100%', height: '100%', flex: 1, opacity: 1, margin:0, marginBottom:-2, padding:2, backgroundColor:"transparent", justifyContent:"flex-end"},
-    menubar: { height: 76, width: "98%", opacity: 1, marginTop: 3, alignSelf: "center", marginBottom: 9 },
+    menubar: { height: 76, width: "98%", opacity: 1, marginTop: 38, alignSelf: "center", marginBottom: 1 },
     buttonimage: { width: "67%", flex: 1, height: 67, alignItems: "center", justifyContent: "center", opacity: 1, alignSelf:"center" },
     cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#5a4f07', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
   });

@@ -289,7 +289,7 @@ export default function WheeCrosswords() {
       return;
     }
   
-    let chapterCategories = [];
+    let crosswordCategories = [];
     let cCategories = [{ id: "c-all", category: "allcategories" }];
   
     try {
@@ -313,8 +313,8 @@ export default function WheeCrosswords() {
         matches = mainMatch || nestedMatch;
         if (!matches) return;
   
-        if ( !chapterCategories.includes(currentStyle) ) {
-          chapterCategories.push(currentStyle); 
+        if ( !crosswordCategories.includes(currentStyle) ) {
+          crosswordCategories.push(currentStyle); 
           cCategories.push({ ...m, category: currentStyle }); 
         } 
       });
@@ -323,7 +323,7 @@ export default function WheeCrosswords() {
         setScrosswords(cCategories);
       } 
     } catch (e) {
-      Alert.alert("Parse Error", "An error occurred while grouping chapter category: " + e.message);
+      Alert.alert("Parse Error", "An error occurred while grouping crossword category: " + e.message);
     }
   };
    
@@ -559,7 +559,7 @@ export default function WheeCrosswords() {
       resetForm();
       setMode(prevMode || "main");
     } catch (err) {
-      Alert.alert("Save Error", err.message || "Failed to save Chapter");
+      Alert.alert("Save Error", err.message || "Failed to save Crossword");
     } finally {
       if (isLoading) setIsLoading(false);
     }
@@ -886,7 +886,7 @@ export default function WheeCrosswords() {
     return ( <View style={styles.loadingOverlay}>
       <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
         <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24,  borderRadius: 12, opacity: 1 } } resizeMode='contain' source={require('../assets/icon.png')} />
-        <ActivityIndicator size="large" color="#b1b419" style={{ transform: [{ scale: 1.9 }], marginBottom: 17,  }} />
+        <ActivityIndicator size="large" color="#19b42e" style={{ transform: [{ scale: 1.9 }], marginBottom: 17,  }} />
         <Text style={styles.loadingText}>Please Wait...</Text>
       </View>
     </View> );
@@ -905,7 +905,7 @@ export default function WheeCrosswords() {
   
             <TouchableOpacity onPress={() => { resetForm(); setMode(prevMode || "main"); }} style={styles.discardBtn}>
               <ImageBackground style={{ alignSelf: 'center', height: 67, width: "100%", opacity: 1}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
-              <Text style={styles.discardText}>CANCEL</Text>
+              <Text style={styles.discardText}>❌CANCEL</Text>
             </TouchableOpacity>
             
             <ScrollView style={styles.container}>
@@ -1015,8 +1015,8 @@ export default function WheeCrosswords() {
                       setQuestions(newQuestions); 
                   }} />
     
-                  <TouchableOpacity style={{ width: 133, height: 114, borderRadius: 15, marginTop: -12, alignSelf:'center' }} onPress={saveCrossword}>
-                    <ImageBackground style={{ height: 76, width: "100%", opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='cover' source={require('../assets/crosswords/savecrosswordbtn.png')} />
+                  <TouchableOpacity style={{ width: 125, height: 97, borderRadius: 15, marginTop: 7, alignSelf:'center', alignItems: 'center', justifyContent:'center' }} onPress={saveCrossword}>
+                    <ImageBackground style={{ height: 47, width: "100%",justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/savecrosswordbtn.png')} />
                   </TouchableOpacity>
 
                   <View style={styles.grid}>
@@ -1042,7 +1042,7 @@ export default function WheeCrosswords() {
   if (mode === 'list') {
     return (
       <ImageBackground style={{flex: 1, width: '100%', height: '100%', opacity: 1}} resizeMode='cover' imageStyle={{ opacity: 0.9 }} source={require('../assets/crosswords/crosswordslistbg.png')}>
-          <StatusBar barStyle="light-content"/>
+          <StatusBar barStyle="dark-content"/>
           <SafeAreaView style={{ flex: 1}}>
             <View style={{marginBottom: 12, paddingHorizontal: 5, justifyContent: 'center', alignItems: 'center', opacity: 1}}>
               <ImageBackground style={ styles.icon } resizeMode='contain' imageStyle={{ opacity: 1 }} source={ require('../assets/crosswords/crosswordlisttitle.png') } /> 
@@ -1112,7 +1112,7 @@ export default function WheeCrosswords() {
     <ImageBackground style={styles.imgBackground } imageStyle={{ opacity: 1 }} resizeMode='cover' source={require('../assets/crosswords/crosswordsbg.png')}>
       <StatusBar barStyle="dark-content"/>
       <SafeAreaView style={{flex: 1, width: "100%", height: "100%", marginTop: 0}}>
-        <View style={{ marginBottom: 5, marginTop: -19, opacity: 1, justifyContent: "center", alignItems: 'center', textAlign: 'center' }}>
+        <View style={{ marginBottom: 5, marginTop: 19, opacity: 1, justifyContent: "center", alignItems: 'center', textAlign: 'center' }}>
           <ImageBackground style={styles.icon} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/crosswords/crosswordstitle.png')} /> 
         </View>
     
@@ -1199,7 +1199,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 17, fontWeight: 'bold', color: '#27bd2e', height: 38, width: '100%', textAlign: 'center', marginBottom: 2 },
   card: {  marginVertical: -4, alignSelf: 'center', borderRadius: 10, width: "100%", opacity: 1, alignItems: "center", justifyContent: "center", flex: 1 },
   cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#075a0e', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
-  infoText: { fontSize: 14, fontWeight: 'bold', color: '#3ab936', minHeight: 76, width: '94%', textAlign: 'center', marginTop: -95, paddingHorizontal: 19, backgroundColor: 'rgba(0,0,0,0.5)' },
+  infoText: { fontSize: 14, fontWeight: 'bold', color: '#5be656', minHeight: 76, width: '94%', textAlign: 'center', marginTop: -95, paddingHorizontal: 19, backgroundColor: 'rgba(0,0,0,0.5)' },
   icon: { height: 57, width: '89%', alignSelf: 'center', textAlign: 'center', marginLeft: 19, marginBottom: 3, opacity: 1 },
   saveBtn: { width: 133, height: 114, borderRadius: 15, marginTop: -12, alignSelf:'center' },
   discardBtn: { marginBottom: 9, marginLeft: 12, height: 70, width: 67, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1},
@@ -1213,7 +1213,7 @@ const styles = StyleSheet.create({
   infoIcon: { height: 47, width: 47, marginLeft: 21, marginBottom: 5, opacity: 1 },
   importIcon: {height: 76, width: 67, borderRadius: 9, marginLeft: 12 },
   label: { fontWeight: 'bold', color: '#f3efbd', marginTop: 12, fontSize: 12, marginLeft:12 },
-  input: { borderWidth: 2.5, borderColor: '#88df41', borderRadius: 12, padding: 5, marginTop: 7, backgroundColor: 'rgba(100, 219, 64, 0.46)', opacity: 1, fontWeight: "bold", fontSize: 13 },
+  input: { borderWidth: 2.5, borderColor: '#15811e', borderRadius: 12, padding: 5, marginTop: 7, backgroundColor: 'rgba(152, 247, 123, 0.57))', opacity: 1, fontWeight: "bold", fontSize: 13 },
   plusIconAM: { height: 51, width: 46, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 7, marginRight: 19, marginBottom: 2, opacity: 1},
   myDojoDeleteIcon: {height: 49, width: 49, borderRadius: 0,  alignItems: 'center', justifyContent: 'center' },
   myDojoDiscardIcon: {height: 49, width: 49, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
