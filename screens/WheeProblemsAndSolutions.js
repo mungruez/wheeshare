@@ -130,6 +130,23 @@ export default function ProblemAndSolution() {
   };
    
   
+  const normalizePSItem = (item) => {
+    if (!item || typeof item !== 'object') return null;
+
+    const normalized = { ...item };
+    const problemSections = Array.isArray(item.problemSections)
+      ? item.problemSections
+      : Array.isArray(item.problem) ? item.problem : [];
+    const solutionSections = Array.isArray(item.solutionSections)
+      ? item.solutionSections
+      : Array.isArray(item.solution) ? item.solution : [];
+
+    normalized.problemSections = problemSections;
+    normalized.solutionSections = solutionSections;
+
+    return normalized;
+  };
+
   const parseHPsItems = (itemsList) => {
     let hItemsList = [];
     let categoriesSeen = [];
@@ -169,8 +186,10 @@ export default function ProblemAndSolution() {
       setPsItemId(Date.now().toString());
 
       if (mvcat === "allcategories") {
+        setPrevCategory("allcategories");
         setPsItemCategory("");
       } else {
+        setPrevCategory(mvcat);
         setPsItemCategory(mvcat);
       }
 
@@ -183,6 +202,7 @@ export default function ProblemAndSolution() {
       setPsItemId(psItem.id);
       setPsItemTitle(psItem.title);
       setPsItemCategory(mvcat);
+      setPrevCategory(mvcat);
       setPsItemDesc(psItem.description || "");
       setProblemSections(psItem.problemSections || []);
       setSolutionSections(psItem.solutionSections || []);
@@ -198,6 +218,7 @@ export default function ProblemAndSolution() {
     setPsItemDesc('');
     setProblemSections([]);
     setSolutionSections([]);
+    if (prevCategory === "allcategories") setPsItemCategory("allcategories");
   };
 
 
@@ -333,13 +354,14 @@ export default function ProblemAndSolution() {
       if (currentInfo.exists) {
         const content = await FileSystem.readAsStringAsync(fileUri);
         let loadedItems = JSON.parse(content || "[]");
-        loadedItems = loadedItems.filter(m => 
+        loadedItems = (Array.isArray(loadedItems) ? loadedItems : []).map(normalizePSItem).filter(m => 
           m && 
           m.id && 
           m.title &&
           m.category &&
           m.title.trim() !== "" &&
-          ((m.problemSections && m.problemSections.length > 0) || (m.solutionSections && m.solutionSections.length > 0))
+          Array.isArray(m.problemSections) && Array.isArray(m.solutionSections) &&
+          (m.problemSections.length > 0 || m.solutionSections.length > 0)
         );
 
         if (loadedItems.length === 0) {
@@ -351,7 +373,7 @@ export default function ProblemAndSolution() {
           setPsItems(loadedItems);
           parseCategories(loadedItems, null);
 
-          const filtered = getPsItems(psItemCategory, loadedItems);
+          const filtered = getPsItems(psItemCategory || prevCategory || "allcategories", loadedItems);
           if (filtered.length === 0) {
             setHPsItems([]);
             if (mode === "list") setMode("main");
@@ -407,7 +429,7 @@ export default function ProblemAndSolution() {
       setPsItems(itemsData);
       parseCategories(itemsData, null);
       
-      const targetCategory = activeCategory || "allcategories";
+      const targetCategory = activeCategory || prevCategory || "allcategories";
       setHPsItems(getPsItems(targetCategory, itemsData)); 
     } catch (e) {
       Alert.alert("Save Error", e.message || "Could not save items to disk.");
@@ -421,7 +443,7 @@ export default function ProblemAndSolution() {
       isLoadingRef.current = true;
       if (!loading) setLoading(true);
 
-      const incomingItems = Array.isArray(newData) ? newData : [newData];
+      const incomingItems = (Array.isArray(newData) ? newData : [newData]).map(normalizePSItem).filter(Boolean);
       const updatedList = [...psItems];
       
       incomingItems.forEach(itemData => {
@@ -522,8 +544,13 @@ export default function ProblemAndSolution() {
       return;
     }
 
-    if (problemSections.length === 0 && solutionSections.length === 0) {
-      Alert.alert('Required', 'Add at least one Section to Problems or Solutions');
+    if (problemSections.length === 0) {
+      Alert.alert('Required', 'Add at least one Problem section.');
+      return;
+    }
+
+    if (solutionSections.length === 0) {
+      Alert.alert('Required', 'Add at least one Solution section.');
       return;
     }
 
@@ -608,7 +635,7 @@ export default function ProblemAndSolution() {
         return;
       }  
 
-      const psItemData = {
+      const psItemData = normalizePSItem({
         id: psId,
         title: psItemTitle.trim(),
         category: psItemCategory.trim() || "Enter Category",
@@ -616,7 +643,7 @@ export default function ProblemAndSolution() {
         problemSections: processedProblemSections,
         solutionSections: processedSolutionSections,
         updatedAt: new Date().toISOString(),
-      };
+      });
 
       try {
         const existingFiles = await FileSystem.readDirectoryAsync(permanentDirUri);
@@ -631,6 +658,7 @@ export default function ProblemAndSolution() {
       }
 
       const destinationCategory = prevCategory || 'allcategories';
+      setPrevCategory(destinationCategory);
       setPsItemCategory(destinationCategory);
       
       await handleSavePSItem(psItemData, destinationCategory);
@@ -851,11 +879,11 @@ export default function ProblemAndSolution() {
         throw new Error('No valid items found in zip file');
       }
       
-      const finalItems = rawItems.map((psItem, index) => ({
+      const finalItems = rawItems.map((psItem, index) => normalizePSItem({
         ...psItem,
         id: `ps_${importId}_${index}_${Math.random().toString(36).substring(2, 6)}`,
         updatedAt: new Date().toISOString()
-      })).filter(c => (c.problemSections?.length > 0 || c.solutionSections?.length > 0));
+      })).filter(c => (Array.isArray(c.problemSections) && c.problemSections.length > 0) && (Array.isArray(c.solutionSections) && c.solutionSections.length > 0));
       
       if (finalItems.length === 0) {
         throw new Error("No valid items to import");
