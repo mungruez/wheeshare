@@ -880,7 +880,10 @@ export default function ProblemAndSolution() {
 
             const sourceExt = localSource.includes('.')
               ? `.${localSource.split('.').pop().toLowerCase()}`
-              : section.type === 'pdf' ? '.pdf' : '.mp4';
+              : section.type === 'pdf' ? '.pdf'
+              : section.type === 'audio' ? '.m4a'
+              : section.type === 'image' ? '.jpg'
+              : '.mp4';
 
             const prefix = isProblem ? 'prob' : 'sol';
             const destUri = `${permanentDirUri}idojo_${prefix}_section_${section.id}${sourceExt}`;
@@ -1168,13 +1171,14 @@ export default function ProblemAndSolution() {
             </View>
             
             <TouchableOpacity onPress={() => { if (isPicking || isPickingRef.current) return; setMode('list'); resetForm(); }} style={styles.discardBtn}>
-              <Text style={styles.discardText}>❌ CANCEL EDITS</Text>
+              <ImageBackground style={{ alignSelf:'center', height:67, width:"100%", opacity: 1}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
+              <Text style={styles.discardText}>❌CANCEL</Text>
             </TouchableOpacity>
 
             <ScrollView style={styles.formScroller} contentContainerStyle={{ paddingBottom: 120 }}>
               <Text style={styles.label}>Problem & Solution Title</Text>
               <TextInput
-                                style={styles.input}
+                style={styles.input}
                 placeholder="Enter Title..."
                 placeholderTextColor="#726b6b"
                 value={psItemTitle}
@@ -1204,30 +1208,55 @@ export default function ProblemAndSolution() {
               <Text style={styles.formStreamSectionDivider}>⚠️ PROBLEM SECTIONS BUILDER</Text>
               {problemSections.map((section, index) => renderSectionItem(section, index, 'problem'))}
               
-              <View style={styles.addSectionButtonsContainer}>
-                <TouchableOpacity style={styles.miniAddBtn} onPress={() => addSection(SECTION_TYPES.VIDEO, 'problem')}>
-                  <Text style={styles.miniAddBtnText}>+ 📹 PROB VIDEO</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.miniAddBtn} onPress={() => addSection(SECTION_TYPES.PDF, 'problem')}>
-                  <Text style={styles.miniAddBtnText}>+ 📄 PROB PDF</Text>
-                </TouchableOpacity>
+              <View style={styles.addSectionContainer}>
+                <View style={styles.addSectionButtons}>
+                  <TouchableOpacity style={styles.addSectionBtn} onPress={() => addSection(SECTION_TYPES.VIDEO, 'problem')}>
+                    <ImageBackground style={{ height: 38, width: "100%", justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/addvideobtn.png')} />
+                  </TouchableOpacity>
+              
+                  <TouchableOpacity style={styles.addPdfSectionBtn} onPress={() => addSection(SECTION_TYPES.PDF, 'problem')}>
+                    <ImageBackground style={{ height: 38, width: "100%", justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/addpdfbtn.png')} />
+                  </TouchableOpacity>
+                </View>
+              
+                <View style={styles.addSectionButtons}>
+                  <TouchableOpacity style={styles.addAudioSectionBtn} onPress={() => addSection(SECTION_TYPES.AUDIO, 'problem')}>
+                    <ImageBackground style={{ height: 38, width: "100%", justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/addaudiobtn.png')} />
+                  </TouchableOpacity>
+              
+                  <TouchableOpacity style={styles.addImgSectionBtn} onPress={() => addSection(SECTION_TYPES.IMAGE, 'problem')}>
+                    <ImageBackground style={{ height: 38, width: "100%", justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/addimagebtn.png')} />
+                  </TouchableOpacity>
+                </View>
               </View>
 
               <Text style={styles.formStreamSectionDivider}>✅ SOLUTION SECTIONS BUILDER</Text>
               {solutionSections.map((section, index) => renderSectionItem(section, index, 'solution'))}
+
+              <View style={styles.addSectionContainer}>
+                <View style={styles.addSectionButtons}>
+                  <TouchableOpacity style={styles.addSectionBtn} onPress={() => addSection(SECTION_TYPES.VIDEO, 'solution')}>
+                    <ImageBackground style={{ height: 38, width: "100%", justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/addvideobtn.png')} />
+                  </TouchableOpacity>
               
-              <View style={styles.addSectionButtonsContainer}>
-                <TouchableOpacity style={styles.miniAddBtn} onPress={() => addSection(SECTION_TYPES.VIDEO, 'solution')}>
-                  <Text style={styles.miniAddBtnText}>+ 📹 SOL VIDEO</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.miniAddBtn} onPress={() => addSection(SECTION_TYPES.PDF, 'solution')}>
-                  <Text style={styles.miniAddBtnText}>+ 📄 SOL PDF</Text>
-                </TouchableOpacity>
+                  <TouchableOpacity style={styles.addPdfSectionBtn} onPress={() => addSection(SECTION_TYPES.PDF, 'solution')}>
+                    <ImageBackground style={{ height: 38, width: "100%", justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/addpdfbtn.png')} />
+                  </TouchableOpacity>
+                </View>
+              
+                <View style={styles.addSectionButtons}>
+                  <TouchableOpacity style={styles.addAudioSectionBtn} onPress={() => addSection(SECTION_TYPES.AUDIO, 'solution')}>
+                    <ImageBackground style={{ height: 38, width: "100%", justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/addaudiobtn.png')} />
+                  </TouchableOpacity>
+              
+                  <TouchableOpacity style={styles.addImgSectionBtn} onPress={() => addSection(SECTION_TYPES.IMAGE, 'solution')}>
+                    <ImageBackground style={{ height: 38, width: "100%", justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/addimagebtn.png')} />
+                  </TouchableOpacity>
+                </View>
               </View>
 
               <TouchableOpacity style={styles.saveBtnFullBlock} onPress={savePSItem}>
                 <ImageBackground style={{ height: 50, width: "100%", justifyContent: 'center', alignItems: 'center' }} resizeMode='cover' source={require('../assets/problems/saveproblemandsolutionbtn.png')}>
-                  <Text style={styles.saveBtnTextInternal}>COMMIT WORKSPACE SAVE</Text>
                 </ImageBackground>
               </TouchableOpacity>
             </ScrollView>
@@ -1380,7 +1409,7 @@ const styles = StyleSheet.create({
   vcDescText: { color: 'honeydew', fontSize: 12, lineHeight: 16 },
   streamHeadingDivider: { color: '#fff', backgroundColor: '#1e293b', fontSize: 13, fontWeight: 'bold', paddingVertical: 6, paddingHorizontal: 16, marginVertical: 12, letterSpacing: 1 },
   formHeaderTitleRow: { width: '100%', alignItems: 'center', marginVertical: 10 },
-  discardBtn: { alignSelf: 'center', backgroundColor: 'rgba(220, 38, 190, 0.15)', borderWidth: 1, borderColor: '#a926dc', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, marginBottom: 12 },
+  discardBtn: { backgroundColor: 'rgba(206, 26, 26, 0.32)', borderWidth: 1, borderColor: '#dc262623', marginBottom: 9, marginLeft: 12, height: 70, width: 67, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1},
   discardText: { color: '#ef4444', fontWeight: 'bold', fontSize: 11 },
   formScroller: { flex: 1, paddingHorizontal: 16 },
   label: { color: '#ae2ab3', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
@@ -1400,9 +1429,12 @@ const styles = StyleSheet.create({
   changeTypeIconBtn: { width: 36, height: 36, borderRadius: 8, backgroundColor: 'rgba(202, 102, 56, 0.15)', borderWidth: 1, borderColor: 'rgba(202, 56, 178, 0.4)', alignItems: 'center', justifyContent: 'center' },
   changeTypeIcon: { fontSize: 18 },
   removeStepIcon: { justifyContent: 'center', alignItems: 'center' },
-  addSectionButtonsContainer: { flexDirection: 'row', justifyContent: 'center', gap: 12, marginVertical: 10, width: '100%' },
-  miniAddBtn: { flex: 1, height: 38, backgroundColor: 'rgba(202, 56, 178, 0.2)', borderWidth: 1, borderColor: '#a926dc', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
-  miniAddBtnText: { color: '#a838ca', fontWeight: 'bold', fontSize: 11 },
+  addSectionBtn: {marginTop: 5, height: 47, width: 114, alignSelf:'center', alignItems: 'center', justifyContent:'center', opacity: 1, marginRight: 19},
+  addPdfSectionBtn: {marginTop: 5, height: 41, width: 114, alignSelf:'center', alignItems: 'center', justifyContent:'center', opacity: 1, marginLeft: 3},
+  addImgSectionBtn: {marginTop: 24, height: 76, width: 125, opacity: 1, alignSelf:'center', alignItems: 'center', marginLeft: 19},
+  addAudioSectionBtn: {marginTop: 5, height: 57, width: 140, opacity: 1, marginLeft: 15, alignSelf:'center',},
+  addSectionButtons: {marginTop: 5, width: "100%", flexDirection: "row", opacity: 1, alignItems: 'center', justifyContent: 'center'},
+  addSectionContainer: {marginTop: 38, width: "100%", flexDirection: "column", opacity: 1, justifyContent:'center', alignItems: 'center'},
   saveBtnFullBlock: { width: '100%', height: 50, borderRadius: 10, overflow: 'hidden', marginTop: 25, marginBottom: 20 },
   saveBtnTextInternal: { color: '#fff', fontWeight: 'bold', fontSize: 14, letterSpacing: 1 },
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.76)', justifyContent: 'center', alignItems: 'center', zIndex: 999 },
