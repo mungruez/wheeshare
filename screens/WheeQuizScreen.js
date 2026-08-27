@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Image, Pressable, ImageBackground, SafeAreaView , FlatList, ScrollView } from "react-native";
 import React, { useState, useEffect, useLayoutEffect } from "react"; 
 import CheckBox from "./CheckBox";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from '@expo/vector-icons'; 
 

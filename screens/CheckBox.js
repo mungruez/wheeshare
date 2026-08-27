@@ -8,12 +8,12 @@ const CheckBox = (props) => {
 		"checkbox-marked" : "checkbox-blank-outline"; 
 
 	return ( 
-		<View style={styles.container}> 
+		<View style={styles.ckboxcontainer}> 
 			<Pressable onPress={props.onPress}> 
 				<MaterialCommunityIcons 
 					name={iconName} size={25} color="#228B22" /> 
 			</Pressable> 
-			<Text style={styles.title}>{props.title}</Text> 
+			<Text style={styles.ckboxtitle}>{props.title}</Text> 
 		</View> 
 	); 
 }; 
@@ -22,7 +22,7 @@ export default CheckBox;
 
 
 const styles = StyleSheet.create({ 
-	container: { 
+	ckboxcontainer: { 
 		justifyContent: "flex-start", 
 		alignItems: "center", 
 		flexDirection: "column", 
@@ -34,5 +34,5 @@ const styles = StyleSheet.create({
 		backgroundColor: '#d8fffd',
 		borderWidth:.7,
 	}, 
-	title: { fontSize: 13, color: "#000", marginLeft: 0, fontWeight: "600" }, 
+	ckboxtitle: { fontSize: 13, color: "#000", marginLeft: 0, fontWeight: "600" }, 
 }); 

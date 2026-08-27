@@ -3,12 +3,12 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet,
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
+import { MaterialCommunityIcons } from "@expo/vector-icons"; 
 import * as FileSystem from 'expo-file-system/legacy';
 import { zip, unzip } from 'react-native-zip-archive';
 import * as DocumentPicker from 'expo-document-picker';
 import WheeQuizScreen from "./WheeQuizScreen";
 import * as Sharing from 'expo-sharing';
-import CheckBox from "./CheckBox";
 
 const { height, width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.76;
@@ -48,6 +48,9 @@ export default function WheeQuizzes() {
     { id: "q3", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
     { id: "q4", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
   ]);
+
+
+  const iconName = props.isChecked ? "checkbox-marked" : "checkbox-blank-outline"; 
   
 
   const showInstructions = () => {
@@ -1017,11 +1020,34 @@ export default function WheeQuizzes() {
               {questionsList.map((section, index) => renderFormQuestionEditor(section, index))}
               
               <Text style={{marginLeft: 2, color: "#001414", fontSize: 15, fontWeight: "600", textAlign: "center"}}>Question Type:</Text>
-              <View style={{ flexDirection: "row", flex: 1, maxHeight: 57, justifyContent: "center", alignItems: "center", marginBottom: 19}}> 
-                <CheckBox onPress={handleMultipleChoiceClick} title="Multiple Choice" isChecked={multiplechoice} /> 
-                <CheckBox onPress={handleTrueFalseClick} title="True/False" isChecked={truefalse} /> 
-                <CheckBox onPress={handleMultipleAnswersClick} title="Multiple Answers" isChecked={multipleanswers} /> 
-                <CheckBox onPress={handleLongAnswerClick} title="Long Answer" isChecked={longanswer} />
+              <View style={{ flexDirection: "row", flex: 1, maxHeight: 57, justifyContent: "center", alignItems: "center", marginBottom: 19}}>
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 57, height: 55, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
+                  <Pressable onPress={handleMultipleChoiceClick}> 
+                    <MaterialCommunityIcons name={multiplechoice ? "checkbox-marked" : "checkbox-blank-outline"} size={25} color="#411313" /> 
+                  </Pressable> 
+                  <Text style={{fontSize: 11, color: "#000", marginLeft: 0, fontWeight: "600"}}>Multiple Choice</Text> 
+                </View>
+                
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 57, height: 55, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
+                  <Pressable onPress={handleTrueFalseClick}> 
+                    <MaterialCommunityIcons name={truefalse ? "checkbox-marked" : "checkbox-blank-outline"} size={25} color="#228B22" /> 
+                  </Pressable> 
+                  <Text style={{fontSize: 11, color: "#000", marginLeft: 0, fontWeight: "600"}}>True/False</Text> 
+                </View>
+
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 57, height: 55, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
+                  <Pressable onPress={handleMultipleAnswersClick}> 
+                    <MaterialCommunityIcons name={multipleanswers ? "checkbox-marked" : "checkbox-blank-outline"} size={25} color="#228B22" /> 
+                  </Pressable> 
+                  <Text style={{fontSize: 11, color: "#000", marginLeft: 0, fontWeight: "600"}}>Multiple Answers</Text> 
+                </View>
+
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 57, height: 55, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
+                  <Pressable onPress={handleLongAnswerClick}> 
+                    <MaterialCommunityIcons name={longanswer ? "checkbox-marked" : "checkbox-blank-outline"} size={25} color="#228B22" /> 
+                  </Pressable> 
+                  <Text style={{fontSize: 11, color: "#000", marginLeft: 0, fontWeight: "600"}}>Long Answer</Text> 
+                </View>
               </View>
               
               <TouchableOpacity onPress={addQuestionItem} style={styles.addQuestionBtn}>
