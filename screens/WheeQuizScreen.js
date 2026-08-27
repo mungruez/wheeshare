@@ -40,7 +40,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   const getInferredType = (question) => {
     if (!question || !Array.isArray(question.options)) return "long";
     
-    const optionsCount = question.options.length;
+    const optionsCount = question.options.filter(option => option?.trim()).length;
     if (optionsCount === 1) return "long";
     if (optionsCount === 2) return "truefalse";
     if (optionsCount === 4) return "single";
@@ -48,6 +48,10 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     
     return "single";
   };
+
+  const getDisplayOptions = (question) => Array.isArray(question?.options)
+    ? question.options.map((item, index) => ({ item, index })).filter(({ item }) => item?.trim())
+    : [];
   
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -255,7 +259,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
           </Text>
           
           <View style={{ marginTop: 6, gap: 10 }}>
-            {Array.isArray(currentQuestion?.options) && currentQuestion.options.length === 1 ? (
+            {getInferredType(currentQuestion) === "long" ? (
               <View>
                 <TextInput
                   style={styles.textInput}
@@ -280,8 +284,8 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
               </View>
             ) : (
               <>
-                {Array.isArray(currentQuestion?.options) && currentQuestion.options.map((item, optIdx) => {
-                  const totalOpts = currentQuestion.options.length;
+                {getDisplayOptions(currentQuestion).map(({ item, index: optIdx }) => {
+                  const totalOpts = getDisplayOptions(currentQuestion).length;
                   const isMultiple = totalOpts > 4;
                   
                   const isSelected = isMultiple
@@ -332,7 +336,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
                   );
                 })}
 
-                {Array.isArray(currentQuestion?.options) && currentQuestion.options.length > 4 && answerStatus === null && (
+                {getInferredType(currentQuestion) === "multiple" && answerStatus === null && (
                   <Pressable 
                     onPress={() => {
                       if (Array.isArray(selectedAnswerIndex)) {
@@ -359,7 +363,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
           )}
 
           {/* Displays target verification string text block specifically for essays */}
-          {answerStatus !== null && Array.isArray(currentQuestion?.options) && currentQuestion.options.length === 1 && (
+          {answerStatus !== null && getInferredType(currentQuestion) === "long" && (
             <Text style={{ fontSize: 13, textAlign: 'center', marginVertical: 4, color: '#334155', fontWeight: '600' }}>
               Expected Answer: "{currentQuestion.correctAnswerIndex}"
             </Text>
@@ -420,8 +424,11 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
               }}
               contentContainerStyle={{ paddingBottom: 120 }}
               renderItem={({ item }) => {
-                const isLongText = !Array.isArray(item.curra) || item.curra.length === 1;
-                const isMultipleAns = Array.isArray(item.curra) && item.curra.length > 4;
+                const displayOptions = Array.isArray(item.curra)
+                  ? item.curra.map((opt, optIdx) => ({ opt, optIdx })).filter(({ opt }) => opt?.trim())
+                  : [];
+                const isLongText = item.inferredType === "long" || !Array.isArray(item.curra) || displayOptions.length === 1;
+                const isMultipleAns = item.inferredType === "multiple" || displayOptions.length > 4;
 
                 return (
                   <View style={styles.questionContainer}>
@@ -440,7 +447,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
                       </View>
                     ) : (
                       <View style={{ gap: 4 }}>
-                        {item.curra.map((opt, optIdx) => {
+                        {displayOptions.map(({ opt, optIdx }) => {
                           const isCorrectOption = isMultipleAns 
                             ? (Array.isArray(item.corra) && item.corra.includes(optIdx))
                             : Number(item.corra) === optIdx;

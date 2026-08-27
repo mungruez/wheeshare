@@ -1258,6 +1258,10 @@ export default function ProblemAndSolution() {
                 </View>
               </View>
 
+              <View style={{marginTop: 4, marginBottom: 3, flex: 1 }}> 
+                <Image source={require('../assets/silverdivider.png')} style={{ width: '99%', height: 49, alignSelf: "center", paddingVertical: 1, opacity: 1}} resizeMode='contain'/>
+              </View>
+
               <Text style={styles.formStreamSectionDivider}>✅ SOLUTION SECTIONS BUILDER</Text>
               {solutionSections.map((section, index) => renderSectionItem(section, index, 'solution'))}
 

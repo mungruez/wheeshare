@@ -185,11 +185,13 @@ export default function WheeQuizzes() {
           c && c.id && c.title && c.category &&
           c.title.trim() !== "" && c.category.trim() !== "" &&
           Array.isArray(c.quiz) && c.quiz.length === 4 &&
-          c.quiz.every(qItem => 
-            qItem && qItem.question?.trim() !== "" && 
-            Array.isArray(qItem.options) && qItem.options.length === 4 &&
-            qItem.options.every(opt => opt?.trim() !== "")
-          )
+          c.quiz.every(qItem => {
+            const optionCount = qItem?.options?.length || 0;
+            return qItem && qItem.question?.trim() !== "" &&
+              Array.isArray(qItem.options) &&
+              (optionCount === 1 || optionCount === 2 || optionCount === 4 || (optionCount >= 5 && optionCount <= 7)) &&
+              qItem.options.every(opt => opt?.trim() !== "");
+          })
         );
  
         if (loadedQuizzes.length === 0) {
@@ -349,19 +351,24 @@ export default function WheeQuizzes() {
         return;
       }
       
-      const totalOptionsCount = qitem.options.length;
+      const originalOptions = qitem.options;
+      const trimmedOptions = originalOptions.map(option => option?.trim() || "");
+      const isMultipleAnswers = originalOptions.length > 4;
+      const filledOptions = isMultipleAnswers ? trimmedOptions.filter(Boolean) : trimmedOptions;
+      const totalOptionsCount = isMultipleAnswers ? filledOptions.length : originalOptions.length;
       const isLongTextLayout = totalOptionsCount === 1;
       const isTrueFalseLayout = totalOptionsCount === 2;
       const isSingleChoiceLayout = totalOptionsCount === 4;
       const isMultipleAnswersLayout = totalOptionsCount > 4;
       if (!isLongTextLayout && !isTrueFalseLayout && !isSingleChoiceLayout && !isMultipleAnswersLayout) {
-        Alert.alert('Layout Error', `Question #${i + 1} has an invalid choice configuration (${totalOptionsCount} options). Valid setups are: 1 (Long Text), 2 (True/False), 4 (Single Choice), or 5+ (Multiple Answers).`);
+        Alert.alert('Layout Error', `Question #${i + 1} has an invalid choice configuration (${totalOptionsCount} options). Valid setups are: 1 (Long Text), 2 (True/False), 4 (Single Choice), or 5-7 (Multiple Answers).`);
         return;
       }
 
-      for (let j = 0; j < qitem.options.length; j++) {
-        const optionText = qitem.options[j]?.trim();
+      for (let j = 0; j < trimmedOptions.length; j++) {
+        const optionText = trimmedOptions[j];
         if (!optionText && !isLongTextLayout) {
+          if (isMultipleAnswers) continue;
           Alert.alert('Required', `Question #${i + 1}, Option #${j + 1} cannot be empty`);
           return;
         }
@@ -382,13 +389,21 @@ export default function WheeQuizzes() {
         category: quizCategory.trim() || "allcategories",
         description: quizDesc.trim(),
         quiz: questionsList.map(item => {
-          const totalOpts = Array.isArray(item.options) ? item.options.length : 0;
+          const rawOptions = Array.isArray(item.options) ? item.options : [];
+          const totalOpts = rawOptions.length;
           let finalSanitizedAnswerKey = item.correctAnswerIndex;
           if (totalOpts === 4 || totalOpts === 2) {
             finalSanitizedAnswerKey = parseInt(String(item.correctAnswerIndex), 10) || 0;
           } else if (totalOpts > 4) {
-            finalSanitizedAnswerKey = Array.isArray(item.correctAnswerIndex) 
-              ? item.correctAnswerIndex.map(val => parseInt(String(val), 10)) 
+            const keptOptionIndexes = rawOptions.reduce((indexes, option, index) => {
+              if (option?.trim()) indexes.push(index);
+              return indexes;
+            }, []);
+            const indexMap = new Map(keptOptionIndexes.map((originalIndex, compactIndex) => [originalIndex, compactIndex]));
+            finalSanitizedAnswerKey = Array.isArray(item.correctAnswerIndex)
+              ? item.correctAnswerIndex
+                .map(val => indexMap.get(parseInt(String(val), 10)))
+                .filter(val => Number.isInteger(val))
               : [];
           } else if (totalOpts === 1) {
             finalSanitizedAnswerKey = typeof item.correctAnswerIndex === 'string' 
@@ -398,7 +413,9 @@ export default function WheeQuizzes() {
 
           return {
             question: item.question.trim(),
-            options: totalOpts === 1 ? [""] : item.options.map(o => o.trim()),
+            options: totalOpts === 1 ? [""] : totalOpts > 4
+              ? rawOptions.map(o => o.trim()).filter(Boolean)
+              : rawOptions.map(o => o.trim()),
             correctAnswerIndex: finalSanitizedAnswerKey,
             explanation: item.explanation?.trim() || ""
           };
@@ -511,6 +528,12 @@ export default function WheeQuizzes() {
   };
 
 
+  const removeQuestionItem = (qIdx) => {
+    if (questionsList.length <= 1) return;
+    setQuestionsList(questionsList.filter((_, index) => index !== qIdx));
+  };
+
+
   const resetForm = () => {
     setCurrentQuiz(null);
     setQuizId(Date.now().toString());
@@ -524,7 +547,7 @@ export default function WheeQuizzes() {
   const addQuestionItem = () => { 
     if(multiplechoice) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]); 
     else if (truefalse) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["True", "False"], correctAnswerIndex: 0, explanation: "" }]);
-    else if (multipleanswers) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", "",""], correctAnswerIndex: [-1,0], explanation: "" }]);
+    else if (multipleanswers) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", "", "", "", ""], correctAnswerIndex: [], explanation: "" }]);
     else setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: [""], correctAnswerIndex: 0, explanation: "" }]);
   };
 
@@ -679,10 +702,21 @@ export default function WheeQuizzes() {
     );
   };
 
-
+//remove checkbox use icons or btns
+//add remove question button
+//for multiple answers just give them up to 7 options and dont render blank options
   const renderFormQuestionEditor = (qItem, qIdx) => (
     <View key={qItem.id} style={styles.sectionContainerBlock}>
-      <Text style={styles.sectionIndexLabel}>{`QUESTION ELEMENT #${qIdx + 1}`}</Text>
+      <View style={styles.questionHeaderRow}>
+        <Text style={styles.sectionIndexLabel}>{`QUESTION ELEMENT #${qIdx + 1}`}</Text>
+        <TouchableOpacity
+          disabled={questionsList.length <= 1}
+          onPress={() => removeQuestionItem(qIdx)}
+          style={[styles.removeQuestionBtn, questionsList.length <= 1 && styles.disabledQuestionBtn]}
+        >
+          <Text style={styles.removeQuestionText}>REMOVE QUESTION</Text>
+        </TouchableOpacity>
+      </View>
 
       <Text style={styles.label}>Question Prompt</Text>
       <TextInput
@@ -697,9 +731,9 @@ export default function WheeQuizzes() {
         }}
       />
       
-      { multiplechoice ? ( <View>
+      { qItem.options?.length == 4 ? ( <View>
         <Text style={styles.label}>4 Multiple Choice Options (Max 80 Chars Each)</Text>
-        {qItem.options?.map((optValue, optIdx) => (
+        {Array.from({ length: 7 }, (_, optIdx) => qItem.options?.[optIdx] || "").map((optValue, optIdx) => (
           <TextInput
             key={optIdx}
             style={styles.optionsinput}
@@ -734,7 +768,7 @@ export default function WheeQuizzes() {
             );
           })}
         </View>
-      </View> ) : truefalse ? ( <View>
+      </View> ) : qItem.options?.length == 2 ? ( <View>
         <Text style={styles.label}>True or False Selector</Text>
         <View style={styles.changeTypeGrid}>
           {[0, 1].map((idx) => {
@@ -754,8 +788,8 @@ export default function WheeQuizzes() {
             );
           })}
         </View>
-      </View> ) : multipleanswers ? (<View>
-        <Text style={styles.label}>Answer Selection Options (Max 80 Chars Each)</Text>
+      </View> ) : qItem.options?.length > 4 ? (<View>
+        <Text style={styles.label}>Multiple Answers Options (Max 80 Chars Each)</Text>
         {qItem.options?.map((optValue, optIdx) => (
           <TextInput
             key={optIdx}
@@ -774,19 +808,22 @@ export default function WheeQuizzes() {
 
         <Text style={styles.label}>Correct Option Index Selector</Text>
         <View style={styles.changeTypeGrid}>
-          {[0, 1, 2, 3].map((idx) => {
-            const isActiveIndex = qItem.correctAnswerIndex === idx;
+          {qItem.options?.map((option, idx) => ({ option, idx })).filter(({ option }) => option?.trim()).map(({ option, idx }) => {
+            const isActiveIndex = Array.isArray(qItem.correctAnswerIndex) && qItem.correctAnswerIndex.includes(idx);
             return (
               <TouchableOpacity
                 key={idx}
                 style={[styles.changeTypeIconBtn, isActiveIndex && { backgroundColor: '#ca3838' }]}
                 onPress={() => {
                   const updated = [...questionsList];
-                  updated[qIdx].correctAnswerIndex = idx;
+                  const currentAnswers = Array.isArray(updated[qIdx].correctAnswerIndex) ? updated[qIdx].correctAnswerIndex : [];
+                  updated[qIdx].correctAnswerIndex = currentAnswers.includes(idx)
+                    ? currentAnswers.filter(answerIndex => answerIndex !== idx)
+                    : [...currentAnswers, idx];
                   setQuestionsList(updated);
                 }}
               >
-                <Text style={[styles.changeTypeIcon, isActiveIndex && { color: '#fff' }]}>{qItem.options[idx]}</Text>
+                <Text style={[styles.changeTypeIcon, isActiveIndex && { color: '#fff' }]}>{option}</Text>
               </TouchableOpacity>
             );
           })}
@@ -822,6 +859,10 @@ export default function WheeQuizzes() {
         multiline
         numberOfLines={3}
       />
+
+      <View style={{marginTop: 4, marginBottom: 3, flex: 1 }}> 
+        <Image source={require('../assets/silverdivider.png')} style={{ width: '99%', height: 49, alignSelf: "center", paddingVertical: 1, opacity: 1}} resizeMode='contain'/>
+      </View> 
     </View>
   );
   
@@ -1144,7 +1185,11 @@ const styles = StyleSheet.create({
   optionsinput: { height: 38, backgroundColor: '#cbd5e1', borderRadius: 8, paddingHorizontal: 5, color: '#000', borderWidth: 1, borderColor: '#8a3c40cc', marginBottom: 2 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
+  questionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   sectionIndexLabel: { color: '#fff', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
+  removeQuestionBtn: { backgroundColor: '#b91c1c', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 6, marginBottom: 6 },
+  disabledQuestionBtn: { opacity: 0.45 },
+  removeQuestionText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
   changeTypeGrid: { flexDirection: 'row', gap: 10, marginVertical: 6 },
   changeTypeIconBtn: { width: 45, height: 40, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },
   changeTypeIcon: { fontSize: 14, fontWeight: 'bold', color: '#caaf38' },
