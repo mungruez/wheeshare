@@ -705,19 +705,14 @@ export default function WheeQuizzes() {
     );
   };
 
-//remove checkbox use icons or btns
-//add remove question button
+
 //for multiple answers just give them up to 7 options and dont render blank options
   const renderFormQuestionEditor = (qItem, qIdx) => (
     <View key={qItem.id} style={styles.sectionContainerBlock}>
       <View style={styles.questionHeaderRow}>
-        <Text style={styles.sectionIndexLabel}>{`QUESTION ELEMENT #${qIdx + 1}`}</Text>
-        <TouchableOpacity
-          disabled={questionsList.length <= 1}
-          onPress={() => removeQuestionItem(qIdx)}
-          style={[styles.removeQuestionBtn, questionsList.length <= 1 && styles.disabledQuestionBtn]}
-        >
-          <Text style={styles.removeQuestionText}>REMOVE QUESTION</Text>
+        <Text style={styles.sectionIndexLabel}>{`QUESTION #${qIdx + 1}`}</Text>
+        <TouchableOpacity disabled={questionsList.length <= 1} onPress={() => removeQuestionItem(qIdx)} style={styles.removeQuestionBtn}>
+          <Image source={require('../assets/redgoldcloseicon.png')} style={styles.removeQuestionImage} resizeMode="contain" />
         </TouchableOpacity>
       </View>
 
@@ -863,9 +858,9 @@ export default function WheeQuizzes() {
         numberOfLines={3}
       />
 
-      <View style={{marginTop: 4, marginBottom: 3, flex: 1 }}> 
+      <View style={{marginTop: 4, marginBottom: 3, flex: 1 }}>
         <Image source={require('../assets/silverdivider.png')} style={{ width: '99%', height: 49, alignSelf: "center", paddingVertical: 1, opacity: 1}} resizeMode='contain'/>
-      </View> 
+      </View>
     </View>
   );
   
@@ -1021,30 +1016,30 @@ export default function WheeQuizzes() {
               
               <Text style={{marginLeft: 2, color: "#001414", fontSize: 15, fontWeight: "600", textAlign: "center"}}>Question Type:</Text>
               <View style={{ flexDirection: "row", flex: 1, maxHeight: 57, justifyContent: "center", alignItems: "center", marginBottom: 19}}>
-                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 57, height: 55, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 43, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
                   <Pressable onPress={handleMultipleChoiceClick}> 
-                    <MaterialCommunityIcons name={multiplechoice ? "checkbox-marked" : "checkbox-blank-outline"} size={25} color="#411313" /> 
+                    <MaterialCommunityIcons name={multiplechoice ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#411313" /> 
                   </Pressable> 
                   <Text style={{fontSize: 11, color: "#000", marginLeft: 0, fontWeight: "600"}}>Multiple Choice</Text> 
                 </View>
                 
-                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 57, height: 55, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 43, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
                   <Pressable onPress={handleTrueFalseClick}> 
-                    <MaterialCommunityIcons name={truefalse ? "checkbox-marked" : "checkbox-blank-outline"} size={25} color="#228B22" /> 
+                    <MaterialCommunityIcons name={truefalse ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#411313" /> 
                   </Pressable> 
                   <Text style={{fontSize: 11, color: "#000", marginLeft: 0, fontWeight: "600"}}>True/False</Text> 
                 </View>
 
-                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 57, height: 55, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 43, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
                   <Pressable onPress={handleMultipleAnswersClick}> 
-                    <MaterialCommunityIcons name={multipleanswers ? "checkbox-marked" : "checkbox-blank-outline"} size={25} color="#228B22" /> 
+                    <MaterialCommunityIcons name={multipleanswers ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#411313" /> 
                   </Pressable> 
                   <Text style={{fontSize: 11, color: "#000", marginLeft: 0, fontWeight: "600"}}>Multiple Answers</Text> 
                 </View>
 
-                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 57, height: 55, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 43, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
                   <Pressable onPress={handleLongAnswerClick}> 
-                    <MaterialCommunityIcons name={longanswer ? "checkbox-marked" : "checkbox-blank-outline"} size={25} color="#228B22" /> 
+                    <MaterialCommunityIcons name={longanswer ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#411313" /> 
                   </Pressable> 
                   <Text style={{fontSize: 11, color: "#000", marginLeft: 0, fontWeight: "600"}}>Long Answer</Text> 
                 </View>
@@ -1211,11 +1206,10 @@ const styles = StyleSheet.create({
   optionsinput: { height: 38, backgroundColor: '#cbd5e1', borderRadius: 8, paddingHorizontal: 5, color: '#000', borderWidth: 1, borderColor: '#8a3c40cc', marginBottom: 2 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
-  questionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  questionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', position: "relative" },
   sectionIndexLabel: { color: '#fff', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
-  removeQuestionBtn: { backgroundColor: '#b91c1c', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 6, marginBottom: 6 },
-  disabledQuestionBtn: { opacity: 0.45 },
-  removeQuestionText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
+  removeQuestionBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center', marginLeft: 8, borderColor: '#d4af37', borderWidth: 1.5, position: "absolute", top: 7, right: 7  },
+  removeQuestionImage: { width: 22, height: 22 },
   changeTypeGrid: { flexDirection: 'row', gap: 10, marginVertical: 6 },
   changeTypeIconBtn: { width: 45, height: 40, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },
   changeTypeIcon: { fontSize: 14, fontWeight: 'bold', color: '#caaf38' },

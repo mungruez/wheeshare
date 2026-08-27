@@ -363,7 +363,6 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
             </Text>
           )}
 
-          {/* Displays target verification string text block specifically for essays */}
           {answerStatus !== null && getInferredType(currentQuestion) === "long" && (
             <Text style={{ fontSize: 13, textAlign: 'center', marginVertical: 4, color: '#334155', fontWeight: '600' }}>
               Expected Answer: "{currentQuestion.correctAnswerIndex}"
