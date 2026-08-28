@@ -22,39 +22,38 @@ const SECTION_TYPES = {
 };
 
 export default function ProblemAndSolution() {
-  const [mode, setMode] = useState("main");
-  const [prevMode, setPrevMode] = useState("main");
-  const navigation = useNavigation();
-
-  const [psItems, setPsItems] = useState([]);
   const [currentPSItem, setCurrentPSItem] = useState(null);
-  const [sPsItems, setSPsItems] = useState([]); 
-  const [hPsItems, setHPsItems] = useState([]); 
-
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [vcDropdownVisible, setVcDropdownVisible] = useState(true);
-  const [openpdfViewer, setOpenpdfViewer] = useState(null);
-  
-  const [isPicking, setIsPicking] = useState(false);
+  const [prevMode, setPrevMode] = useState("main");
+  const [mode, setMode] = useState("main");
+  const navigation = useNavigation();
   const isPickingRef = useRef(false);
   const isLoadingRef = useRef(false);
-  const isOffline = useNetInfo().isConnected === false;
 
-  const [psItemId, setPsItemId] = useState(null);
-  const [psItemTitle, setPsItemTitle] = useState("");
+  const [sPsItems, setSPsItems] = useState([]); 
+  const [hPsItems, setHPsItems] = useState([]); 
+  const [psItems, setPsItems] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [openpdfViewer, setOpenpdfViewer] = useState(null);
+  const [pDropdownVisible, setPDropdownVisible] = useState(true);
+  const [sDropdownVisible, setSDropdownVisible] = useState(true);
+  const [vcDropdownVisible, setVcDropdownVisible] = useState(true);
+
   const [psItemCategory, setPsItemCategory] = useState("");
   const [prevCategory, setPrevCategory] = useState("");
+  const [psItemTitle, setPsItemTitle] = useState("");
   const [psItemDesc, setPsItemDesc] = useState("");
+  const [psItemId, setPsItemId] = useState(null);
 
-  const [problemSections, setProblemSections] = useState([]);
   const [solutionSections, setSolutionSections] = useState([]);
   const [activeSectionId, setActiveSectionId] = useState(null);
+  const [problemSections, setProblemSections] = useState([]);
+  const isOffline = useNetInfo().isConnected === false;
+  const [isPicking, setIsPicking] = useState(false);
 
-  const bgColor = ['khaki', 'sandybrown', 'bisque', 'honeydew', 'darkkhaki', 'oldlace', 'papayawhip', 'lavender', 'wheat', 'mintcream', 'aliceblue', 'goldenrod', 'tan', 'lightsteelblue', 'burlywood', 'palegoldenrod', 'beige', 'azure'];
 
-  
   const showInstructions = () => {
     Alert.alert(
       "My Dojo Problems & Solutions List",
@@ -983,7 +982,7 @@ export default function ProblemAndSolution() {
       <TextInput
         style={styles.input}
         placeholder="Enter Section Title"
-        placeholderTextColor="#726b6b"
+        placeholderTextColor="#918c8c"
         value={section.title}
         onChangeText={(text) => updateSection(section.id, 'title', text, stream)}
       />
@@ -992,7 +991,7 @@ export default function ProblemAndSolution() {
       <TextInput
         style={styles.input}
         placeholder="Paste Link (HTTP/HTTPS)"
-        placeholderTextColor="#726b6b"
+        placeholderTextColor="#918c8c"
         value={section.mediaUrl}
         onChangeText={(text) => updateSection(section.id, 'mediaUrl', text, stream)}
       />
@@ -1008,7 +1007,7 @@ export default function ProblemAndSolution() {
       <TextInput
         style={[styles.input, styles.descInput]}
         placeholder="Enter Section Description"
-        placeholderTextColor="#726b6b"
+        placeholderTextColor="#918c8c"
         value={section.description}
         onChangeText={(text) => updateSection(section.id, 'description', text, stream)}
         multiline
@@ -1042,8 +1041,43 @@ export default function ProblemAndSolution() {
     </View>
   );
 
-    if (mode === 'view' && currentPSItem) {
-     return (
+
+  if ( openpdfViewer && mode === 'view' && currentPSItem?.problemSections?.[openpdfViewer] && currentPSItem.problemSections[openpdfViewer].type === "pdf" ) {
+    return (
+      <PdfMove
+        pdf={{
+          title: currentPSItem.problemSections[openpdfViewer].title,
+          style: 'Problem',
+          desc: currentPSItem.problemSections[openpdfViewer].description,
+          videoUrl: currentPSItem.problemSections[openpdfViewer].mediaUrl,
+          vid: currentPSItem.problemSections[openpdfViewer].mediaUri,
+        }}
+        onClosePdf={() => setOpenpdfViewer(null)}
+        isActive={true}
+      />
+    )
+  }
+
+
+  if ( openpdfViewer && mode === 'view' && currentPSItem?.solutionSections?.[openpdfViewer] && currentPSItem.solutionSections[openpdfViewer].type === "pdf" ) {
+    return (
+      <PdfMove
+        pdf={{
+          title: currentPSItem.solutionSections[openpdfViewer].title,
+          style: 'Solution',
+          desc: currentPSItem.solutionSections[openpdfViewer].description,
+          videoUrl: currentPSItem.solutionSections[openpdfViewer].mediaUrl,
+          vid: currentPSItem.solutionSections[openpdfViewer].mediaUri,
+        }}
+        onClosePdf={() => setOpenpdfViewer(null)}
+        isActive={true}
+      />
+    )
+  }
+
+
+  if (mode === 'view' && currentPSItem) {
+    return (
       <SafeAreaView style={styles.viewLayoutContainer}>
         <StatusBar barStyle="dark-content"/>
         <View style={styles.vcHeader}>
@@ -1055,7 +1089,7 @@ export default function ProblemAndSolution() {
 
         {vcDropdownVisible && (
           <View style={styles.vcDropdownContainer}>
-            <Text style={styles.vcInfoLabel}>{`Structure: ${currentPSItem.problemSections?.length || 0} Problems / ${currentPSItem.solutionSections?.length || 0} Solutions`}</Text>
+            <Text style={styles.vcInfoLabel}>{`Sections: ${currentPSItem.problemSections?.length || 0} Problems / ${currentPSItem.solutionSections?.length || 0} Solutions`}</Text>
             {currentPSItem.description ? (
               <ScrollView nestedScrollEnabled style={styles.vcDescScroll}>
                 <Text style={styles.vcDescText}>{currentPSItem.description}</Text>
@@ -1065,8 +1099,13 @@ export default function ProblemAndSolution() {
         )}
 
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>
-          <Text style={styles.streamHeadingDivider}>⚠️ PROBLEM SECTIONS</Text>
-          {currentPSItem.problemSections?.map((item, index) => (
+          <View style={styles.vcHeader}>
+            <Text style={styles.streamHeadingDivider}>⚠️ PROBLEM SECTIONS</Text>
+            <TouchableOpacity onPress={() => setPDropdownVisible(!pDropdownVisible)} style={styles.vcToggleBtn}>
+              <Text style={styles.vcToggleText}>{!pDropdownVisible ? '▼' : '▲'}</Text>
+            </TouchableOpacity>
+          </View>
+          {pDropdownVisible && currentPSItem.problemSections?.map((item, index) => (
             <SectionPlayer
               key={item.id}
               section={item}
@@ -1080,8 +1119,13 @@ export default function ProblemAndSolution() {
             />
           ))}
 
-          <Text style={styles.streamHeadingDivider}>✅ SOLUTION SECTIONS</Text>
-          {currentPSItem.solutionSections?.map((item, index) => (
+          <View style={styles.vcHeader}>
+            <Text style={styles.streamHeadingDivider}>✅ SOLUTION SECTIONS</Text>
+            <TouchableOpacity onPress={() => setSDropdownVisible(!sDropdownVisible)} style={styles.vcToggleBtn}>
+              <Text style={styles.vcToggleText}>{!sDropdownVisible ? '▼' : '▲'}</Text>
+            </TouchableOpacity>
+          </View>
+          {sDropdownVisible && currentPSItem.solutionSections?.map((item, index) => (
             <SectionPlayer
               key={item.id}
               section={item}
@@ -1412,42 +1456,42 @@ const styles = StyleSheet.create({
   cardTextMenuTitle: { color: '#313030', fontWeight: 'bold', fontSize: 15, textAlign: 'center', width: '90%' },
   centerNotificationFlexPanel: { flex: 1, paddingHorizontal: 30, justifyContent: 'center', alignItems: 'center' },
   infoTextDashboardFallback: { color: '#f3efbd', textAlign: 'center', fontSize: 13, lineHeight: 18 },
-  categoryHeaderText: { color: '#ae2ab3', fontSize: 13, fontWeight: '600', textAlign: 'center', textTransform: 'uppercase', marginVertical: 6 },
+  categoryHeaderText: { color: '#9e37f3', fontSize: 13, fontWeight: '600', textAlign: 'center', textTransform: 'uppercase', marginVertical: 6 },
   flatlistContainer: { flex: 1, width: '100%' },
   emptyContainerView: { padding: 20, alignItems: 'center', justifyContent: 'center' },
   emptyReloadText: { color: '#f3efbd', marginBottom: 12, fontWeight: 'bold', fontSize: 15 },
   sectionContainer: { marginVertical: 10, width: '100%' },
-  sectionHeader: { color: '#ae2ab3', fontSize: 14, fontWeight: 'bold', marginLeft: 16, marginBottom: 8, textTransform: 'uppercase' },
+  sectionHeader: { color: '#9e37f3', fontSize: 14, fontWeight: 'bold', marginLeft: 16, marginBottom: 8, textTransform: 'uppercase' },
   verticalWrapper: { width: '100%', alignItems: 'center', paddingVertical: 6 },
   chapterCard: { width: CARD_WIDTH, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, padding: 14, marginHorizontal: 8, borderWidth: 1, borderColor: '#a926dc', elevation: 3 },
   selectedCard: { borderColor: '#a926dc', backgroundColor: '#fef2f2', borderWidth: 2 },
   chapterCardTitle: { fontSize: 15, fontWeight: 'bold', color: '#1e293b', marginBottom: 4 },
   chapterCardCount: { fontSize: 12, color: '#64748b', marginBottom: 10 },
   chapterCardFooter: { flexDirection: 'row', justifyContent: 'flex-end', width: '100%' },
-  editBtnCard: { backgroundColor: '#b238cab4', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
+  editBtnCard: { backgroundColor: '#8f36d8', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
   editBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 11 },
   batchBar: { position: 'absolute', bottom: 20, left: '5%', right: '5%', height: 55, backgroundColor: '#1e293b', borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, borderWidth: 1.5, borderColor: '#a926dc', elevation: 10 },
   batchText: { color: '#ae2ab3', fontWeight: 'bold', fontSize: 13 },
   shareIcon: { width: 35, height: 35 },
   myDojoDiscardIcon: { width: 35, height: 35 },
   myDojoDeleteIcon: { width: 35, height: 35 },
-  vcHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#0c1429a9', paddingHorizontal: 16, paddingVertical: 8, borderWidth: 2, borderColor: '#a926dc', borderRadius: 10, margin: 8 },
+  vcHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1e0c29a9', paddingHorizontal: 16, paddingVertical: 8, borderWidth: 2, borderColor: '#a926dc', borderRadius: 10, margin: 8 },
   vcTitle: { flex: 1, color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginHorizontal: 10 },
   vcToggleBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#8d3081', justifyContent: 'center', alignItems: 'center' },
   vcToggleText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
   vcDropdownContainer: { width: '95%', maxHeight: height * 0.2, alignSelf: 'center', backgroundColor: '#1e293b', borderRadius: 10, padding: 10, marginBottom: 8, borderWidth: 1, borderColor: '#9a926dc90f1a' },
-  vcInfoLabel: { color: '#ae2ab3', fontSize: 12, fontWeight: 'bold', textAlign: 'center', marginBottom: 6 },
+  vcInfoLabel: { color: '#8f36d8', fontSize: 12, fontWeight: 'bold', textAlign: 'center', marginBottom: 6 },
   vcDescScroll: { flexGrow: 1, marginTop: 4 },
   vcDescText: { color: 'honeydew', fontSize: 12, lineHeight: 16 },
-  streamHeadingDivider: { color: '#fff', backgroundColor: '#1e293b', fontSize: 13, fontWeight: 'bold', paddingVertical: 6, paddingHorizontal: 16, marginVertical: 12, letterSpacing: 1 },
+  streamHeadingDivider: { color: '#eef5ed', backgroundColor: '#3f154293', fontSize: 13, fontWeight: 'bold', paddingVertical: 6, paddingHorizontal: 16, marginVertical: 12, letterSpacing: 1 },
   formHeaderTitleRow: { width: '100%', alignItems: 'center', marginVertical: 10 },
   discardBtn: { backgroundColor: 'rgba(206, 26, 26, 0.32)', borderWidth: 1, borderColor: '#dc262623', marginBottom: 9, marginLeft: 12, height: 70, width: 67, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1},
   discardText: { color: '#ef4444', fontWeight: 'bold', fontSize: 11 },
   formScroller: { flex: 1, paddingHorizontal: 16 },
-  label: { color: '#ae2ab3', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
-  input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#cbd5e1', marginBottom: 4 },
+  label: { color: '#9e37f3', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
+  input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#590f85', marginBottom: 4 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
-  formStreamSectionDivider: { color: '#ae2ab3', fontSize: 13, fontWeight: 'bold', marginTop: 22, marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#a926dc', paddingBottom: 4 },
+  formStreamSectionDivider: { color: '#9e37f3', fontSize: 13, fontWeight: 'bold', marginTop: 22, marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#660f88', paddingBottom: 4 },
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   sectionIndexLabel: { color: '#fff', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
   mediaPickerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 6, gap: 10 },
@@ -1458,7 +1502,7 @@ const styles = StyleSheet.create({
   changeTypeContainer: { flex: 1 },
   changeTypeLabel: { color: '#f3efbd', fontSize: 11, fontWeight: '600', marginBottom: 4 },
   changeTypeGrid: { flexDirection: 'row', gap: 6 },
-  changeTypeIconBtn: { width: 36, height: 36, borderRadius: 8, backgroundColor: 'rgba(202, 102, 56, 0.15)', borderWidth: 1, borderColor: 'rgba(202, 56, 178, 0.4)', alignItems: 'center', justifyContent: 'center' },
+  changeTypeIconBtn: { width: 36, height: 36, borderRadius: 8, backgroundColor: 'rgba(185, 56, 202, 0.15)', borderWidth: 1, borderColor: 'rgba(161, 35, 219, 0.38)', alignItems: 'center', justifyContent: 'center' },
   changeTypeIcon: { fontSize: 18 },
   removeStepIcon: { justifyContent: 'center', alignItems: 'center' },
   addSectionBtn: {marginTop: 5, height: 47, width: 114, alignSelf:'center', alignItems: 'center', justifyContent:'center', opacity: 1, marginRight: 19},
@@ -1470,5 +1514,5 @@ const styles = StyleSheet.create({
   saveBtnFullBlock: { width: '100%', height: 50, borderRadius: 10, overflow: 'hidden', marginTop: 25, marginBottom: 20 },
   saveBtnTextInternal: { color: '#fff', fontWeight: 'bold', fontSize: 14, letterSpacing: 1 },
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.76)', justifyContent: 'center', alignItems: 'center', zIndex: 999 },
-  loadingText: { color: '#ae2ab3', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 }
+  loadingText: { color: '#9e37f3', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 }
 });
