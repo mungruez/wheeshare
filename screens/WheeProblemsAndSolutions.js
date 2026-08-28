@@ -955,6 +955,7 @@ export default function ProblemAndSolution() {
     </View>
   );
 
+
   const PSItemCard = ({ item }) => {
     const isSelected = selectedIds.includes(item.id);
     return (
@@ -963,9 +964,9 @@ export default function ProblemAndSolution() {
         onPress={() => selectedIds.length > 0 ? toggleSelect(item.id) : viewPSItem(item)}
         style={[styles.chapterCard, isSelected && styles.selectedCard]}
       >
-        <Text style={styles.chapterCardTitle} numberOfLines={1}>{item.title}</Text>
-        <Text style={styles.chapterCardCount}>{`${item.problemSections?.length || 0} Problems / ${item.solutionSections?.length || 0} Solutions`}</Text>
-        <View style={styles.chapterCardFooter}>
+        <Text style={styles.psCardTitle} numberOfLines={1}>{item.title}</Text>
+        <Text style={styles.psCardCount}>{`${item.problemSections?.length || 0} Problems / ${item.solutionSections?.length || 0} Solutions`}</Text>
+        <View style={styles.psCardFooter}>
           <TouchableOpacity style={styles.editBtnCard} onPress={() => populateForEdit(item, item.category)}>
             <Text style={styles.editBtnText}>EDIT</Text>
           </TouchableOpacity>
@@ -974,6 +975,7 @@ export default function ProblemAndSolution() {
     );
   };
 
+  
   const renderSectionItem = (section, index, stream) => (
     <View key={section.id} style={styles.sectionContainerBlock}>
       <Text style={styles.sectionIndexLabel}>{`${stream.toUpperCase()} SECTION #${index + 1}`}</Text>
@@ -1465,9 +1467,9 @@ const styles = StyleSheet.create({
   verticalWrapper: { width: '100%', alignItems: 'center', paddingVertical: 6 },
   chapterCard: { width: CARD_WIDTH, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, padding: 14, marginHorizontal: 8, borderWidth: 1, borderColor: '#a926dc', elevation: 3 },
   selectedCard: { borderColor: '#a926dc', backgroundColor: '#fef2f2', borderWidth: 2 },
-  chapterCardTitle: { fontSize: 15, fontWeight: 'bold', color: '#1e293b', marginBottom: 4 },
-  chapterCardCount: { fontSize: 12, color: '#64748b', marginBottom: 10 },
-  chapterCardFooter: { flexDirection: 'row', justifyContent: 'flex-end', width: '100%' },
+  psCardTitle: { fontSize: 15, fontWeight: 'bold', color: '#1e293b', marginBottom: 4 },
+  psCardCount: { fontSize: 12, color: '#64748b', marginBottom: 10 },
+  psCardFooter: { flexDirection: 'row', justifyContent: 'flex-end', width: '100%' },
   editBtnCard: { backgroundColor: '#8f36d8', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
   editBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 11 },
   batchBar: { position: 'absolute', bottom: 20, left: '5%', right: '5%', height: 55, backgroundColor: '#1e293b', borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, borderWidth: 1.5, borderColor: '#a926dc', elevation: 10 },
@@ -1475,7 +1477,7 @@ const styles = StyleSheet.create({
   shareIcon: { width: 35, height: 35 },
   myDojoDiscardIcon: { width: 35, height: 35 },
   myDojoDeleteIcon: { width: 35, height: 35 },
-  vcHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1e0c29a9', paddingHorizontal: 16, paddingVertical: 8, borderWidth: 2, borderColor: '#a926dc', borderRadius: 10, margin: 8 },
+  vcHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1e0c29a9', paddingHorizontal: 16, paddingVertical: 8, borderWidth: 2, borderColor: '#7f19d3', borderRadius: 10, margin: 8 },
   vcTitle: { flex: 1, color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginHorizontal: 10 },
   vcToggleBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#8d3081', justifyContent: 'center', alignItems: 'center' },
   vcToggleText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
