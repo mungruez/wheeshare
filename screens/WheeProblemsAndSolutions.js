@@ -77,6 +77,12 @@ export default function ProblemAndSolution() {
     return '.mp4';
   };
 
+
+  const getSectionPreviewSource = (section) => {
+    if (!section?.mediaUri || !isRenderableMediaUri(section.mediaUri)) return null;
+    return { uri: section.mediaUri };
+  };
+
   
   const parseCategories = (list, query) => {
     if (!Array.isArray(list)) {
@@ -194,7 +200,8 @@ export default function ProblemAndSolution() {
 
       setProblemSections([]);
       setSolutionSections([]);
-      setPrevMode("list");
+      if(mode === "list") setPrevMode("list");
+      else setPrevMode("main");
       setMode("add");
     } else {
       setCurrentPSItem(psItem);
@@ -209,6 +216,7 @@ export default function ProblemAndSolution() {
       setMode("add");
     }
   };
+
 
   const resetForm = () => {
     setCurrentPSItem(null);
@@ -238,6 +246,7 @@ export default function ProblemAndSolution() {
     }
   };
 
+
   const removeSection = (id, stream) => {
     if (isPickingRef.current || isPicking) return;
     if (stream === 'problem') {
@@ -246,6 +255,7 @@ export default function ProblemAndSolution() {
       setSolutionSections(solutionSections.filter(s => s.id !== id));
     }
   };
+
 
   const updateSection = (id, field, value, stream) => {
     if (isPickingRef.current || isPicking) return;
@@ -256,9 +266,11 @@ export default function ProblemAndSolution() {
     }
   };
 
+
   const toggleSelect = (id) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
+
 
   const viewPSItem = (psItem) => {
     setCurrentPSItem(psItem);
@@ -266,10 +278,12 @@ export default function ProblemAndSolution() {
     setMode("view");
   };
 
+
   const isValidMediaUri = (uri) => {
     if (!uri || typeof uri !== 'string') return false;
     return uri.startsWith('http://') || uri.startsWith('https://') || uri.startsWith('file://') || uri.startsWith('content://');
   };
+
 
   const copyPickedMediaToCache = async (sourceUri, fileName) => {
     const cacheDir = `${FileSystem.cacheDirectory}ps-media/`;
@@ -282,6 +296,7 @@ export default function ProblemAndSolution() {
       throw new Error('Unable to copy media file.');
     }
   };
+
 
   const pickMedia = async (id, stream) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -333,7 +348,8 @@ export default function ProblemAndSolution() {
     }
   };
 
-    const loadPsItems = async () => {
+  
+  const loadPsItems = async () => {
     try {
       if (isLoadingRef.current) return; 
       isLoadingRef.current = true;
@@ -417,6 +433,7 @@ export default function ProblemAndSolution() {
     }
   };
 
+
   const savePsItemsToStorage = async (itemsData, activeCategory) => {
     try {
       const fileUri = `${FileSystem.documentDirectory}problem_solution.json`;
@@ -435,6 +452,7 @@ export default function ProblemAndSolution() {
       throw e;
     }
   };
+
 
   const handleSavePSItem = async (newData, activeCategory) => {
     try {
@@ -455,7 +473,7 @@ export default function ProblemAndSolution() {
       });
 
       await savePsItemsToStorage(updatedList, activeCategory);
-      setMode('list');
+      setMode(prevMode);
     } catch (e) {
       Alert.alert('Save Failed', e.message);
     } finally {
@@ -463,6 +481,7 @@ export default function ProblemAndSolution() {
       setLoading(false);
     }
   };
+
 
   const deletePsItems = async (idsFromArg = []) => {
     const actualIds = Array.isArray(idsFromArg) && idsFromArg.length > 0 ? idsFromArg : (selectedIds || []);
@@ -515,7 +534,7 @@ export default function ProblemAndSolution() {
               if (isDeletingAll || matchingItems.length < 1) {
                 setPsItemCategory('Enter Category');
                 setPrevCategory("");
-                setMode('main');
+                setMode('list');
               } else {
                 setHPsItems(getPsItems(psItemCategory, updatedList));
               }
@@ -530,7 +549,8 @@ export default function ProblemAndSolution() {
     );
   };
 
-    const savePSItem = async () => {
+    
+  const savePSItem = async () => {
     if (isPickingRef.current || isPicking) return;
 
     if (!psItemTitle.trim()) {
@@ -668,6 +688,7 @@ export default function ProblemAndSolution() {
     }
   };
 
+
   const sharePsItems = async (itemIds) => {
     if (isOffline) {
       Alert.alert("No Internet", "You need an internet connection to share data.");
@@ -753,11 +774,13 @@ export default function ProblemAndSolution() {
     }
   };
 
+
   useFocusEffect(
     useCallback(() => {
       loadPsItems();
     }, [psItemCategory])
   );
+
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -773,7 +796,7 @@ export default function ProblemAndSolution() {
       if (mode === 'add') {
         if (isPickingRef.current || isPicking) return true;
         if (isLoadingRef.current) return true;
-        setMode('list');
+        setMode(prevMode);
         resetForm();
         return true;
       }
@@ -789,7 +812,8 @@ export default function ProblemAndSolution() {
   }, [mode, openpdfViewer, isPicking, loading]);
 
 
-    const handleImportPSItems = async () => {
+
+  const handleImportPSItems = async () => {
     let extractDir = null;
     let tempZipPath = null;
 
@@ -975,8 +999,8 @@ export default function ProblemAndSolution() {
     );
   };
 
-  
-  const renderSectionItem = (section, index, stream) => (
+
+  const renderSectionItem = (section, index, stream, previewSource) => (
     <View key={section.id} style={styles.sectionContainerBlock}>
       <Text style={styles.sectionIndexLabel}>{`${stream.toUpperCase()} SECTION #${index + 1}`}</Text>
       
@@ -989,21 +1013,62 @@ export default function ProblemAndSolution() {
         onChangeText={(text) => updateSection(section.id, 'title', text, stream)}
       />
 
-      <Text style={styles.label}>Online Media URL (Optional)</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Paste Link (HTTP/HTTPS)"
-        placeholderTextColor="#918c8c"
-        value={section.mediaUrl}
-        onChangeText={(text) => updateSection(section.id, 'mediaUrl', text, stream)}
-      />
-
-      <View style={styles.mediaPickerRow}>
-        <TouchableOpacity style={styles.uploadBtn} onPress={() => pickMedia(section.id, stream)}>
-          <Text style={styles.uploadBtnText}>{section.mediaUri ? "🔄 CHANGE LOCAL FILE" : "📁 UPLOAD FROM PHONE"}</Text>
+      <TouchableOpacity 
+        style={styles.stepImgContainer}
+        onPress={() => { if (isPicking) return; pickMedia(section.id, stream) }}
+      >
+        { isPicking ? ( 
+          <View style={{ height: 114, width: 190, marginTop: 57, alignItems: 'center', justifyContent: 'center'}}>
+            <ActivityIndicator size="small" color="#7d10a8" style={{ transform: [{ scale: 1.5 }] }} />
+            <Text style={{ marginTop: 8, color: '#f3efbd', fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase' }}>Loading</Text>
+          </View> ) : section.mediaUri ? (
+          <View style={section.type === "video" ? styles.videoIconUploaded : section.type === "pdf" ? styles.pdfIconUploaded : section.type === "audio" ? styles.audioIconUploaded : styles.imageIconUploaded } > 
+            { section.type === SECTION_TYPES.IMAGE && previewSource ? ( <Image source={previewSource} style={styles.stepImg} />
+              ) : section.type === SECTION_TYPES.VIDEO && previewSource ? ( <Image source={previewSource} style={styles.stepImg} /> 
+              ) : ( <View style={styles.stepImg}>
+                <Text style={[{fontSize: 45, marginLeft: 13, marginTop: 15}, section.type === SECTION_TYPES.PDF && {fontSize: 57, marginLeft: 12, marginTop: 7}]}>
+                  {section.type === SECTION_TYPES.VIDEO ? '🎬' : section.type === SECTION_TYPES.AUDIO ? '🎵' : '📄'}
+                </Text>
+                <Text style={{ fontSize: 11, marginLeft: 25 }} numberOfLines={1} ellipsizeMode="clip">{section.mediaUri.split('.').pop()}</Text>
+              </View> ) }
+                              
+            <View style={[{height: "15%", width: "100%", alignItems: "center", justifyContent: "cennter", backgroundColor: 'rgba(38, 152, 95, 0.57)', borderRadius: 7 }, section.type === "video" && {backgroundColor: 'rgba(243, 72, 95, 0.57)' }, section.type === "pdf" && {backgroundColor: 'rgba(72, 103, 243, 0.57)'}, section.type === "audio" && {backgroundColor: 'rgba(223, 72, 243, 0.57)'} ]}>
+              <Text style={{ width: "100%", textAlign: "center", alignSelf: "center", fontSize: 10, color: "#f3efbd", fontWeight: "bold" }}>CHANGE</Text>
+            </View>
+          </View> ) : !section.mediaUrl && (
+          <View style={styles.videoIcon}>
+            <ImageBackground 
+              style={{ alignSelf: 'center', height: 95, width: 114, opacity: 1 }} 
+              resizeMode='contain'
+              source={section.type === SECTION_TYPES.VIDEO ? require('../assets/uploadvideobg.png') : section.type === SECTION_TYPES.PDF ? require('../assets/uploadpdfbg.png') : section.type === SECTION_TYPES.AUDIO ? require('../assets/uploadaudiobg.png') : require('../assets/uploadimagebg.png')} />
+          </View> ) }
+      </TouchableOpacity>
+      
+      { section.mediaUri && !isPicking && ( <TouchableOpacity onPress={() => { updateSection(section.id, 'mediaUri', null, stream); }} style={styles.toggleModeBtn}>
+        <Text style={{fontSize: 23, marginTop: -7}}>🔗</Text>
+        <Text style={styles.toggleModeText}>Or Link</Text>
+      </TouchableOpacity> ) }
+      
+      { !section.mediaUri && !section.mediaUrl && !isPicking && ( <Text style={styles.orText}>— OR —</Text> ) }
+                      
+      { !section.mediaUri && !isPicking && ( <>
+        <Text style={styles.label}>{`Section ${section.type} URL`}</Text>
+        <TextInput
+          style={styles.input}
+          placeholder={`Enter ${section.type} URL`}
+          placeholderTextColor="#726b6b"
+          value={section.mediaUrl}
+          onChangeText={(text) => updateSection(section.id, 'mediaUrl', text, stream)}
+          autoCapitalize="none"
+        />
+      </> ) }
+      
+      { section.mediaUrl && !isPicking && (
+        <TouchableOpacity style={[styles.toggleModeBtn, {marginTop: 7}]} onPress={() => { updateSection(section.id, 'mediaUrl', '', stream); }}>
+          <Text style={{fontSize: 22, marginTop: -2}}>📁</Text>
+          <Text style={styles.toggleModeText}> Or Upload</Text>
         </TouchableOpacity>
-        {section.mediaUri && <Text style={styles.fileLoadedIndicator}>✅ Local File Loaded</Text>}
-      </View>
+      ) }
 
       <Text style={styles.label}>Section Description</Text>
       <TextInput
@@ -1244,7 +1309,7 @@ export default function ProblemAndSolution() {
               <ImageBackground style={styles.iconAM} resizeMode='contain' source={currentPSItem ? require('../assets/problems/editproblemtitle.png') : require('../assets/problems/addproblemtitle.png')} /> 
             </View>
             
-            <TouchableOpacity onPress={() => { if (isPicking || isPickingRef.current) return; setMode('list'); resetForm(); }} style={styles.discardBtn}>
+            <TouchableOpacity onPress={() => { if (isPicking || isPickingRef.current) return; setMode(prevMode); resetForm(); }} style={styles.discardBtn}>
               <ImageBackground style={{ alignSelf:'center', height:67, width:"100%", opacity: 1}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
               <Text style={styles.discardText}>❌CANCEL</Text>
             </TouchableOpacity>
@@ -1280,7 +1345,7 @@ export default function ProblemAndSolution() {
               />
 
               <Text style={styles.formStreamSectionDivider}>⚠️ PROBLEM SECTIONS BUILDER</Text>
-              {problemSections.map((section, index) => renderSectionItem(section, index, 'problem'))}
+              {problemSections.map((section, index) => renderSectionItem(section, index, 'problem', getSectionPreviewSource(section)))}
               
               <View style={styles.addSectionContainer}>
                 <View style={styles.addSectionButtons}>
@@ -1309,7 +1374,7 @@ export default function ProblemAndSolution() {
               </View>
 
               <Text style={styles.formStreamSectionDivider}>✅ SOLUTION SECTIONS BUILDER</Text>
-              {solutionSections.map((section, index) => renderSectionItem(section, index, 'solution'))}
+              {solutionSections.map((section, index) => renderSectionItem(section, index, 'solution', getSectionPreviewSource(section)))}
 
               <View style={styles.addSectionContainer}>
                 <View style={styles.addSectionButtons}>
@@ -1333,8 +1398,8 @@ export default function ProblemAndSolution() {
                 </View>
               </View>
 
-              <TouchableOpacity style={styles.saveBtnFullBlock} onPress={savePSItem}>
-                <ImageBackground style={{ height: 50, width: "100%", justifyContent: 'center', alignItems: 'center' }} resizeMode='cover' source={require('../assets/problems/saveproblemandsolutionbtn.png')}>
+              <TouchableOpacity style={styles.saveBtnBlock} onPress={savePSItem}>
+                <ImageBackground style={{ height: 54, width: "100%", justifyContent: 'center', alignItems: 'center' }} resizeMode='cover' source={require('../assets/problems/saveproblemandsolutionbtn.png')}>
                 </ImageBackground>
               </TouchableOpacity>
             </ScrollView>
@@ -1423,7 +1488,7 @@ export default function ProblemAndSolution() {
 
         { loading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#caaf38" />
+            <ActivityIndicator size="large" color="#ad38ca" />
             <Text style={styles.loadingText}>Synchronizing File Systems...</Text>
           </View>
         ) }
@@ -1473,7 +1538,7 @@ const styles = StyleSheet.create({
   editBtnCard: { backgroundColor: '#8f36d8', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
   editBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 11 },
   batchBar: { position: 'absolute', bottom: 20, left: '5%', right: '5%', height: 55, backgroundColor: '#1e293b', borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, borderWidth: 1.5, borderColor: '#a926dc', elevation: 10 },
-  batchText: { color: '#ae2ab3', fontWeight: 'bold', fontSize: 13 },
+  batchText: { color: '#a32ab3', fontWeight: 'bold', fontSize: 13 },
   shareIcon: { width: 35, height: 35 },
   myDojoDiscardIcon: { width: 35, height: 35 },
   myDojoDeleteIcon: { width: 35, height: 35 },
@@ -1490,16 +1555,12 @@ const styles = StyleSheet.create({
   discardBtn: { backgroundColor: 'rgba(206, 26, 26, 0.32)', borderWidth: 1, borderColor: '#dc262623', marginBottom: 9, marginLeft: 12, height: 70, width: 67, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1},
   discardText: { color: '#ef4444', fontWeight: 'bold', fontSize: 11 },
   formScroller: { flex: 1, paddingHorizontal: 16 },
-  label: { color: '#9e37f3', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
+  label: { color: '#f3efbd', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
   input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#590f85', marginBottom: 4 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
-  formStreamSectionDivider: { color: '#9e37f3', fontSize: 13, fontWeight: 'bold', marginTop: 22, marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#660f88', paddingBottom: 4 },
+  formStreamSectionDivider: { color: '#b155fc', fontSize: 13, fontWeight: 'bold', marginTop: 22, marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#660f88', paddingBottom: 4 },
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   sectionIndexLabel: { color: '#fff', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
-  mediaPickerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 6, gap: 10 },
-  uploadBtn: { backgroundColor: '#475569', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6 },
-  uploadBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 11 },
-  fileLoadedIndicator: { color: '#4ade80', fontSize: 11, fontWeight: '600' },
   sectionFooterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' },
   changeTypeContainer: { flex: 1 },
   changeTypeLabel: { color: '#f3efbd', fontSize: 11, fontWeight: '600', marginBottom: 4 },
@@ -1510,10 +1571,21 @@ const styles = StyleSheet.create({
   addSectionBtn: {marginTop: 5, height: 47, width: 114, alignSelf:'center', alignItems: 'center', justifyContent:'center', opacity: 1, marginRight: 19},
   addPdfSectionBtn: {marginTop: 5, height: 41, width: 114, alignSelf:'center', alignItems: 'center', justifyContent:'center', opacity: 1, marginLeft: 3},
   addImgSectionBtn: {marginTop: 24, height: 76, width: 125, opacity: 1, alignSelf:'center', alignItems: 'center', marginLeft: 19},
-  addAudioSectionBtn: {marginTop: 5, height: 57, width: 140, opacity: 1, marginLeft: 15, alignSelf:'center',},
+  addAudioSectionBtn: {marginTop: 5, height: 57, width: 140, opacity: 1, marginLeft: 15, alignSelf:'center'},
   addSectionButtons: {marginTop: 5, width: "100%", flexDirection: "row", opacity: 1, alignItems: 'center', justifyContent: 'center'},
   addSectionContainer: {marginTop: 38, width: "100%", flexDirection: "column", opacity: 1, justifyContent:'center', alignItems: 'center'},
-  saveBtnFullBlock: { width: '100%', height: 50, borderRadius: 10, overflow: 'hidden', marginTop: 25, marginBottom: 20 },
+  stepImg: { width: '100%', height: '85%', borderRadius: 5, alignSelf: 'flex-start' },
+  stepImgContainer: { minWidth: 95, minHeight: 95, justifyContent: 'center', alignItems: 'center', borderRadius: 19, borderWidth: 1, opacity: 1},
+  videoIcon: { height: 95, width: 114, marginLeft: 12, borderRadius: 2, marginTop: 45, justifyContent: 'center', alignItems: 'center'},
+  pdfIcon: { height: 76, width:76, backgroundColor: 'hsla(204, 77%, 48%, 0.17)', borderRadius: 2, marginTop: 5, justifyContent: 'center', alignItems: 'center', marginLeft: 12},
+  videoIconUploaded: { height: 133, width: 95, marginLeft: 12, backgroundColor: 'rgba(243, 72, 95, 0.57)', borderRadius: 10, marginTop: 57, justifyContent: 'center', alignItems: 'center',borderWidth: 1, borderColor: '#fa4e4e',borderStyle: 'dashed'},
+  pdfIconUploaded: { height: 133, width: 95, marginLeft: 12, backgroundColor: 'rgba(72, 103, 243, 0.57)', borderRadius: 10, marginTop: 57, justifyContent: 'center', alignItems: 'center',borderWidth: 1, borderColor: '#4447f8',borderStyle: 'dashed'},
+  audioIconUploaded: { height: 133, width: 95, marginLeft: 12, backgroundColor: 'rgba(223, 72, 243, 0.57)', borderRadius: 10, marginTop: 57, justifyContent: 'center', alignItems: 'center',borderWidth: 1, borderColor: '#da44f8',borderStyle: 'dashed'},
+  imageIconUploaded: { height: 133, width: 95, marginLeft: 12, backgroundColor: 'rgba(38, 152, 95, 0.57)', borderRadius: 10, marginTop: 57, justifyContent: 'center', alignItems: 'center',borderWidth: 1, borderColor: '#44f84d',borderStyle: 'dashed'},
+  orText: { color: '#f3efbd', fontWeight: 'bold', fontSize: 16, marginTop: 19, marginBottom: -7, marginLeft: 38 },
+  toggleModeBtn: { alignSelf: 'center', marginTop: 45, marginBottom: 19, padding: 5, backgroundColor: 'rgba(186, 55, 212, 0.12)', borderRadius: 6, borderWidth: 1, borderColor: 'rgba(149, 55, 212, 0.5)', flexDirection: "row" },
+  toggleModeText: { color: '#f3efbd', fontSize: 14, fontWeight: '600', marginLeft: 4 },
+  saveBtnBlock: { width: 152, height: 61, borderRadius: 10, alignSelf:'center', marginTop: 25, marginBottom: 20 },
   saveBtnTextInternal: { color: '#fff', fontWeight: 'bold', fontSize: 14, letterSpacing: 1 },
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.76)', justifyContent: 'center', alignItems: 'center', zIndex: 999 },
   loadingText: { color: '#9e37f3', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 }
