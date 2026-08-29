@@ -200,8 +200,7 @@ export default function ProblemAndSolution() {
 
       setProblemSections([]);
       setSolutionSections([]);
-      if(mode === "list") setPrevMode("list");
-      else setPrevMode("main");
+      setPrevMode(mode === "list" ? "list" : "main");
       setMode("add");
     } else {
       setCurrentPSItem(psItem);
@@ -489,6 +488,7 @@ export default function ProblemAndSolution() {
     if (cleanIdsToDelete.length === 0) return;
     
     const isDeletingAll = actualIds.length === hPsItems.length;
+
     Alert.alert(
       isDeletingAll ? "Delete All Items" : "Delete Items",
       isDeletingAll ? "Remove all Items in this Category?" : `Remove ${cleanIdsToDelete.length} selected Item(s)?`,
@@ -679,7 +679,6 @@ export default function ProblemAndSolution() {
       const destinationCategory = prevCategory || 'allcategories';
       setPrevCategory(destinationCategory);
       setPsItemCategory(destinationCategory);
-      
       await handleSavePSItem(psItemData, destinationCategory);
     } catch (err) {
       Alert.alert("Save Error", err.message || "Failed to save Item");
@@ -796,7 +795,7 @@ export default function ProblemAndSolution() {
       if (mode === 'add') {
         if (isPickingRef.current || isPicking) return true;
         if (isLoadingRef.current) return true;
-        setMode(prevMode);
+        setMode(prevMode === "list" ? "list" : "main");
         resetForm();
         return true;
       }
@@ -1223,7 +1222,6 @@ export default function ProblemAndSolution() {
     );
   }
 
-
   if (mode === 'list') {
      return (
       <ImageBackground style={{flex: 1, width: '100%', height: '100%'}} resizeMode='cover' source={require('../assets/problems/problemsbg.png')}>
@@ -1409,7 +1407,6 @@ export default function ProblemAndSolution() {
     );
   }
 
-
   return (
     <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/problems/problemsbg.png')}>
       <StatusBar barStyle="dark-content"/>
@@ -1422,7 +1419,7 @@ export default function ProblemAndSolution() {
           <View style={styles.searchRow}>
             <TextInput
               style={styles.searchInput}
-              placeholder="Search Workspace..."
+              placeholder="Search Problems..."
               placeholderTextColor="rgba(88, 79, 79, 0.62)"
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -1488,7 +1485,7 @@ export default function ProblemAndSolution() {
 
         { loading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#ad38ca" />
+            <ActivityIndicator size="large" color="#8821c4" />
             <Text style={styles.loadingText}>Synchronizing File Systems...</Text>
           </View>
         ) }
@@ -1496,7 +1493,6 @@ export default function ProblemAndSolution() {
     </ImageBackground>
   );
 }
-
 
 const styles = StyleSheet.create({
   imgBackground: { flex: 1, width: '100%', height: '100%' },
