@@ -278,12 +278,6 @@ export default function ProblemAndSolution() {
   };
 
 
-  const isValidMediaUri = (uri) => {
-    if (!uri || typeof uri !== 'string') return false;
-    return uri.startsWith('http://') || uri.startsWith('https://') || uri.startsWith('file://') || uri.startsWith('content://');
-  };
-
-
   const copyPickedMediaToCache = async (sourceUri, fileName) => {
     const cacheDir = `${FileSystem.cacheDirectory}ps-media/`;
     await FileSystem.makeDirectoryAsync(cacheDir, { intermediates: true });
@@ -985,15 +979,15 @@ export default function ProblemAndSolution() {
       <TouchableOpacity 
         onLongPress={() => toggleSelect(item.id)}
         onPress={() => selectedIds.length > 0 ? toggleSelect(item.id) : viewPSItem(item)}
-        style={[styles.chapterCard, isSelected && styles.selectedCard]}
+        style={[styles.psitemCard, isSelected && styles.selectedCard]}
       >
         <Text style={styles.psCardTitle} numberOfLines={1}>{item.title}</Text>
         <Text style={styles.psCardCount}>{`${item.problemSections?.length || 0} Problems / ${item.solutionSections?.length || 0} Solutions`}</Text>
-        <View style={styles.psCardFooter}>
+        { selectedIds.includes(item.id) && selectedIds.length === 1 && ( <View style={styles.psCardFooter}>
           <TouchableOpacity style={styles.editBtnCard} onPress={() => populateForEdit(item, item.category)}>
             <Text style={styles.editBtnText}>EDIT</Text>
           </TouchableOpacity>
-        </View>
+        </View> ) }
       </TouchableOpacity>
     );
   };
@@ -1165,12 +1159,14 @@ export default function ProblemAndSolution() {
         )}
 
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>
+        
           <View style={styles.vcHeader}>
             <Text style={styles.streamHeadingDivider}>⚠️ PROBLEM SECTIONS</Text>
             <TouchableOpacity onPress={() => setPDropdownVisible(!pDropdownVisible)} style={styles.vcToggleBtn}>
               <Text style={styles.vcToggleText}>{!pDropdownVisible ? '▼' : '▲'}</Text>
             </TouchableOpacity>
           </View>
+
           {pDropdownVisible && currentPSItem.problemSections?.map((item, index) => (
             <SectionPlayer
               key={item.id}
@@ -1191,6 +1187,7 @@ export default function ProblemAndSolution() {
               <Text style={styles.vcToggleText}>{!sDropdownVisible ? '▼' : '▲'}</Text>
             </TouchableOpacity>
           </View>
+
           {sDropdownVisible && currentPSItem.solutionSections?.map((item, index) => (
             <SectionPlayer
               key={item.id}
@@ -1526,35 +1523,35 @@ const styles = StyleSheet.create({
   sectionContainer: { marginVertical: 10, width: '100%' },
   sectionHeader: { color: '#9e37f3', fontSize: 14, fontWeight: 'bold', marginLeft: 16, marginBottom: 8, textTransform: 'uppercase' },
   verticalWrapper: { width: '100%', alignItems: 'center', paddingVertical: 6 },
-  chapterCard: { width: CARD_WIDTH, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, padding: 14, marginHorizontal: 8, borderWidth: 1, borderColor: '#a926dc', elevation: 3 },
-  selectedCard: { borderColor: '#a926dc', backgroundColor: '#fef2f2', borderWidth: 2 },
-  psCardTitle: { fontSize: 15, fontWeight: 'bold', color: '#1e293b', marginBottom: 4 },
-  psCardCount: { fontSize: 12, color: '#64748b', marginBottom: 10 },
-  psCardFooter: { flexDirection: 'row', justifyContent: 'flex-end', width: '100%' },
-  editBtnCard: { backgroundColor: '#8f36d8', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
-  editBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 11 },
-  batchBar: { position: 'absolute', bottom: 20, left: '5%', right: '5%', height: 55, backgroundColor: '#1e293b', borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, borderWidth: 1.5, borderColor: '#a926dc', elevation: 10 },
+  psitemCard: { width: CARD_WIDTH, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, padding: 14, marginHorizontal: 8, borderWidth: 1, borderColor: '#a926dc', elevation: 3 },
+  selectedCard: { borderColor: '#a926dc', backgroundColor: '#fcfbfb73', borderWidth: 2 },
+  psCardTitle: { fontSize: 15, fontWeight: 'bold', color: '#261735', marginBottom: 4 },
+  psCardCount: { fontSize: 12, color: '#213b42', marginBottom: 10 },
+  psCardFooter: { flexDirection: 'row', justifyContent: 'flex-end', width: '76%' },
+  editBtnCard: { backgroundColor: '#7821c0', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
+  editBtnText: { color: '#edf5ed', fontWeight: 'bold', fontSize: 11 },
+  batchBar: { position: 'absolute', bottom: 57, left: 20, right: 20, height: 55, backgroundColor: '#1e293b', borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, borderWidth: 1.5, borderColor: '#a926dc', elevation: 10 },
   batchText: { color: '#a32ab3', fontWeight: 'bold', fontSize: 13 },
   shareIcon: { width: 35, height: 35 },
   myDojoDiscardIcon: { width: 35, height: 35 },
   myDojoDeleteIcon: { width: 35, height: 35 },
-  vcHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1e0c29a9', paddingHorizontal: 16, paddingVertical: 8, borderWidth: 2, borderColor: '#7f19d3', borderRadius: 10, margin: 8 },
+  vcHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#511974ad', paddingHorizontal: 16, paddingVertical: 8, borderWidth: 2, borderColor: '#7f19d3', borderRadius: 10, margin: 8 },
   vcTitle: { flex: 1, color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginHorizontal: 10 },
-  vcToggleBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#8d3081', justifyContent: 'center', alignItems: 'center' },
+  vcToggleBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#7e308d', justifyContent: 'center', alignItems: 'center' },
   vcToggleText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
   vcDropdownContainer: { width: '95%', maxHeight: height * 0.2, alignSelf: 'center', backgroundColor: '#1e293b', borderRadius: 10, padding: 10, marginBottom: 8, borderWidth: 1, borderColor: '#9a926dc90f1a' },
   vcInfoLabel: { color: '#8f36d8', fontSize: 12, fontWeight: 'bold', textAlign: 'center', marginBottom: 6 },
   vcDescScroll: { flexGrow: 1, marginTop: 4 },
   vcDescText: { color: 'honeydew', fontSize: 12, lineHeight: 16 },
-  streamHeadingDivider: { color: '#eef5ed', backgroundColor: '#3f154293', fontSize: 13, fontWeight: 'bold', paddingVertical: 6, paddingHorizontal: 16, marginVertical: 12, letterSpacing: 1 },
+  streamHeadingDivider: { color: '#edf5ed', backgroundColor: '#3f154293', fontSize: 13, fontWeight: 'bold', paddingVertical: 6, paddingHorizontal: 16, marginVertical: 12, letterSpacing: 1 },
   formHeaderTitleRow: { width: '100%', alignItems: 'center', marginVertical: 10 },
   discardBtn: { backgroundColor: 'rgba(206, 26, 26, 0.32)', borderWidth: 1, borderColor: '#dc262623', marginBottom: 9, marginLeft: 12, height: 70, width: 67, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1},
   discardText: { color: '#ef4444', fontWeight: 'bold', fontSize: 11 },
   formScroller: { flex: 1, paddingHorizontal: 16 },
-  label: { color: '#f3efbd', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
+  label: { color: '#f9fadf', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
   input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#590f85', marginBottom: 4 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
-  formStreamSectionDivider: { color: '#b155fc', fontSize: 13, fontWeight: 'bold', marginTop: 22, marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#660f88', paddingBottom: 4 },
+  formStreamSectionDivider: { color: '#b155fc', fontSize: 13, fontWeight: 'bold', marginTop: 22, marginBottom: 10, borderBottomWidth: 2, borderBottomColor: '#590f85', paddingBottom: 4 },
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   sectionIndexLabel: { color: '#fff', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
   sectionFooterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' },

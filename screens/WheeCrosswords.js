@@ -25,6 +25,7 @@ export default function WheeCrosswords() {
   const [mode, setMode] = useState("main");
 
   const [crosswordGridT, setCrosswordGridT] = useState([[]]);
+  const [isGridVisible, setIsGridVisible] = useState(false);
   const [hcrosswords, setHcrosswords] = useState([]);
   const [scrosswords, setScrosswords] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -550,6 +551,7 @@ export default function WheeCrosswords() {
     if( !isValidCrossword(vCrossword) ) {
       Alert.alert("Invalid Formation","Unable to make a valid crossword formation with the given words. Please adjust your answers.");
       setCrosswordGridT(getGridT(vCrossword));
+      setIsGridVisible(true);
       return;
     }
 
@@ -1019,7 +1021,15 @@ export default function WheeCrosswords() {
                     <ImageBackground style={{ height: 47, width: "100%",justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/savecrosswordbtn.png')} />
                   </TouchableOpacity>
 
-                  <View style={styles.grid}>
+                  { isGridVisible && (
+                    <View style={styles.grid}>
+                      <View style={styles.gridHeaderRow}>
+                        <Text style={styles.sectionIndexLabel}>Crossword</Text>
+                        <TouchableOpacity disabled={isGridVisible} onPress={() => setIsGridVisible(!isGridVisible)} style={styles.removeGridBtn}>
+                          <Image source={require('../assets/redgoldcloseicon.png')} style={styles.removeGridImage} resizeMode="contain" />
+                        </TouchableOpacity>
+                    </View>
+
                     {crosswordGridT.map((row, rowIndex) => (
                       <View key={`row-${rowIndex}`} style={styles.row}>
                         {row.map((letter, colIndex) => (
@@ -1029,7 +1039,7 @@ export default function WheeCrosswords() {
                         ))}
                       </View>
                     ))}
-                  </View>
+                  </View> ) }
 
                 </View>
             </ScrollView>
@@ -1232,4 +1242,8 @@ const styles = StyleSheet.create({
   row: {flexDirection: 'row'},
   cell: {width: 60,height: 60,backgroundColor: '#f0f4f8',borderWidth: 1,borderColor: '#cbd5e1',borderRadius: 8,margin: 4, justifyContent: 'center',alignItems: 'center'},
   cellText: {fontSize: 24,fontWeight: 'bold',color: '#1e293b'},
+  removeGridBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center', marginLeft: 8, borderColor: '#990f0f', borderWidth: 1.5, position: "absolute", top: 7, right: 7  },
+  removeGridImage: { width: 22, height: 22 },
+  gridHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', position: "relative" },
+  sectionIndexLabel: { color: '#fff', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
 });
