@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, Pressable, ImageBackground, SafeAreaView , FlatList, ScrollView } from "react-native";
+import { StyleSheet, Text, View, Image, Pressable, ImageBackground, FlatList, ScrollView } from "react-native";
 import React, { useState, useEffect, useLayoutEffect } from "react"; 
 import CheckBox from "./CheckBox";
 import { SafeAreaView } from 'react-native-safe-area-context';

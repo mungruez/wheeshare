@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator, Pressable } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -48,9 +48,6 @@ export default function WheeQuizzes() {
     { id: "q3", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
     { id: "q4", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
   ]);
-
-
-  const iconName = props.isChecked ? "checkbox-marked" : "checkbox-blank-outline"; 
   
 
   const showInstructions = () => {
@@ -978,11 +975,11 @@ export default function WheeQuizzes() {
             </View>
             
             <TouchableOpacity onPress={() => { resetForm(); setMode(prevMode); }} style={styles.discardBtn}>
-              <ImageBackground style={{ height: 67, width: "100%", opacity: 1, marginBottom: 4}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
-              <Text style={styles.discardText}>❌CANCEL</Text>
+              <ImageBackground style={{ height: 57, width: 57, opacity: 1, marginTop: 7}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
+              <Text style={styles.discardText}>CANCEL</Text>
             </TouchableOpacity>
 
-            <ScrollView style={styles.formScroller} contentContainerStyle={{ paddingBottom: 120 }}>
+            <ScrollView style={styles.formScroller} contentContainerStyle={{ paddingBottom: 120, paddingTop: 12 }}>
               <Text style={styles.label}>Quiz Title</Text>
               <TextInput
                 style={styles.input}
@@ -1050,7 +1047,7 @@ export default function WheeQuizzes() {
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.saveBtnFullBlock} onPress={saveQuiz}>
-                <ImageBackground style={{ height: 57, width: "100%",justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/savequizbtn.png')} />
+                <ImageBackground style={{ height: 57, width: "100%",justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/quizzes/savequizbtn.png')} />
               </TouchableOpacity>
             </ScrollView>
           </SafeAreaView>
@@ -1198,8 +1195,8 @@ const styles = StyleSheet.create({
   vcDescScroll: { flexGrow: 1, marginTop: 4 },
   vcDescText: { color: 'honeydew', fontSize: 12, lineHeight: 16 },
   formHeaderTitleRow: { width: '100%', alignItems: 'center', marginVertical: 10 },
-  discardBtn: { alignSelf: 'flex-start', backgroundColor: 'rgba(220, 38, 38, 0.19)', borderWidth: 1, borderColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 8, marginBottom: 9, marginLeft: 12, height: 70, width: 67, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1 },
-  discardText: { color: '#ef4444', fontWeight: 'bold', fontSize: 11 },
+  discardBtn: { alignSelf: 'flex-start', backgroundColor: 'rgba(220, 38, 38, 0.19)', borderWidth: 1, borderColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 8, marginBottom: 9, marginLeft: 12, height: 85, width: 64, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1 },
+  discardText: { color: '#ef4444', fontWeight: '600', fontSize: 10, width: 76, marginTop: 2, textAlign: 'center' },
   formScroller: { flex: 1, paddingHorizontal: 16 },
   label: { color: '#f04444', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
   input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#cbd5e1', marginBottom: 4 },
