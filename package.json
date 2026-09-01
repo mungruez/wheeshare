@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
+    "@config-plugins/react-native-blob-util": "^14.0.2",
+    "@config-plugins/react-native-pdf": "^14.0.2",
     "@expo/vector-icons": "^15.0.2",
     "@react-native-community/netinfo": "12.0.1",
     "@react-navigation/native": "^7.3.14",
@@ -17,7 +19,9 @@
     "expo-video": "~57.0.2",
     "react": "19.2.3",
     "react-native": "0.86.0",
+    "react-native-blob-util": "^0.24.10",
     "react-native-gesture-handler": "~2.32.0",
+    "react-native-pdf": "^7.0.5",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
     "react-native-webview": "13.16.1",

@@ -1,24 +1,61 @@
 {
   "expo": {
-    "name": "wheeShare",
-    "slug": "wheeShare",
+    "name": "WheeShare",
+    "slug": "wheeshare",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/wheesharelauncher.png",
     "userInterfaceStyle": "light",
-    "ios": {
-      "supportsTablet": true
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F0EFEA"
     },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "android": {
+      "softwareKeyboardLayoutMode": "pan",
+      "package": "dojosoft.zaakirmungrue.wheeshare",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/wheesharelauncher.png",
+        "backgroundColor": "#F0EFEA"
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
+    },
+    "plugins": [
+      "expo-video",
+      "expo-audio",
+      "expo-asset",
+      "expo-image-picker",
+      "expo-sharing",
+      "expo-status-bar",
+      "@config-plugins/react-native-blob-util",
+      "@config-plugins/react-native-pdf"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "364bec3e-dd73-4059-98b0-b395f4384fc4"
+      }
+    },
+    "owner": "mungruez"
   }
 }
