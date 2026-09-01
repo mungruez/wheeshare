@@ -193,12 +193,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginBottom:57,
 	},
-	row: {
-		flexDirection: 'row',
-	},
-	cellContainer: {
-		position: 'relative',
-	},
+	row: {flexDirection: 'row'},
+	cellContainer: {position: 'relative'},
 	cell: {
 		borderWidth: 1,
 		margin: 1,
@@ -207,10 +203,7 @@ const styles = StyleSheet.create({
 		height: 30,
 		textAlign: 'center',
 	},
-	staticCell: {
-		borderColor: 'transparent',
-		color: 'white',
-	},
+	staticCell: {color: 'white'},
 	smallDigit: {
 		position: 'absolute',
 		top: 2,
@@ -243,12 +236,8 @@ const styles = StyleSheet.create({
 		marginTop: 20,
 		marginHorizontal: 10,
 	},
-	button: {
-		flex: 1, // Ensure equal width for both buttons
-	},
-	gap: {
-		width: 10, // Adjust the width as needed for the desired gap
-	},
+	button: {flex: 1},
+	gap: {width: 10}
 });
 
 export default CrosswordGrid
