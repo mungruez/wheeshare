@@ -38,6 +38,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     return 5;
   };
   
+
   const getInferredType = (question) => {
     if (!question || !Array.isArray(question.options)) return "long";
     
@@ -50,10 +51,12 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     return "single";
   };
 
+
   const getDisplayOptions = (question) => Array.isArray(question?.options)
     ? question.options.map((item, index) => ({ item, index })).filter(({ item }) => item?.trim())
     : [];
   
+
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
@@ -125,8 +128,6 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
       setAnswers((prevAnswers) => [...prevAnswers, newAnswerRecord]);
     }
   }, [selectedAnswerIndex]);
-
-  
  
   
   useEffect(() => {
@@ -237,8 +238,9 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
       <SafeAreaView style={{ flex: 1, backgroundColor: "#f8fafc" }}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
           <Pressable onPress={() => { if (onBackToDashboard) {onBackToDashboard();}}} style={styles.closeIconContainer} >
-          <AntDesign name="close" size={22} color="red" />
-        </Pressable>
+            <AntDesign name="close" size={22} color="red" />
+          </Pressable>
+
           <Text style={{ fontSize: 16, fontWeight: "bold", color: "#1e293b" }}>Quiz Challenge</Text>
           <Pressable style={{ padding: 10, backgroundColor: "green", borderRadius: 20, minWidth: 45 }}>
             <Text style={{ color: "white", textAlign: "center", fontWeight: "bold" }} >{counter}</Text>
@@ -481,13 +483,12 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
                   </View>
                 );
               }}
-
             />
           </View>         
 
-          <Pressable style={{ backgroundColor: "#228B22", padding: 12, marginBottom: 20, borderRadius: 5, mx: 10 }}
+          <Pressable style={{ backgroundColor: "#159215", padding: 12, marginVertical: 19, borderRadius: 9, width: 133, alignSelf: "center", justifyContent: "center" }}
             onPress={() => { setQmode("start"); }}>
-            <Text style={{ color: "white", textAlign: "center", fontWeight: "700" }}>New Quiz</Text>
+            <Text style={{ color: "white", textAlign: "center", fontWeight: "700", fontSize: 13 }}>Start Quiz</Text>
           </Pressable>
         </View>
       </SafeAreaView>
