@@ -7,9 +7,7 @@ import WheeProblemsAndSolutions from './screens/WheeProblemsAndSolutions';
 import WheeChapters from './screens/WheeChapters';
 import WheeCrosswords from './screens/WheeCrosswords';
 import WheeQuizzes from './screens/WheeQuizzes';
-//<Stack.Screen name="Chapters" component={WheeChapters} options={{headerShown:false, animation: 'slide_from_right'}}/>
-       // <Stack.Screen name="ProblemsAndSolutions" component={WheeProblemsAndSolutions} options={{headerShown:false, animation: 'slide_from_right'}}/>
-       
+   
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -18,6 +16,8 @@ export default function App() {
       <StatusBar style="dark" />
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} options={{headerShown:false, animation: 'slide_from_left'}}/>
+        <Stack.Screen name="Chapters" component={WheeChapters} options={{headerShown:false, animation: 'slide_from_right'}}/>
+        <Stack.Screen name="Problems" component={WheeProblemsAndSolutions} options={{headerShown:false, animation: 'slide_from_right'}}/>
          <Stack.Screen name="Crosswords" component={WheeCrosswords} options={{headerShown:false, animation: 'slide_from_right'}}/>
         <Stack.Screen name="Quizzes" component={WheeQuizzes} options={{headerShown:false, animation: 'slide_from_right'}}/>
         <Stack.Screen name="About" component={Resources} options={{headerShown:false, animation: 'slide_from_right'}}/>

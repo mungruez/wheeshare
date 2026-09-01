@@ -28,12 +28,12 @@ export default function HomeScreen() {
         <ScrollView style={{ flexDirection:"column", marginTop: 19}}>
             <TouchableOpacity
               style={styles.buttonimage}
-              onPress={()=> navigation.navigate('Quizzes')}>
+              onPress={()=> navigation.navigate('Chapters')}>
               <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
-                <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>QUIZZES</Text>
+                <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>CHAPTERS</Text>
               </ImageBackground>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={styles.buttonimage}
               onPress={()=> navigation.navigate('Crosswords')}>
@@ -42,7 +42,21 @@ export default function HomeScreen() {
               </ImageBackground>
             </TouchableOpacity>
 
-
+            <TouchableOpacity
+              style={styles.buttonimage}
+              onPress={()=> navigation.navigate('Quizzes')}>
+              <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
+                <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>QUIZZES</Text>
+              </ImageBackground>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.buttonimage}
+              onPress={()=> navigation.navigate('Problems')}>
+              <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
+                <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>PROBLEMS</Text>
+              </ImageBackground>
+            </TouchableOpacity>
             
             <TouchableOpacity
               style={styles.buttonimage}
