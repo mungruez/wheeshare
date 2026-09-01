@@ -12,10 +12,10 @@ import * as Sharing from 'expo-sharing';
 const { height, width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.76;
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const GRID_PADDING = 16; 
+const GRID_PADDING = 3; 
 const COLUMN_COUNT = 25;
 const CALCULATED_CELL_SIZE = (SCREEN_WIDTH - (GRID_PADDING * 2)) / COLUMN_COUNT;
-const CELL_SIZE = Math.max(CALCULATED_CELL_SIZE, 24);
+const CELL_SIZE = Math.max(CALCULATED_CELL_SIZE, 21);
 
 
 export default function WheeCrosswords() {
@@ -999,10 +999,10 @@ export default function WheeCrosswords() {
                                     key={`cell-${rowIndex}-${colIndex}`} 
                                     style={[
                                       styles.cell, 
-                                      { backgroundColor: isEmpty ? '#111111' : '#FFFFFF', borderWidth: isEmpty ? 0 : 1, borderColor: '#FFD700' }
+                                      { backgroundColor: isEmpty ? '#111111' : '#FFFFFF', borderWidth: isEmpty ? 0 : 1, borderColor: '#259963' }
                                     ]}
                                   >
-                                    <Text style={[styles.cellText, { color: isEmpty ? '#333' : '#111' }]}>
+                                    <Text style={[styles.cellText, { color: isEmpty ? '#e8ffdd' : '#1d460b' }]}>
                                       {isEmpty ? '' : letter}
                                     </Text>
                                   </View>
@@ -1025,7 +1025,7 @@ export default function WheeCrosswords() {
   if (mode === 'list') {
     return (
       <ImageBackground style={{flex: 1, width: '100%', height: '100%', opacity: 1}} resizeMode='cover' imageStyle={{ opacity: 0.9 }} source={require('../assets/crosswords/crosswordslistbg.png')}>
-          <StatusBar barStyle="dark-content"/>
+          <StatusBar barStyle="light-content"/>
           <SafeAreaView style={{ flex: 1}}>
             <View style={{marginBottom: 12, paddingHorizontal: 5, justifyContent: 'center', alignItems: 'center', opacity: 1}}>
               <ImageBackground style={ styles.icon } resizeMode='contain' imageStyle={{ opacity: 1 }} source={ require('../assets/crosswords/crosswordlisttitle.png') } /> 
@@ -1196,7 +1196,7 @@ const styles = StyleSheet.create({
   infoIcon: { height: 47, width: 47, marginLeft: 21, marginBottom: 5, opacity: 1 },
   importIcon: {height: 76, width: 67, borderRadius: 9, marginLeft: 12 },
   label: { fontWeight: 'bold', color: '#f3efbd', marginTop: 12, fontSize: 12, marginLeft:12 },
-  input: { borderWidth: 2.5, borderColor: '#15811e', borderRadius: 12, padding: 5, marginTop: 7, backgroundColor: 'rgba(152, 247, 123, 0.57))', opacity: 1, fontWeight: "bold", fontSize: 13 },
+  input: { borderWidth: 2.5, borderColor: '#15811e', borderRadius: 12, padding: 5, marginTop: 7, backgroundColor: 'rgba(224, 255, 217, 0.86))', opacity: 1, fontWeight: "bold", fontSize: 13 },
   plusIconAM: { height: 51, width: 46, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 7, marginRight: 19, marginBottom: 2, opacity: 1},
   myDojoDeleteIcon: {height: 49, width: 49, borderRadius: 0,  alignItems: 'center', justifyContent: 'center' },
   myDojoDiscardIcon: {height: 49, width: 49, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
@@ -1212,12 +1212,12 @@ const styles = StyleSheet.create({
   typeBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginBottom: 3 },
   typeText: { color: 'honeydew', fontSize: 9, fontWeight: 'bold' },
   row: {flexDirection: 'row', justifyContent: 'center'},
-  removeGridBtn: { width: 27, height: 27, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center', marginLeft: "70%", borderColor: '#990f0f', borderWidth: 1.5 },
+  removeGridBtn: { width: 24, height: 24, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center', marginLeft: "70%", borderColor: '#990f0f', borderWidth: 1.5 },
   removeGridImage: { width: 19, height: 19 },
   sectionIndexLabel: { color: '#fff', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
-  grid: {backgroundColor: '#1a1a1a',borderRadius: 12,padding: GRID_PADDING,borderWidth: 1,borderColor: '#15811e',marginVertical: 12,alignSelf: 'stretch'},
+  grid: {backgroundColor: '#222020a1',borderRadius: 12,padding: GRID_PADDING,borderWidth: 1,borderColor: '#15811e',marginVertical: 12,alignSelf: 'stretch'},
   gridHeaderRow: {flexDirection: 'row', justifyContent: 'space-between',alignItems: 'center',marginBottom: 16, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: '#333'},
   sectionIndexLabel: {fontSize: 18,fontWeight: 'bold',color: '#308d38'},
   cell: {width: CELL_SIZE,height: CELL_SIZE,justifyContent: 'center',alignItems: 'center',margin: 0.5,borderRadius: 2,backgroundColor: '#2a2a2a'},
-  cellText: {fontSize: CELL_SIZE * 0.55,fontWeight: 'bold',color: '#FFFFFF',textTransform: 'uppercase'}
+  cellText: {fontSize: CELL_SIZE * 0.55,fontWeight: 'bold',color: '#e8ffdd',textTransform: 'uppercase'}
 });
