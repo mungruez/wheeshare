@@ -63,6 +63,22 @@ export default function ProblemAndSolution() {
     );
   };
 
+
+  const clearAppCache = async () => {
+    try {
+      const cacheDir = FileSystem.cacheDirectory;
+      if (cacheDir) {
+        const cachedItems = await FileSystem.readDirectoryAsync(cacheDir);
+        for (const item of cachedItems) {
+          const itemPath = `${cacheDir}${item}`;
+          await FileSystem.deleteAsync(itemPath, { idempotent: true });
+        }
+      }
+    } catch (error) {
+
+    }
+  };
+
   
   const getMediaFileExtension = (uri, type) => {
     if (!uri || typeof uri !== 'string') return '';
@@ -770,8 +786,9 @@ export default function ProblemAndSolution() {
 
   useFocusEffect(
     useCallback(() => {
-      loadPsItems();
-    }, [psItemCategory])
+      if ( mode !== "view" ) clearAppCache();
+      if ( mode !== "add" && mode !== "view" ) loadPsItems();
+    }, [])
   );
 
 

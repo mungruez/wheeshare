@@ -42,12 +42,7 @@ export default function WheeQuizzes() {
   const [multipleanswers, setMultipleAnswers] = useState(false);
   const [longanswer, setLongAnswer] = useState(false);
 
-  const [questionsList, setQuestionsList] = useState([
-    { id: "q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-    { id: "q2", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-    { id: "q3", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-    { id: "q4", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
-  ]);
+  const [questionsList, setQuestionsList] = useState([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
   
 
   const showInstructions = () => {
@@ -527,10 +522,7 @@ export default function WheeQuizzes() {
       }
       
       setQuestionsList([
-        { id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-        { id: Date.now().toString()+"q2", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-        { id: Date.now().toString()+"q3", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
-        { id: Date.now().toString()+"q4", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
+        { id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
       ]);
       setMode("add");
     } else {
