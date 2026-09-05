@@ -1314,7 +1314,7 @@ export default function ProblemAndSolution() {
   if (mode === 'add') {
      return (
       <ImageBackground source={require('../assets/problems/problemsbg.png')} style={styles.imgBackground} resizeMode='cover' >
-        <StatusBar barStyle="dark-content" />
+        <StatusBar barStyle="light-content" />
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
           <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.formHeaderTitleRow}>
@@ -1423,7 +1423,7 @@ export default function ProblemAndSolution() {
 
   return (
     <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/problems/problemsbg.png')}>
-      <StatusBar barStyle="dark-content"/>
+      <StatusBar barStyle="light-content"/>
       <SafeAreaView style={{flex: 1}}>
         <View style={styles.centerLogoWrapper}>
           <ImageBackground style={styles.icon} resizeMode='contain' source={require('../assets/problems/problemstitle.png')} /> 
@@ -1532,7 +1532,7 @@ const styles = StyleSheet.create({
   fullWidthBtnAssetTextured: { width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' },
   cardTextMenuTitle: { color: '#313030', fontWeight: 'bold', fontSize: 15, textAlign: 'center', width: '90%' },
   centerNotificationFlexPanel: { flex: 1, paddingHorizontal: 30, justifyContent: 'center', alignItems: 'center' },
-  infoTextDashboardFallback: { color: '#f3efbd', textAlign: 'center', fontSize: 13, lineHeight: 18 },
+  infoTextDashboardFallback: { color: '#b155fc', textAlign: 'center', fontSize: 13, lineHeight: 18 },
   categoryHeaderText: { color: '#9e37f3', fontSize: 13, fontWeight: '600', textAlign: 'center', textTransform: 'uppercase', marginVertical: 6 },
   flatlistContainer: { flex: 1, width: '100%' },
   emptyContainerView: { padding: 20, alignItems: 'center', justifyContent: 'center' },
@@ -1541,7 +1541,7 @@ const styles = StyleSheet.create({
   sectionHeader: { color: '#9e37f3', fontSize: 14, fontWeight: 'bold', marginLeft: 16, marginBottom: 8, textTransform: 'uppercase' },
   verticalWrapper: { width: '100%', alignItems: 'center', paddingVertical: 6 },
   psitemCard: { width: CARD_WIDTH, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, padding: 14, marginHorizontal: 8, borderWidth: 1, borderColor: '#a926dc', elevation: 3 },
-  selectedCard: { borderColor: '#a926dc', backgroundColor: '#fcfbfb73', borderWidth: 2 },
+  selectedCard: { borderColor: '#b338fa', backgroundColor: '#fcfbfb73', borderWidth: 2 },
   psCardTitle: { fontSize: 15, fontWeight: 'bold', color: '#261735', marginBottom: 4 },
   psCardCount: { fontSize: 12, color: '#213b42', marginBottom: 10 },
   psCardFooter: { flexDirection: 'row', justifyContent: 'flex-end', width: '76%' },
@@ -1560,20 +1560,20 @@ const styles = StyleSheet.create({
   vcInfoLabel: { color: '#8f36d8', fontSize: 12, fontWeight: 'bold', textAlign: 'center', marginBottom: 6 },
   vcDescScroll: { flexGrow: 1, marginTop: 4 },
   vcDescText: { color: 'honeydew', fontSize: 12, lineHeight: 16 },
-  streamHeadingDivider: { color: '#edf5ed', backgroundColor: '#3f154293', fontSize: 13, fontWeight: 'bold', paddingVertical: 6, paddingHorizontal: 16, marginVertical: 12, letterSpacing: 1 },
+  streamHeadingDivider: { color: '#d9acee', backgroundColor: '#3f154293', fontSize: 13, fontWeight: 'bold', paddingVertical: 6, paddingHorizontal: 16, marginVertical: 12, letterSpacing: 1 },
   formHeaderTitleRow: { width: '100%', alignItems: 'center', marginVertical: 10 },
   discardBtn: { backgroundColor: 'rgba(206, 26, 26, 0.32)', borderWidth: 1, borderColor: '#dc262623', marginBottom: 9, marginLeft: 12, height: 70, width: 67, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1},
   discardText: { color: '#ef4444', fontWeight: 'bold', fontSize: 11 },
   formScroller: { flex: 1, paddingHorizontal: 16 },
-  label: { color: '#f9fadf', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
+  label: { color: '#b155fc', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4 },
   input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#590f85', marginBottom: 4 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
   formStreamSectionDivider: { color: '#b155fc', fontSize: 13, fontWeight: 'bold', marginTop: 22, marginBottom: 10, borderBottomWidth: 2, borderBottomColor: '#590f85', paddingBottom: 4 },
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
-  sectionIndexLabel: { color: '#fff', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
+  sectionIndexLabel: { color: '#b155fc', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
   sectionFooterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' },
   changeTypeContainer: { flex: 1 },
-  changeTypeLabel: { color: '#f3efbd', fontSize: 11, fontWeight: '600', marginBottom: 4 },
+  changeTypeLabel: { color: '#c89eeb', fontSize: 11, fontWeight: '600', marginBottom: 4 },
   changeTypeGrid: { flexDirection: 'row', gap: 6 },
   changeTypeIconBtn: { width: 36, height: 36, borderRadius: 8, backgroundColor: 'rgba(185, 56, 202, 0.15)', borderWidth: 1, borderColor: 'rgba(161, 35, 219, 0.38)', alignItems: 'center', justifyContent: 'center' },
   changeTypeIcon: { fontSize: 18 },
@@ -1592,11 +1592,11 @@ const styles = StyleSheet.create({
   pdfIconUploaded: { height: 133, width: 95, marginLeft: 12, backgroundColor: 'rgba(72, 103, 243, 0.57)', borderRadius: 10, marginTop: 57, justifyContent: 'center', alignItems: 'center',borderWidth: 1, borderColor: '#4447f8',borderStyle: 'dashed'},
   audioIconUploaded: { height: 133, width: 95, marginLeft: 12, backgroundColor: 'rgba(223, 72, 243, 0.57)', borderRadius: 10, marginTop: 57, justifyContent: 'center', alignItems: 'center',borderWidth: 1, borderColor: '#da44f8',borderStyle: 'dashed'},
   imageIconUploaded: { height: 133, width: 95, marginLeft: 12, backgroundColor: 'rgba(38, 152, 95, 0.57)', borderRadius: 10, marginTop: 57, justifyContent: 'center', alignItems: 'center',borderWidth: 1, borderColor: '#44f84d',borderStyle: 'dashed'},
-  orText: { color: '#f3efbd', fontWeight: 'bold', fontSize: 16, marginTop: 19, marginBottom: -7, marginLeft: 38 },
+  orText: { color: '#c89eeb', fontWeight: 'bold', fontSize: 16, marginTop: 19, marginBottom: -7, marginLeft: 38 },
   toggleModeBtn: { alignSelf: 'center', marginTop: 45, marginBottom: 19, padding: 5, backgroundColor: 'rgba(186, 55, 212, 0.12)', borderRadius: 6, borderWidth: 1, borderColor: 'rgba(149, 55, 212, 0.5)', flexDirection: "row" },
-  toggleModeText: { color: '#f3efbd', fontSize: 14, fontWeight: '600', marginLeft: 4 },
+  toggleModeText: { color: '#c89eeb', fontSize: 14, fontWeight: '600', marginLeft: 4 },
   saveBtnBlock: { width: 152, height: 61, borderRadius: 10, alignSelf:'center', marginTop: 25, marginBottom: 20 },
-  saveBtnTextInternal: { color: '#fff', fontWeight: 'bold', fontSize: 14, letterSpacing: 1 },
+  saveBtnTextInternal: { color: '#c89eeb', fontWeight: 'bold', fontSize: 14, letterSpacing: 1 },
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.76)', justifyContent: 'center', alignItems: 'center', zIndex: 999 },
   loadingText: { color: '#9e37f3', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 }
 });

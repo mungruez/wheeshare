@@ -1028,32 +1028,32 @@ export default function WheeQuizzes() {
               
               <Text style={{marginLeft: 2, color: "#001414", fontSize: 15, fontWeight: "600", textAlign: "center"}}>Question Type:</Text>
               <View style={{ flexDirection: "row", flex: 1, maxHeight: 57, justifyContent: "center", alignItems: "center", marginBottom: 19}}>
-                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 43, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5',borderWidth:.7}}> 
                   <Pressable onPress={handleMultipleChoiceClick}> 
-                    <MaterialCommunityIcons name={multiplechoice ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#411313" /> 
+                    <MaterialCommunityIcons name={multiplechoice ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
                   </Pressable> 
-                  <Text style={{fontSize: 11, color: "#000", marginLeft: 0, fontWeight: "600"}}>Multiple Choice</Text> 
+                  <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>Mul Choice</Text> 
                 </View>
                 
-                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 43, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5',borderWidth:.7}}> 
                   <Pressable onPress={handleTrueFalseClick}> 
-                    <MaterialCommunityIcons name={truefalse ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#411313" /> 
+                    <MaterialCommunityIcons name={truefalse ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
                   </Pressable> 
-                  <Text style={{fontSize: 11, color: "#000", marginLeft: 0, fontWeight: "600"}}>True/False</Text> 
+                  <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>True/False</Text> 
                 </View>
 
-                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 43, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f8f0f0',borderWidth:.7}}> 
                   <Pressable onPress={handleMultipleAnswersClick}> 
-                    <MaterialCommunityIcons name={multipleanswers ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#411313" /> 
+                    <MaterialCommunityIcons name={multipleanswers ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
                   </Pressable> 
-                  <Text style={{fontSize: 11, color: "#000", marginLeft: 0, fontWeight: "600"}}>Multiple Answers</Text> 
+                  <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>Mul Ans</Text> 
                 </View>
 
-                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 43, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#d8fffd',borderWidth:.7}}> 
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f8f0f0',borderWidth:.7}}> 
                   <Pressable onPress={handleLongAnswerClick}> 
-                    <MaterialCommunityIcons name={longanswer ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#411313" /> 
+                    <MaterialCommunityIcons name={longanswer ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
                   </Pressable> 
-                  <Text style={{fontSize: 11, color: "#000", marginLeft: 0, fontWeight: "600"}}>Long Answer</Text> 
+                  <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>Long Ans</Text> 
                 </View>
               </View>
               
@@ -1077,7 +1077,7 @@ export default function WheeQuizzes() {
       <StatusBar barStyle="light-content"/>
       <SafeAreaView style={{flex: 1}}>
         <View style={styles.centerLogoWrapper}>
-          <ImageBackground style={styles.icon} resizeMode='contain' source={require('../assets/quizzes/quizzestitle.png')} /> 
+          <ImageBackground style={styles.iconmain} resizeMode='contain' source={require('../assets/quizzes/quizzestitle.png')} /> 
         </View>
 
         <View style={styles.header}>
@@ -1141,7 +1141,7 @@ export default function WheeQuizzes() {
           />
         ) : (
           <View style={styles.centerNotificationFlexPanel}>
-            <Text style={styles.infoTextDashboardFallback}>Tap the red (+) icon to design a new Quiz..</Text>
+            <Text style={styles.infoTextDashboardFallback}>Tap the red (+) icon to design a new Quiz</Text>
           </View>
         )}
 
@@ -1162,6 +1162,7 @@ const styles = StyleSheet.create({
   viewLayoutContainer: { flex: 1, backgroundColor: '#1e293b', width: '100%', height: '100%' },
   centerLogoWrapper: { marginBottom: 19, marginTop: 19, justifyContent: 'center', alignItems: 'center' },
   icon: { height: 70, width: width * 0.9 },
+  iconmain: { height: 57, width: width * 0.83 },
   iconAM: { height: 60, width: width * 0.8 },
   addQuestionBtn: { width: 177, height: 55, borderRadius: 19, marginTop: 7, alignSelf:'center' },
   header: { paddingHorizontal: 16, marginBottom: 10, width: '100%' },
@@ -1181,7 +1182,7 @@ const styles = StyleSheet.create({
   categoryMenuSelectionRowItem: { width: '80%', height: 55, justifyContent: 'center', alignItems: 'center' },
   cardTextMenuTitle: { color: '#313030', fontWeight: 'bold', fontSize: 15, textAlign: 'center', width: '90%' },
   centerNotificationFlexPanel: { flex: 1, paddingHorizontal: 30, justifyContent: 'center', alignItems: 'center' },
-  infoTextDashboardFallback: { color: '#f3efbd', textAlign: 'center', fontSize: 13, lineHeight: 18 },
+  infoTextDashboardFallback: { color: '#bb211c', textAlign: 'center', fontSize: 13, lineHeight: 18 },
   categoryHeaderText: { color: '#ca3838', fontSize: 13, fontWeight: '600', textAlign: 'center', textTransform: 'uppercase', marginVertical: 6 },
   flatlistContainer: { flex: 1, width: '100%' },
   emptyContainerView: { padding: 20, alignItems: 'center', justifyContent: 'center' },
@@ -1213,7 +1214,7 @@ const styles = StyleSheet.create({
   discardBtn: { alignSelf: 'flex-start', backgroundColor: 'rgba(220, 38, 38, 0.19)', borderWidth: 1, borderColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 8, marginBottom: 9, marginLeft: 12, height: 85, width: 64, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1 },
   discardText: { color: '#ef4444', fontWeight: '600', fontSize: 10, width: 76, marginTop: 2, textAlign: 'center' },
   formScroller: { flex: 1, paddingHorizontal: 16 },
-  label: { color: '#f04444', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
+  label: { color: '#e4d7d7', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4},
   input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#cbd5e1', marginBottom: 4 },
   optionsinput: { height: 34, backgroundColor: '#cbd5e1', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 0, color: '#000', fontSize: 12, lineHeight: 16, borderWidth: 1, borderColor: '#8a3c40cc', marginBottom: 2 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
