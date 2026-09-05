@@ -718,7 +718,6 @@ export default function WheeQuizzes() {
   };
 
 
-//for multiple answers just give them up to 7 options and dont render blank options
   const renderFormQuestionEditor = (qItem, qIdx) => (
     <View key={qItem.id} style={styles.sectionContainerBlock}>
       <View style={styles.questionHeaderRow}>
@@ -1216,7 +1215,7 @@ const styles = StyleSheet.create({
   formScroller: { flex: 1, paddingHorizontal: 16 },
   label: { color: '#f04444', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4, textTransform: 'uppercase' },
   input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#cbd5e1', marginBottom: 4 },
-  optionsinput: { height: 38, backgroundColor: '#cbd5e1', borderRadius: 8, paddingHorizontal: 5, color: '#000', borderWidth: 1, borderColor: '#8a3c40cc', marginBottom: 2 },
+  optionsinput: { height: 34, backgroundColor: '#cbd5e1', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 0, color: '#000', fontSize: 12, lineHeight: 16, borderWidth: 1, borderColor: '#8a3c40cc', marginBottom: 2 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   questionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', position: "relative" },
