@@ -58,8 +58,25 @@ export default function WheeQuizzes() {
         onPress: () => setMode("main"),
         style: "cancel" 
       }],
-      { cancelable: false } 
+      {
+         cancelable: false } 
     );
+  };
+
+
+  const clearAppCache = async () => {
+    try {
+      const cacheDir = FileSystem.cacheDirectory;
+      if (cacheDir) {
+        const cachedItems = await FileSystem.readDirectoryAsync(cacheDir);
+        for (const item of cachedItems) {
+          const itemPath = `${cacheDir}${item}`;
+          await FileSystem.deleteAsync(itemPath, { idempotent: true });
+        }
+      }
+    } catch (error) {
+
+    }
   };
 
   const handleMultipleChoiceClick = () => {
@@ -509,7 +526,12 @@ export default function WheeQuizzes() {
         setQuizCategory(mvcat);
       }
       
-      setQuestionsList([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
+      setQuestionsList([
+        { id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
+        { id: Date.now().toString()+"q2", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
+        { id: Date.now().toString()+"q3", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" },
+        { id: Date.now().toString()+"q4", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
+      ]);
       setMode("add");
     } else {
       setCurrentQuiz(quizItem);
@@ -554,8 +576,9 @@ export default function WheeQuizzes() {
 
   useFocusEffect(
     useCallback(() => {
-      loadQuizzes();
-    }, [quizCategory])
+      if ( mode !== "view" ) clearAppCache();
+      if ( mode !== "add" && mode !== "view" ) loadQuizzes();
+    }, [])
   );
 
 
@@ -997,6 +1020,7 @@ export default function WheeQuizzes() {
                 value={quizCategory}
                 onChangeText={setQuizCategory}
               />
+              
 
               <Text style={styles.label}>Description (Optional)</Text>
               <TextInput

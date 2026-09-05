@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, TextInput, StyleSheet, Text, Button } from 'react-native';
+import { View, TextInput, StyleSheet, Text, Button, ScrollView } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 
 let level = 0;
+const ROW_COUNT = 12;
+const COLUMN_COUNT = 12;
 
 const generateInitialGrid = (crosswordData) => {
-	const initialGrid = Array(7).fill(0).map(() => Array(8).fill('.'));
+	const initialGrid = Array(ROW_COUNT).fill(0).map(() => Array(COLUMN_COUNT).fill('.'));
 	crosswordData[level]?.forEach(({ answer, startx, starty, orientation }) => {
-		let x = startx - 1;
-		let y = starty - 1;
+		let row = startx;
+		let column = starty;
 
 		for (let i = 0; i < answer.length; i++) {
 			if (orientation === 'across') {
-				initialGrid[y][x + i] = '';
+				initialGrid[row][column + i] = '';
 			} else if (orientation === 'down') {
-				initialGrid[y + i][x] = '';
+				initialGrid[row + i][column] = '';
 			}
 		}
 	});
@@ -22,16 +24,16 @@ const generateInitialGrid = (crosswordData) => {
 };
 
 const generateAnswerGrid = (crosswordData) => {
-	const answerGrid = Array(7).fill(0).map(() => Array(8).fill('.'));
+	const answerGrid = Array(ROW_COUNT).fill(0).map(() => Array(COLUMN_COUNT).fill('.'));
 	crosswordData[level]?.forEach(({ answer, startx, starty, orientation }) => {
-		let x = startx - 1;
-		let y = starty - 1;
+		let row = startx;
+		let column = starty;
 
 		for (let i = 0; i < answer.length; i++) {
 			if (orientation === 'across') {
-				answerGrid[y][x + i] = answer[i];
+				answerGrid[row][column + i] = answer[i];
 			} else if (orientation === 'down') {
-				answerGrid[y + i][x] = answer[i];
+				answerGrid[row + i][column] = answer[i];
 			}
 		}
 	});
@@ -50,6 +52,7 @@ const CrosswordGrid = ({ crosswordData }) => {
 	}, []);
 
 	useEffect(() => {
+		level = 0;
 		setGrid(generateInitialGrid(crosswordData));
 	}, [crosswordData]);
 
@@ -60,7 +63,7 @@ const CrosswordGrid = ({ crosswordData }) => {
 	};
 
 	const handleGenerate = () => {
-		level = (level + 1) % 3;
+		level = (level + 1) % Math.max(crosswordData.length, 1);
 		setGrid(generateInitialGrid(crosswordData));
 	};
 
@@ -85,13 +88,14 @@ const CrosswordGrid = ({ crosswordData }) => {
 
 	const renderGrid = () => (
 		<View>
-			{grid?.map((row, rowIndex) => (
-				<View key={rowIndex} style={styles.row}>
-					{row.map((cell, colIndex) => (
+			<ScrollView horizontal showsHorizontalScrollIndicator={false}>
+				{grid?.map((row, rowIndex) => (
+					<View key={rowIndex} style={styles.row}>
+						{row.map((cell, colIndex) => (
 						<View key={colIndex} style={styles.cellContainer}>
 							{crosswordData[level]?.map((entry) => {
 								const { startx, starty, position } = entry;
-								if (rowIndex + 1 === starty && colIndex + 1 === startx) {
+												if (rowIndex === startx && colIndex === starty) {
 									return (
 										<Text key={`digit-${position}`} 
 											style={styles.smallDigit}>
@@ -111,10 +115,11 @@ const CrosswordGrid = ({ crosswordData }) => {
 								}
 								maxLength={1}
 							/>
-						</View>
-					))}
-				</View>
-			))}
+											</View>
+										))}
+									</View>
+								))}
+			</ScrollView>
 		</View>
 	);
 

@@ -13,7 +13,7 @@ const { height, width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.76;
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const GRID_PADDING = 3; 
-const COLUMN_COUNT = 25;
+const COLUMN_COUNT = 12;
 const CALCULATED_CELL_SIZE = (SCREEN_WIDTH - (GRID_PADDING * 2)) / COLUMN_COUNT;
 const CELL_SIZE = Math.max(CALCULATED_CELL_SIZE, 21);
 
@@ -32,6 +32,7 @@ export default function WheeCrosswords() {
 
   const [crosswordGridT, setCrosswordGridT] = useState([[]]);
   const [isGridVisible, setIsGridVisible] = useState(false);
+  const [gridWordCount, setGridWordCount] = useState(0);
   const [hcrosswords, setHcrosswords] = useState([]);
   const [scrosswords, setScrosswords] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -59,7 +60,7 @@ export default function WheeCrosswords() {
 
   const recCrossword = (crossW, gridT, wordNum, tracker) => {
     const MAX_X = 12; 
-    const MAX_Y = 25;
+    const MAX_Y = 12;
     let wordsPlacedSoFar = wordNum - 1;
     if (wordsPlacedSoFar > tracker.maxWordsPlaced) {
       tracker.maxWordsPlaced = wordsPlacedSoFar;
@@ -165,7 +166,7 @@ export default function WheeCrosswords() {
 
 
   const checkCrossword = () => {
-    const createFreshGrid = () => Array(12).fill(0).map(() => Array(25).fill('.'));
+    const createFreshGrid = () => Array(12).fill(0).map(() => Array(12).fill('.'));
     let initialGrid = createFreshGrid();
     let crossW = { 
       id: typeof crosswordId !== 'undefined' ? crosswordId : (currentCrossword?.id || Date.now().toString()), 
@@ -173,7 +174,7 @@ export default function WheeCrosswords() {
       category: crosswordCategory.trim(), 
       updatedAt: new Date().toISOString(),
       questions: [ 
-        { answer: questions[0].answer.trim(), hint: questions[0].hint.trim(), startx: 1, starty: 12, orientation: 'across', position: 1 },
+        { answer: questions[0].answer.trim(), hint: questions[0].hint.trim(), startx: 1, starty: 1, orientation: 'across', position: 1 },
         { answer: questions[1].answer.trim(), hint: questions[1].hint.trim(), startx: -1, starty: -1, orientation: '', position: 2 },
         { answer: questions[2].answer.trim(), hint: questions[2].hint.trim(), startx: -1, starty: -1, orientation: '', position: 3 },
         { answer: questions[3].answer.trim(), hint: questions[3].hint.trim(), startx: -1, starty: -1, orientation: '', position: 4 } 
@@ -184,32 +185,38 @@ export default function WheeCrosswords() {
     recCrossword(crossW.questions, initialGrid, 1, overallBestTracker);
     if (overallBestTracker.maxWordsPlaced === 4) {
       crossW.questions = overallBestTracker.bestQuestionsSnapshot;
-      return crossW;
+      return {
+        crosswordData: crossW,
+        renderGrid: initialGrid
+      };
     }
 
     for (let x = 1; x < 4; x++) {
       initialGrid = createFreshGrid();
       let workingQuestions = JSON.parse(JSON.stringify(crossW.questions));
       workingQuestions.forEach(q => { q.startx = -1; q.starty = -1; q.orientation = ''; });
-      workingQuestions[0].startx = 1; workingQuestions[0].starty = 12; workingQuestions[0].orientation = 'across';
+      workingQuestions[0].startx = 1; workingQuestions[0].starty = 1; workingQuestions[0].orientation = 'across';
       let tmp = workingQuestions[0];
       workingQuestions[0] = workingQuestions[x];
       workingQuestions[x] = tmp;
       workingQuestions[0].position = 1;
       workingQuestions[0].startx = 1; 
-      workingQuestions[0].starty = 12;
+      workingQuestions[0].starty = 1;
       workingQuestions[0].orientation = 'across';
       workingQuestions[x].position = x + 1;
       recCrossword(workingQuestions, initialGrid, 1, overallBestTracker);
 
       if (overallBestTracker.maxWordsPlaced === 4) {
         crossW.questions = overallBestTracker.bestQuestionsSnapshot;
-        return crossW;
+        return {
+          crosswordData: crossW,
+          renderGrid: initialGrid
+        };
       }
     }
 
     crossW.questions = overallBestTracker.bestQuestionsSnapshot;
-    let finalCleanGrid = Array(12).fill(0).map(() => Array(25).fill('.'));
+    let finalCleanGrid = Array(12).fill(0).map(() => Array(12).fill('.'));
     crossW.questions.forEach(q => {
       if (q.startx === -1 || q.starty === -1 || !q.orientation) return;
 
@@ -444,7 +451,7 @@ export default function WheeCrosswords() {
 
 
   const getGridT = (crossW) => {
-    const grid = Array(12).fill(0).map(() => Array(25).fill('.'));
+    const grid = Array(12).fill(0).map(() => Array(12).fill('.'));
     if (!crossW || !Array.isArray(crossW.questions)) return grid;
     for (let wI = 0; wI < crossW.questions.length; wI++) {
       const q = crossW.questions[wI];
@@ -452,15 +459,15 @@ export default function WheeCrosswords() {
       const ans = q.answer || '';
       if (q.orientation === 'across') {
         for (let xI = 0; xI < ans.length; xI++) {
-          const x = q.startx + xI;
-          const y = q.starty;
-          if (x >= 0 && x < 12 && y >= 0 && y < 25) grid[x][y] = ans[xI];
+          const x = q.startx;
+          const y = q.starty + xI;
+          if (x >= 0 && x < 12 && y >= 0 && y < 12) grid[x][y] = ans[xI];
         }
       } else {
         for (let yI = 0; yI < ans.length; yI++) {
-          const x = q.startx;
-          const y = q.starty + yI;
-          if (x >= 0 && x < 12 && y >= 0 && y < 25) grid[x][y] = ans[yI];
+          const x = q.startx + yI;
+          const y = q.starty;
+          if (x >= 0 && x < 12 && y >= 0 && y < 12) grid[x][y] = ans[yI];
         }
       }
     }
@@ -494,7 +501,7 @@ export default function WheeCrosswords() {
       
     let response = checkCrossword();
     let vCrossword = response.crosswordData;
-    let generatedGrid = response.renderGrid;
+    let generatedGrid = getGridT(vCrossword);
     let placedWordCount = vCrossword.questions.filter(q => q.startx !== -1 && q.starty !== -1).length;
     if (placedWordCount < 2) {
       Alert.alert(
@@ -505,6 +512,7 @@ export default function WheeCrosswords() {
     }
 
     setCrosswordGridT(generatedGrid);
+    setGridWordCount(placedWordCount);
     setIsGridVisible(true);
     if (placedWordCount < 4) {
       Alert.alert(
@@ -982,7 +990,9 @@ export default function WheeCrosswords() {
 
                   { isGridVisible && ( <View style={styles.grid}>
                     <View style={styles.gridHeaderRow}>
-                      <Text style={styles.sectionIndexLabel}>Crossword</Text>
+                      <Text style={styles.sectionIndexLabel}>
+                        {gridWordCount < 4 ? `${gridWordCount} of 4 Words Connected` : 'Crossword Preview'}
+                      </Text>
                       <TouchableOpacity onPress={() => setIsGridVisible(false)} style={styles.removeGridBtn}>
                         <Image source={require('../assets/redgoldcloseicon.png')} style={styles.removeGridImage} resizeMode="contain" />
                       </TouchableOpacity>
@@ -1212,8 +1222,8 @@ const styles = StyleSheet.create({
   typeBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginBottom: 3 },
   typeText: { color: 'honeydew', fontSize: 9, fontWeight: 'bold' },
   row: {flexDirection: 'row', justifyContent: 'center'},
-  removeGridBtn: { width: 24, height: 24, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center', marginLeft: "70%", borderColor: '#990f0f', borderWidth: 1.5 },
-  removeGridImage: { width: 19, height: 19 },
+  removeGridBtn: { width: 24, height: 24, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center', marginRight: 2, borderColor: '#990f0f', borderWidth: 1.5 },
+  removeGridImage: { width: 21, height: 21 },
   sectionIndexLabel: { color: '#fff', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
   grid: {backgroundColor: '#222020a1',borderRadius: 12,padding: GRID_PADDING,borderWidth: 1,borderColor: '#15811e',marginVertical: 12,alignSelf: 'stretch'},
   gridHeaderRow: {flexDirection: 'row', justifyContent: 'space-between',alignItems: 'center',marginBottom: 16, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: '#333'},
