@@ -24,9 +24,9 @@ export default function Resources() {
   return (
     <ImageBackground style={ styles.imgBackground } resizeMode='stretch' source={require('../assets/homescreen.png')}>
       <StatusBar barStyle="light-content"/>
-      <SafeAreaView style={{ flex: 1, height: "100%", marginTop:7}}>
+      <SafeAreaView style={{ flex: 1, height: "100%", marginTop: 7}}>
 
-      <View style={{ marginBottom:19, paddingTop:1, paddingBottom:7, height:76 ,width: '90%',alignSelf: 'center',zIndex: 19,elevation: 19,}}>
+      <View style={{ marginBottom: 19, paddingTop: 1, paddingBottom: 7, height: 114, width: '90%', alignSelf: 'center', elevation: 19,}}>
         <ImageBackground style={ styles.icon } resizeMode='contain' source={require('../assets/abouttitle.png')} /> 
       </View > 
 
@@ -68,11 +68,10 @@ const styles = StyleSheet.create({
   imgBackground: { marginBottom:"5%",width: '100%', maxHeight: '95%', flex: 1, opacity: 1 },
   title: {fontSize: 15,fontWeight: 'medium',color: 'white',backgroundColor: 'lightgrey',backgroundColor: 'rgba(211, 211, 211, 0.1)',marginLeft: 19,marginRight: 19,marginTop: 7,marginBottom: 12,padding: 5},
   icon: { 
-    height: 76, 
+    height: 114,
     elevation: 3, 
-    marginTop:38, 
+    marginTop: 3, 
     textAlign: "center", 
-    zIndex:3 
   },
   buttonArea: { flex: 1 },
   quizzes: {

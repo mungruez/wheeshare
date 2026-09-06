@@ -351,8 +351,8 @@ export default function WheeQuizzes() {
       return;
     }
 
-    if (!Array.isArray(questionsList) || questionsList.length !== 4) {
-      Alert.alert('Required', 'Every Quiz must contain exactly 4 Questions');
+    if (!Array.isArray(questionsList) || questionsList.length < 10) {
+      Alert.alert('Required', 'Every Quiz must contain at least 10 Questions');
       return;
     }
 
@@ -382,10 +382,6 @@ export default function WheeQuizzes() {
         if (!optionText && !isLongTextLayout) {
           if (isMultipleAnswers) continue;
           Alert.alert('Required', `Question #${i + 1}, Option #${j + 1} cannot be empty`);
-          return;
-        }
-        if (optionText && optionText.length > 95) {
-          Alert.alert('Limit Exceeded', `Question #${i + 1} Option #${j + 1} is too long! Maximum allowed is 95 characters.`);
           return;
         }
       }
@@ -434,7 +430,6 @@ export default function WheeQuizzes() {
         }),
         updatedAt: new Date().toISOString()
       };
-
 
       await handleSaveQuiz(sanitizedQuizData);
       if(prevCategory === 'allcategories') setQuizCategory("allcategories");
@@ -686,8 +681,8 @@ export default function WheeQuizzes() {
 
   
   const MyHeader = () => (
-    <View style={styles.silverDivider}>
-      <ImageBackground style={{width: "100%", height: "100%"}} resizeMode="cover" source={require('../assets/quizzes/quizzesdivider.png')}/>
+    <View style={styles.quizzesDivider}>
+      <ImageBackground style={{width: "100%", height: "100%"}} resizeMode="contain" source={require('../assets/quizzes/quizzesdivider.png')}/>
     </View>
   );
 
@@ -742,7 +737,7 @@ export default function WheeQuizzes() {
       
       { qItem.options?.length == 4 ? ( <View>
         <Text style={styles.label}>4 Multiple Choice Options (Max 80 Chars Each)</Text>
-        {Array.from({ length: 7 }, (_, optIdx) => qItem.options?.[optIdx] || "").map((optValue, optIdx) => (
+        {Array.from({ length: 4 }, (_, optIdx) => qItem.options?.[optIdx] || "").map((optValue, optIdx) => (
           <TextInput
             key={optIdx}
             style={styles.optionsinput}
@@ -1026,30 +1021,30 @@ export default function WheeQuizzes() {
 
               {questionsList.map((section, index) => renderFormQuestionEditor(section, index))}
               
-              <Text style={{marginLeft: 2, color: "#001414", fontSize: 15, fontWeight: "600", textAlign: "center"}}>Question Type:</Text>
+              <Text style={{marginLeft: 2, color: "#f7efef", fontSize: 15, fontWeight: "600", textAlign: "center"}}>Question Type:</Text>
               <View style={{ flexDirection: "row", flex: 1, maxHeight: 57, justifyContent: "center", alignItems: "center", marginBottom: 19}}>
-                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5',borderWidth:.7}}> 
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius: 12, borderWidth:.7, borderColor: '#b62730'}}> 
                   <Pressable onPress={handleMultipleChoiceClick}> 
                     <MaterialCommunityIcons name={multiplechoice ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
                   </Pressable> 
-                  <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>Mul Choice</Text> 
+                  <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>Multi Choice</Text> 
                 </View>
                 
-                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5',borderWidth:.7}}> 
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius:12, borderWidth:.7, borderColor: '#b62730'}}> 
                   <Pressable onPress={handleTrueFalseClick}> 
                     <MaterialCommunityIcons name={truefalse ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
                   </Pressable> 
                   <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>True/False</Text> 
                 </View>
 
-                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f8f0f0',borderWidth:.7}}> 
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f8f0f0', borderRadius: 12, borderWidth:.7, borderColor: '#b62730'}}> 
                   <Pressable onPress={handleMultipleAnswersClick}> 
                     <MaterialCommunityIcons name={multipleanswers ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
                   </Pressable> 
-                  <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>Mul Ans</Text> 
+                  <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>Multi Ans</Text> 
                 </View>
 
-                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 43, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f8f0f0',borderWidth:.7}}> 
+                <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f8f0f0', borderRadius: 12, borderWidth:.7, borderColor: '#b62730'}}> 
                   <Pressable onPress={handleLongAnswerClick}> 
                     <MaterialCommunityIcons name={longanswer ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
                   </Pressable> 
@@ -1122,7 +1117,7 @@ export default function WheeQuizzes() {
               <View style={styles.card}>
                 {item && item.category && (
                   <TouchableOpacity
-                    style={{ width: '79%', height: 43, justifyContent:'center', alignItems:'center' }}
+                    style={{ width: 152, height: 57, justifyContent:'center', alignItems:'center' }}
                     onPress={() => { setHquizzes(getQuizzes(item.category, quizzes)); setQuizCategory(item.category); setPrevCategory(item.category); setMode("list"); }}>
                     <ImageBackground style={{flex: 1, justifyContent:'center', alignItems:'center'}} resizeMode='stretch' source={require('../assets/quizzes/redbtnbg.png')}>
                       { item.id === 'q-all' ? 
@@ -1160,7 +1155,7 @@ export default function WheeQuizzes() {
 const styles = StyleSheet.create({
   imgBackground: { flex: 1, width: '100%', height: '100%' },
   viewLayoutContainer: { flex: 1, backgroundColor: '#1e293b', width: '100%', height: '100%' },
-  centerLogoWrapper: { marginBottom: 19, marginTop: 19, justifyContent: 'center', alignItems: 'center' },
+  centerLogoWrapper: { marginBottom: 7, marginTop: 12, justifyContent: 'center', alignItems: 'center' },
   icon: { height: 70, width: width * 0.9 },
   iconmain: { height: 57, width: width * 0.83 },
   iconAM: { height: 60, width: width * 0.8 },
@@ -1176,6 +1171,7 @@ const styles = StyleSheet.create({
   importIcon: { width: 45, height: 45 },
   infoIcon: { width: 45, height: 45 },
   silverDivider: { width: '99%', height: 10, alignSelf: 'center', marginVertical: 5 },
+  quizzesDivider: { width: '76%', height: 38, alignSelf: 'center', marginVertical: 5 },
   smallGap: { height: 12 },
   card: { width: '100%', alignItems: 'center', marginVertical: 6 },
   cardText: { fontSize: 16, fontWeight: 'bold', color: '#f3bdbd', paddingHorizontal: 5},
@@ -1193,9 +1189,9 @@ const styles = StyleSheet.create({
   chapterCard: { width: CARD_WIDTH, backgroundColor: 'rgba(245, 238, 238, 0.86)', borderRadius: 12, padding: 14, marginHorizontal: 8, borderWidth: 1, borderColor: '#f14242', elevation: 3 },
   selectedCard: { borderColor: '#dc2626', backgroundColor: '#ffadad94', borderWidth: 2 },
   chapterCardTitle: { fontSize: 14, fontWeight: 'bold', color: '#1e293b', marginBottom: 4 },
-  chapterCardCount: { fontSize: 12, color: '#64748b', marginBottom: 10 },
-  chapterCardFooter: { flexDirection: 'row', justifyContent: 'flex-end', width: '76%' },
-  editBtnCard: { backgroundColor: '#da4e36', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
+  chapterCardCount: { fontSize: 12, color: '#606f83', marginBottom: 10 },
+  chapterCardFooter: { flexDirection: 'row', justifyContent: 'center', width: '76%' },
+  editBtnCard: { backgroundColor: '#bd280e', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
   editBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 11 },
   batchBar: { position: 'absolute', bottom: 57, left: 20, right: 20, height: 55, backgroundColor: '#19212e', borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 19, borderWidth: 1.5, borderColor: '#ca3838', elevation: 10 },
   batchText: { color: '#ca3838', fontWeight: 'bold', fontSize: 13 },
@@ -1221,7 +1217,7 @@ const styles = StyleSheet.create({
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   questionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', position: "relative" },
   sectionIndexLabel: { color: '#fff', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
-  removeQuestionBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center', marginLeft: 8, borderColor: '#990f0f', borderWidth: 1.5, position: "absolute", top: 7, right: 7  },
+  removeQuestionBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center', marginLeft: 8, borderColor: '#990f0f', borderWidth: 1.5, position: "absolute", top: 5, right: 7  },
   removeQuestionImage: { width: 22, height: 22 },
   changeTypeGrid: { flexDirection: 'row', gap: 10, marginVertical: 6 },
   changeTypeIconBtn: { width: 45, height: 40, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },

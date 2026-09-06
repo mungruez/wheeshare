@@ -169,7 +169,7 @@ export default function WheeCrosswords() {
     const createFreshGrid = () => Array(12).fill(0).map(() => Array(12).fill('.'));
     let initialGrid = createFreshGrid();
     let crossW = { 
-      id: typeof crosswordId !== 'undefined' ? crosswordId : (currentCrossword?.id || Date.now().toString()), 
+      id: crosswordId || currentCrossword?.id || Date.now().toString(), 
       title : crosswordTitle.trim(), 
       category: crosswordCategory.trim(), 
       updatedAt: new Date().toISOString(),
@@ -409,7 +409,7 @@ export default function WheeCrosswords() {
       Alert.alert('Save Failed', e.message);
     } finally {
       isLoadingRef.current = false;
-      if (isLoading) setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -530,7 +530,7 @@ export default function WheeCrosswords() {
     } catch (err) {
       Alert.alert("Save Error", err.message || "Failed to save Crossword");
     } finally {
-      if (isLoading) setIsLoading(false);
+      setIsLoading(false);
     }
   }
 
@@ -1127,7 +1127,7 @@ export default function WheeCrosswords() {
               </View>
     
               <View style={{flexDirection:'row', alignItems:'center', justifyContent: 'center', marginBottom: 1, minHeight: 73, width:"100%"}}>
-                <TouchableOpacity onPress={() => { setCurrentCrossword(null); setCrosswordTitle(""); setCrosswordCategory(""); setSelectedIds([]); setQuestions([{answer: "", hint: "", startx: "", starty: "", orientation: "", position: "1"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "2"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "3"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "4"}]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
+                <TouchableOpacity onPress={() => { setCurrentCrossword(null); setCrosswordId(null); setCrosswordTitle(""); setCrosswordCategory(""); setSelectedIds([]); setQuestions([{answer: "", hint: "", startx: "", starty: "", orientation: "", position: "1"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "2"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "3"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "4"}]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
                   <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/crosswords/addcrosswordbtn.png')}/>         
                 </TouchableOpacity> 
                 <TouchableOpacity onPress={handleImportCrosswords} style={styles.importIcon}>

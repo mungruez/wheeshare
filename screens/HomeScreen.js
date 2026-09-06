@@ -17,8 +17,8 @@ export default function HomeScreen() {
       <StatusBar barStyle="light-content"/>
       <SafeAreaView style={{ flexDirection:"column", height: "100%", marginTop: 19, opacity: 1}}>
 
-        <View style={{ marginBottom: 5, marginTop: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ImageBackground style={{ height: 70, width: "95%" }} resizeMode='contain' source={require('../assets/wheesharetitle.png')} /> 
+        <View style={{ width: '100%', marginBottom: 5, marginTop: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ImageBackground style={{ height: 70, width: "95%", alignSelf: 'center' }} resizeMode='contain' source={require('../assets/wheesharetitle.png')} /> 
         </View>
          
         <View style={{ flexDirection:" row", justifyContent: "center"}}>
