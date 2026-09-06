@@ -1367,7 +1367,11 @@ export default function ProblemAndSolution() {
                 numberOfLines={3}
               />
 
-              <Text style={styles.formStreamSectionDivider}>⚠️ PROBLEM SECTIONS BUILDER</Text>
+              <View style={styles.formStreamSectionDivider}>
+                <Image source={require('../assets/problems/problemicon.png')} style={styles.formStreamSectionDividerIcon} resizeMode="contain" />
+                <Text style={styles.formStreamSectionDividerText}>PROBLEM SECTIONS BUILDER</Text>
+              </View>
+
               {problemSections.map((section, index) => renderSectionItem(section, index, 'problem', getSectionPreviewSource(section)))}
               
               <View style={styles.addSectionContainer}>
@@ -1396,7 +1400,11 @@ export default function ProblemAndSolution() {
                 <Image source={require('../assets/silverdivider.png')} style={{ width: '99%', height: 49, alignSelf: "center", paddingVertical: 1, opacity: 1}} resizeMode='contain'/>
               </View>
 
-              <Text style={styles.formStreamSectionDivider}>✅ SOLUTION SECTIONS BUILDER</Text>
+              <View style={styles.formStreamSectionDivider}>
+                <Image source={require('../assets/problems/solutionicon.png')} style={styles.formStreamSectionDividerIcon} resizeMode="contain" />
+                <Text style={styles.formStreamSectionDividerText}>SOLUTION SECTIONS BUILDER</Text>
+              </View>
+              
               {solutionSections.map((section, index) => renderSectionItem(section, index, 'solution', getSectionPreviewSource(section)))}
 
               <View style={styles.addSectionContainer}>
@@ -1580,7 +1588,9 @@ const styles = StyleSheet.create({
   label: { color: '#b155fc', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4 },
   input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#590f85', marginBottom: 4 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
-  formStreamSectionDivider: { color: '#b155fc', fontSize: 13, fontWeight: 'bold', marginTop: 22, marginBottom: 10, borderBottomWidth: 2, borderBottomColor: '#590f85', paddingBottom: 4 },
+  formStreamSectionDivider: { flexDirection: 'row', alignItems: 'center', marginTop: 22, marginBottom: 10, borderBottomWidth: 2, borderBottomColor: '#590f85', paddingBottom: 4 },
+  formStreamSectionDividerIcon: { width: 20, height: 20, marginRight: 6 },
+  formStreamSectionDividerText: { color: '#b155fc', fontSize: 13, fontWeight: 'bold' },
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   sectionIndexLabel: { color: '#b155fc', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
   sectionFooterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' },
