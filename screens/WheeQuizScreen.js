@@ -193,35 +193,58 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
           <View style={{ padding: 10, flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <Text style={styles.rulesHeader}>QUIZ RULES</Text>
 
-            <View style={{ padding: 10, backgroundColor: "#ff7f7f", borderRadius: 6, marginTop: 15, borderWidth: 2, borderColor: "#9a9aa1" }}>
+            <View style={{ width: '100%', padding: 10, backgroundColor: 'rgba(211, 211, 211, 0.1)', borderRadius: 6, marginTop: 15, borderWidth: 2, borderColor: "#9a9aa1" }}>
               <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5 }}>
-                <Text style={{ color: "white", marginRight: 6 }}>•</Text>
+                <Text style={{ color: "#d1fafa", marginRight: 6 }}>•</Text>
                 <Text style={styles.ruleText}>For each correct answer you get 10 points</Text>
               </View>
 
               <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5 }}>
-                <Text style={{ color: "white", marginRight: 6 }}>•</Text>
+                <Text style={{ color: "#d1fafa", marginRight: 6 }}>•</Text>
                 <Text style={styles.ruleText}>There is no negative marking for wrong answers</Text>
               </View>
 
               <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5 }}>
-                <Text style={{ color: "white", marginRight: 6 }}>•</Text>
+                <Text style={{ color: "#d1fafa", marginRight: 6 }}>•</Text>
                 <Text style={styles.ruleText}>Each question has a time limit of 15 seconds</Text>
               </View>
 
               <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5 }}>
-                <Text style={{ color: "white", marginRight: 6 }}>•</Text>
+                <Text style={{ color: "#d1fafa", marginRight: 6 }}>•</Text>
                 <Text style={styles.ruleText}>You should answer all the questions compulsarily</Text>
               </View>
             </View>
           </View>
 
-          <Text style={{ marginLeft: 2, color: "#001414", fontSize: 15, fontWeight: "600", textAlign: "center", marginBottom: 5 }}>Total Questions</Text>
-          <View style={styles.container}> 
-            <CheckBox onPress={handleTenClick} title="10" isChecked={ten} /> 
-            <CheckBox onPress={handleTwentyClick} title="20" isChecked={twenty} /> 
-            <CheckBox onPress={handleThirtyClick} title="30" isChecked={thirty} /> 
-            <CheckBox onPress={handleFourtyClick} title="40" isChecked={fourty} />
+          <Text style={{marginLeft: 2, color: "#d1fafa", fontSize: 15, fontWeight: "600", textAlign: "center"}}>Total Questions:</Text>
+          <View style={{ flexDirection: "row", flex: 1, maxHeight: 57, justifyContent: "center", alignItems: "center", marginBottom: 19}}>
+            <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius: 12, borderWidth:.7, borderColor: '#b62730'}}> 
+              <Pressable onPress={handleTenClick}> 
+                <MaterialCommunityIcons name={ten ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
+              </Pressable> 
+              <Text style={{fontSize: 12, color: "#000", fontWeight: "600"}}>10</Text> 
+            </View>
+                          
+            <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius:12, borderWidth:.7, borderColor: '#b62730'}}> 
+              <Pressable onPress={handleTwentyClick}> 
+                <MaterialCommunityIcons name={twenty ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
+              </Pressable> 
+              <Text style={{fontSize: 12, color: "#000", fontWeight: "600"}}>20</Text> 
+            </View>
+            
+            <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius:12, borderWidth:.7, borderColor: '#b62730'}}> 
+              <Pressable onPress={handleThirtyClick}> 
+                <MaterialCommunityIcons name={thirty ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
+              </Pressable> 
+              <Text style={{fontSize: 12, color: "#000", fontWeight: "600"}}>30</Text> 
+            </View>
+          
+            <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f8f0f0', borderRadius: 12, borderWidth:.7, borderColor: '#b62730'}}> 
+              <Pressable onPress={handleFourtyClick}> 
+                <MaterialCommunityIcons name={fourty ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
+              </Pressable> 
+              <Text style={{fontSize: 12, color: "#000", fontWeight: "600"}}>40</Text> 
+            </View>
           </View>
 
           <Pressable onPress={() => initializeQuizArray(getQnum())} style={styles.startQuizBtn}>
@@ -249,7 +272,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginHorizontal: 10 }}>
           <Text style={{ fontSize: 13, color: "#64748b" }}>Your Progress</Text>
-          <Text style={{ fontSize: 13, color: "#64748b", fontWeight: "600" }}>({index}/{totalQuestions}) questions answered</Text>
+          <Text style={{ fontSize: 13, color: "#64748b", fontWeight: "600" }}>({index}/{totalQuestionsCount}) questions answered</Text>
         </View>
 
         <View style={{ backgroundColor: "#e2e8f0", width: "95%", height: 10, borderRadius: 20, marginTop: 15, marginLeft: 10, overflow: "hidden", position: "relative" }}>
@@ -500,7 +523,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 const styles = StyleSheet.create({
   imgBackground: { flex: 1, width: '100%', height: '100%' },
   rulesHeader: { fontSize: 22, fontWeight: 'bold', color: '#001414', textAlign: 'center', letterSpacing: 0.5, marginTop: 10 },
-  ruleText: { color: 'white', fontSize: 13, marginLeft: 8, fontWeight: '500', flex: 1, flexWrap: 'wrap' },
+  ruleText: { color: '#d1fafa', fontSize: 13, marginLeft: 8, fontWeight: '500', flex: 1, flexWrap: 'wrap' },
   container: { flexDirection: 'row', justifyContent: 'center', gap: 14, marginVertical: 12, paddingHorizontal: 10 },
   startQuizBtn: { backgroundColor: '#004d40', paddingVertical: 14, borderRadius: 8, marginHorizontal: 20, marginBottom: 30, elevation: 3 },
   questionContainer: { paddingHorizontal: 14, paddingVertical: 10, width: '100%', borderBottomWidth: 1, borderBottomColor: '#e6e6e6' },
