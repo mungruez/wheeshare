@@ -198,6 +198,12 @@ export default function ProblemAndSolution() {
   };
 
 
+  const isRenderableMediaUri = (uri) => {
+    if (!uri || typeof uri !== 'string') return false;
+    return uri.startsWith('http://') || uri.startsWith('https://') || uri.startsWith('file://') || uri.startsWith('content://');
+  };
+
+
   const populateForEdit = (psItem, mvcat) => {
     if (psItem === null) {
       setSelectedIds([]);
@@ -308,19 +314,10 @@ export default function ProblemAndSolution() {
 
 
   const pickMedia = async (id, stream) => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission Denied", "Gallery access is needed to add assets!");
-      return;
-    }
-    
     const activeSections = stream === 'problem' ? problemSections : solutionSections;
     const targetSection = activeSections.find(s => s.id === id);
     if (!targetSection) return;
 
-    const isVideo = targetSection.type === SECTION_TYPES.VIDEO;
-    const mediaType = isVideo ? 'videos' : 'images';
-    
     try {
       isPickingRef.current = true;
       setIsPicking(true);
@@ -331,7 +328,21 @@ export default function ProblemAndSolution() {
         if (!result.canceled && result.assets?.[0]) {
           pickedUri = result.assets[0].uri;
         }
+      } else if (targetSection.type === SECTION_TYPES.AUDIO) {
+        const result = await DocumentPicker.getDocumentAsync({
+          type: ['audio/*', 'audio/mpeg', 'audio/mp3', 'audio/wav']
+        });
+        if (!result.canceled && result.assets?.[0]) {
+          pickedUri = result.assets[0].uri;
+        }
       } else {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Permission Denied", "Gallery access is needed!");
+          return;
+        }
+
+        const mediaType = targetSection.type === SECTION_TYPES.VIDEO ? 'videos' : 'images';
         const res = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: [mediaType],
           allowsEditing: false,
