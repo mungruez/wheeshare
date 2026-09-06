@@ -1057,7 +1057,7 @@ export default function WheeQuizzes() {
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.saveBtnFullBlock} onPress={saveQuiz}>
-                <ImageBackground style={{ height: 57, width: "100%",justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/quizzes/savequizbtn.png')} />
+                <ImageBackground style={{ height: 83, width: "100%",justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/quizzes/savequizbtn.png')} />
               </TouchableOpacity>
             </ScrollView>
           </SafeAreaView>
@@ -1229,6 +1229,6 @@ const styles = StyleSheet.create({
   explanationBoxView: { marginTop: 10, padding: 10, backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
   explanationLabelText: { color: '#cf2323', fontSize: 12, fontWeight: 'bold' },
   explanationBodyText: { color: '#cbd5e1', fontSize: 12, marginTop: 4 },
-  saveBtnFullBlock: { width: 125, height: 97, borderRadius: 15, marginTop: 7, alignSelf:'center', alignItems: 'center', justifyContent:'center', },
+  saveBtnFullBlock: { width: 133, height: 114, borderRadius: 15, marginTop: 7, alignSelf:'center', alignItems: 'center', justifyContent:'center', },
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.75)', justifyContent: 'center', alignItems: 'center', zIndex: 999 },
   loadingText: { color: '#e02f2f', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 } });

@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View, Image, Pressable, ImageBackground, FlatList, ScrollView } from "react-native";
-import React, { useState, useEffect, useLayoutEffect } from "react"; 
-import CheckBox from "./CheckBox";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from '@expo/vector-icons'; 
@@ -117,7 +116,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
       const newAnswerRecord = {
         question: index + 1,
         answer: isCorrect,
-        q: currentQuestion.title || currentQuestion.q || "Question Title",
+        q: currentQuestion.question || "Question Text",
         explanation: currentQuestion.explanation || "",
         corra: currentQuestion.correctAnswerIndex,
         curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : [],
@@ -147,7 +146,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
           const timeoutRecord = {
             question: index + 1,
             answer: false,
-            q: currentQuestion.title || currentQuestion.q || "Question Title",
+            q: currentQuestion.question || "Question Text",
             explanation: currentQuestion.explanation || "Time limit exceeded.",
             corra: currentQuestion.correctAnswerIndex,
             curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : [],
