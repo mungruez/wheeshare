@@ -1334,7 +1334,7 @@ export default function ProblemAndSolution() {
             
             <TouchableOpacity onPress={() => { if (isPicking || isPickingRef.current) return; setMode(prevMode); resetForm(); }} style={styles.discardBtn}>
               <ImageBackground style={{ alignSelf:'center', height:67, width:"100%", opacity: 1}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
-              <Text style={styles.discardText}>❌CANCEL</Text>
+              <Text style={styles.discardText}>CANCEL</Text>
             </TouchableOpacity>
 
             <ScrollView style={styles.formScroller} contentContainerStyle={{ paddingBottom: 120 }}>
@@ -1531,8 +1531,8 @@ const styles = StyleSheet.create({
   searchBtn: { width: 39, height: 37, backgroundColor: '#e7f5ed4f', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
   clearBtn: { width: 32, height: 32, backgroundColor: '#31303080', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
   dashboardIconsControlsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 1, minHeight: 50, width: '100%', gap: 15 },
-  plusIcon: { width: 45, height: 45 },
-  plusIconAM: { width: 40, height: 40, marginRight: 10 },
+  plusIcon: { width: 45, height: 45, marginRight: 7, marginLeft: 10 },
+  plusIconAM: { width: 45, height: 44, marginRight: 19 },
   importIcon: { width: 45, height: 45 },
   infoIcon: { width: 45, height: 45 },
   silverDivider: { width: '99%', height: 10, alignSelf: 'center', marginVertical: 5 },
@@ -1544,7 +1544,7 @@ const styles = StyleSheet.create({
   cardTextMenuTitle: { color: '#313030', fontWeight: 'bold', fontSize: 15, textAlign: 'center', width: '90%' },
   centerNotificationFlexPanel: { flex: 1, paddingHorizontal: 30, justifyContent: 'center', alignItems: 'center' },
   infoTextDashboardFallback: { color: '#b155fc', textAlign: 'center', fontSize: 13, lineHeight: 18 },
-  categoryHeaderText: { color: '#9e37f3', fontSize: 13, fontWeight: '600', textAlign: 'center', textTransform: 'uppercase', marginVertical: 6 },
+  categoryHeaderText: { color: '#9e37f3', fontSize: 12, flex: 1, textTransform: 'uppercase', fontWeight: "500" },
   flatlistContainer: { flex: 1, width: '100%' },
   emptyContainerView: { padding: 20, alignItems: 'center', justifyContent: 'center' },
   emptyReloadText: { color: '#f3efbd', marginBottom: 12, fontWeight: 'bold', fontSize: 15 },
@@ -1563,6 +1563,7 @@ const styles = StyleSheet.create({
   shareIcon: { width: 35, height: 35 },
   myDojoDiscardIcon: { width: 35, height: 35 },
   myDojoDeleteIcon: { width: 35, height: 35 },
+  myDojoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 15, backgroundColor: 'rgba(0,0,0,0.76)', opacity: 1 },
   vcHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#511974ad', paddingHorizontal: 16, paddingVertical: 8, borderWidth: 2, borderColor: '#7f19d3', borderRadius: 10, margin: 8 },
   vcTitle: { flex: 1, color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginHorizontal: 10 },
   vcToggleBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#7e308d', justifyContent: 'center', alignItems: 'center' },

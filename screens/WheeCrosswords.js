@@ -874,7 +874,7 @@ export default function WheeCrosswords() {
   
             <TouchableOpacity onPress={() => { resetForm(); setMode(prevMode || "main"); }} style={styles.discardBtn}>
               <ImageBackground style={{ alignSelf: 'center', height: 51, width: "100%", opacity: 1}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
-              <Text style={styles.discardText}>❌CANCEL</Text>
+              <Text style={styles.discardText}>CANCEL</Text>
             </TouchableOpacity>
             
             <ScrollView style={styles.container}>

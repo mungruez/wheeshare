@@ -907,7 +907,7 @@ export default function WheeQuizzes() {
           </View>
     
           <View style={styles.myDojoHeader}>
-            <Text style={styles.categoryHeaderText}>{quizCategory === "allcategories" ? "ALL CATEGORIES" : `CATEGORY: ${quizCategory}`}</Text>
+            <Text style={{ color: '#caaf38', fontSize: 12, flex: 1, textTransform: 'uppercase', fontWeight: "500" }}>{quizCategory === "allcategories" ? "ALL CATEGORIES" : `CATEGORY: ${quizCategory}`}</Text>
             <View style={{flexDirection:'row'}}>
               <TouchableOpacity onPress={() => { setSelectedIds([]); setQuizCategory(""); setPrevCategory(""); setMode("main"); setPrevMode("main"); }} style={styles.plusIconAM}>
                 <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/quizzes/redbackbtn.png')}/>
@@ -917,6 +917,7 @@ export default function WheeQuizzes() {
               </TouchableOpacity>
             </View>
           </View>
+          
                
           <View style={styles.flatlistContainer}> 
             <FlatList
@@ -1166,8 +1167,8 @@ const styles = StyleSheet.create({
   searchBtn: { width: 39, height: 37, backgroundColor: '#e7f5ed4f', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
   clearBtn: { width: 32, height: 32, backgroundColor: '#31303080', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
   dashboardIconsControlsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 1, minHeight: 50, width: '100%', gap: 19, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 9},
-  plusIcon: { width: 45, height: 45 },
-  plusIconAM: { width: 40, height: 40, marginRight: 10 },
+  plusIcon: { width: 45, height: 45,marginLeft: 15, marginRight: 7},
+  plusIconAM: { width: 45, height: 45, marginRight: 19 },
   importIcon: { width: 45, height: 45 },
   infoIcon: { width: 45, height: 45 },
   silverDivider: { width: '99%', height: 10, alignSelf: 'center', marginVertical: 5 },
@@ -1198,6 +1199,7 @@ const styles = StyleSheet.create({
   shareIcon: { width: 35, height: 35 },
   myDojoDiscardIcon: { width: 35, height: 35 },
   myDojoDeleteIcon: { width: 35, height: 35 },
+  myDojoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 15, backgroundColor: 'rgba(0,0,0,0.76)', opacity: 1 },
   vcHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#0c1429a9', paddingHorizontal: 16, paddingVertical: 8, borderWidth: 2, borderColor: '#990f0f', borderRadius: 10, margin: 8 },
   vcTitle: { flex: 1, color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginHorizontal: 10 },
   vcToggleBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#570f0f', justifyContent: 'center', alignItems: 'center' },
