@@ -278,8 +278,8 @@ export default function ProblemAndSolution() {
   };
 
 
-  const updateSection = (id, field, value, stream) => {
-    if (isPickingRef.current || isPicking) return;
+  const updateSection = (id, field, value, stream, allowWhilePicking = false) => {
+    if (!allowWhilePicking && (isPickingRef.current || isPicking)) return;
     if (stream === 'problem') {
       setProblemSections(problemSections.map(s => s.id === id ? { ...s, [field]: value } : s));
     } else {
@@ -359,7 +359,7 @@ export default function ProblemAndSolution() {
       const mediaFileName = `${Date.now()}${ext}`;
       const cachedUri = await copyPickedMediaToCache(pickedUri, mediaFileName);
 
-      updateSection(id, 'mediaUri', cachedUri, stream);
+      updateSection(id, 'mediaUri', cachedUri, stream, true);
     } catch (err) {
       Alert.alert("Copy Media Failed", "Please try again or select a smaller asset file.");
     } finally {

@@ -58,6 +58,45 @@ export default function WheeCrosswords() {
   };
 
 
+  const canPlaceWord = (word, gridT, startX, startY, orientation, requireCrossing) => {
+    let crossingCount = 0;
+    const stepX = orientation === "down" ? 1 : 0;
+    const stepY = orientation === "across" ? 1 : 0;
+    const endX = startX + stepX * word.length;
+    const endY = startY + stepY * word.length;
+
+    if (startX < 0 || startY < 0 || endX > 12 || endY > 12) return false;
+
+    const beforeX = startX - stepX;
+    const beforeY = startY - stepY;
+    const afterX = endX;
+    const afterY = endY;
+    if ((beforeX >= 0 && beforeY >= 0 && gridT[beforeX][beforeY] !== '.') ||
+        (afterX < 12 && afterY < 12 && gridT[afterX][afterY] !== '.')) return false;
+
+    for (let charIdx = 0; charIdx < word.length; charIdx++) {
+      const x = startX + stepX * charIdx;
+      const y = startY + stepY * charIdx;
+      const existing = gridT[x][y];
+
+      if (existing !== '.' && existing !== word[charIdx]) return false;
+      if (existing !== '.') crossingCount++;
+
+      const sideX = orientation === "across" ? [x - 1, x + 1] : [x, x];
+      const sideY = orientation === "across" ? [y, y] : [y - 1, y + 1];
+      for (let sideIdx = 0; sideIdx < 2; sideIdx++) {
+        const neighborX = sideX[sideIdx];
+        const neighborY = sideY[sideIdx];
+        if (neighborX >= 0 && neighborX < 12 && neighborY >= 0 && neighborY < 12 && gridT[neighborX][neighborY] !== '.') {
+          return false;
+        }
+      }
+    }
+
+    return !requireCrossing || crossingCount > 0;
+  };
+
+
   const recCrossword = (crossW, gridT, wordNum, tracker) => {
     const MAX_X = 12; 
     const MAX_Y = 12;
@@ -65,6 +104,7 @@ export default function WheeCrosswords() {
     if (wordsPlacedSoFar > tracker.maxWordsPlaced) {
       tracker.maxWordsPlaced = wordsPlacedSoFar;
       tracker.bestQuestionsSnapshot = JSON.parse(JSON.stringify(crossW));
+      tracker.bestGridSnapshot = JSON.parse(JSON.stringify(gridT));
     }
 
     if (wordNum === 1) {
@@ -109,6 +149,7 @@ export default function WheeCrosswords() {
         if (currentStartX < 0 || currentStartY < 0) continue;
         if (current.orientation === "across" && currentStartY + current.answer.length > MAX_Y) continue;
         if (current.orientation === "down" && currentStartX + current.answer.length > MAX_X) continue;
+        if (!canPlaceWord(current.answer, gridT, currentStartX, currentStartY, current.orientation, true)) continue;
 
         let isValid = true;
         let gridStack = [];
@@ -144,6 +185,7 @@ export default function WheeCrosswords() {
             if (complete) {
               tracker.maxWordsPlaced = 4;
               tracker.bestQuestionsSnapshot = JSON.parse(JSON.stringify(crossW));
+              tracker.bestGridSnapshot = JSON.parse(JSON.stringify(gridT));
               return crossW;
             }
           } else {
@@ -187,7 +229,7 @@ export default function WheeCrosswords() {
       crossW.questions = overallBestTracker.bestQuestionsSnapshot;
       return {
         crosswordData: crossW,
-        renderGrid: initialGrid
+        renderGrid: overallBestTracker.bestGridSnapshot || initialGrid
       };
     }
 
@@ -210,7 +252,7 @@ export default function WheeCrosswords() {
         crossW.questions = overallBestTracker.bestQuestionsSnapshot;
         return {
           crosswordData: crossW,
-          renderGrid: initialGrid
+          renderGrid: overallBestTracker.bestGridSnapshot || initialGrid
         };
       }
     }
@@ -773,6 +815,11 @@ export default function WheeCrosswords() {
   };
 
 
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(selectedId => selectedId !== id) : [...prev, id]);
+  };
+
+
   const truncText = (txt) => {
     let str = "";
     if(txt) {
@@ -838,6 +885,36 @@ export default function WheeCrosswords() {
     if (!scrosswords[0]) return null;
     if (scrosswords[0].id === "c-all") return <Image source={require('../assets/crosswords/crosswordsdivider.png')} style={styles.goldDivider} resizeMode='contain'/>;
     return null;
+  };
+
+
+  const CrosswordCard = ({ item }) => {
+    const isSelected = selectedIds.includes(item.id);
+
+    return (
+      <TouchableOpacity
+        style={[styles.listCard, isSelected && styles.selectedListCard]}
+        onLongPress={() => toggleSelect(item.id)}
+        onPress={() => selectedIds.length > 0 ? toggleSelect(item.id) : viewCrossword(item.category)}
+        activeOpacity={0.8}
+      >
+        <View style={styles.listRow}>
+          <View style={styles.infoBox}>
+            <Text style={styles.crosswordTitle} numberOfLines={2} ellipsizeMode='clip'>{truncText(item.title)}</Text>
+          </View>
+          <View style={styles.typeBadge}>
+            <Text style={styles.questionText} numberOfLines={2} ellipsizeMode='clip'>{truncText(item.questions?.[0]?.hint)}</Text>
+          </View>
+        </View>
+        {isSelected && selectedIds.length === 1 && (
+          <View style={styles.crosswordCardFooter}>
+            <TouchableOpacity style={styles.editBtnCard} onPress={() => populateForEdit(item, item.category)}>
+              <Text style={styles.editBtnText}>EDIT</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
   };
 
 
@@ -1058,27 +1135,25 @@ export default function WheeCrosswords() {
               <View style = {styles.flatlistContainer}> 
                 <FlatList
                   data={hcrosswords || []}
-                  keyExtractor={(item) => item.id}
+                  keyExtractor={(item, index) => item.category || index.toString()}
                   style = {{ flex: 1 }}
                   nestedScrollEnabled={true}
                   contentContainerStyle={{ paddingBottom: 57 }}
                   showsVerticalScrollIndicator={false}
-                  renderItem={({ item, index }) => (
-                    <TouchableOpacity
-                      style={styles.listCard}
-                      onPress={() => viewCrossword(item.category)}
-                      activeOpacity={0.8}
-                    >
-                      <View style={styles.listRow}>
-                        <View style={styles.infoBox}>
-                          <Text style={styles.crosswordTitle} numberOfLines={2} ellipsizeMode='clip' >{truncText(item.title)}</Text>
-                        </View>
-                          <View style={styles.typeBadge}>
-                            <Text style={styles.questionText} numberOfLines={2} ellipsizeMode='clip' >{truncText(item.questions[0].hint)}</Text>
-                          </View>
-                      </View>
-                    </TouchableOpacity>
-                  )}
+                  renderItem={({ item }) => crosswordCategory === 'allcategories' ? (
+                    <View style={styles.crosswordSection}>
+                      <Text style={styles.crosswordSectionHeader}>{item.category}</Text>
+                      <FlatList
+                        horizontal
+                        data={item.data || []}
+                        extraData={[selectedIds, crosswords]}
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={(crossword, index) => crossword.id || index.toString()}
+                        contentContainerStyle={{ paddingHorizontal: 7 }}
+                        renderItem={({ item: crossword }) => <CrosswordCard item={crossword} />}
+                      />
+                    </View>
+                  ) : <CrosswordCard item={item} />}
                 />
               </View>
            
@@ -1214,12 +1289,18 @@ const styles = StyleSheet.create({
   batchText: { color: '#25b320', fontWeight: 'bold'},
   shareIcon: { height: 49, width: 49, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
   goldDivider: {width: '57%', height: 43, alignSelf: 'center', marginVertical: 15, shadowColor: '#edf7d6', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 10, opacity: 1},
-  listCard: { backgroundColor: 'rgba(241, 255, 250, 0.84)', marginHorizontal: 7, marginVertical: 7, borderRadius: 12, borderWidth: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 4, overflow: 'hidden' },
+  listCard: { width: CARD_WIDTH, backgroundColor: 'rgba(241, 255, 250, 0.84)', marginHorizontal: 7, marginVertical: 7, borderRadius: 12, borderWidth: 2, borderColor: '#259963', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 4, overflow: 'hidden' },
+  selectedListCard: { borderColor: '#dc2626', backgroundColor: '#d8ffcf' },
   listRow: { flexDirection: 'row', height: 133 },
   infoBox: { flex: 1, padding: 7, justifyContent: 'center' },
   crosswordTitle: { color: '#308d38', fontSize: 12, fontWeight: 'bold', marginBottom: 4 },
   questionText: { color: '#2b8814', fontSize: 11, fontWeight: 'bold', marginBottom: 5 },
   typeBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginBottom: 3 },
+  crosswordCardFooter: { flexDirection: 'row', justifyContent: 'center', paddingBottom: 9 },
+  editBtnCard: { backgroundColor: '#12863f', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
+  editBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 11 },
+  crosswordSection: { width: '100%', marginVertical: 5 },
+  crosswordSectionHeader: { color: '#12863f', fontSize: 14, fontWeight: 'bold', marginLeft: 14, marginBottom: 2, textTransform: 'uppercase' },
   typeText: { color: 'honeydew', fontSize: 9, fontWeight: 'bold' },
   row: {flexDirection: 'row', justifyContent: 'center'},
   removeGridBtn: { width: 24, height: 24, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center', marginRight: 2, borderColor: '#990f0f', borderWidth: 1.5 },

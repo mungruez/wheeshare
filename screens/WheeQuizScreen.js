@@ -3,6 +3,7 @@ import React, { useState, useEffect, useLayoutEffect } from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from '@expo/vector-icons'; 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function WheeQuizScreen({ data, onBackToDashboard}) {
   const [ten, setTen] = useState(false); 

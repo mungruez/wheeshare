@@ -89,40 +89,37 @@ const CrosswordGrid = ({ crosswordData }) => {
 	const renderGrid = () => (
 		<View>
 			<ScrollView horizontal showsHorizontalScrollIndicator={false}>
-				{grid?.map((row, rowIndex) => (
-					<View key={rowIndex} style={styles.row}>
-						{row.map((cell, colIndex) => (
-						<View key={colIndex} style={styles.cellContainer}>
-							{crosswordData[level]?.map((entry) => {
-								const { startx, starty, position } = entry;
-												if (rowIndex === startx && colIndex === starty) {
-									return (
-										<Text key={`digit-${position}`} 
-											style={styles.smallDigit}>
-											{position}
-										</Text>
-									);
-								}
-								return null;
-							})}
-							<TextInput
-								style={[styles.cell, 
-								grid[rowIndex][colIndex] ==='.' ? styles.staticCell:null]}
-								value={cell}
-								editable={grid[rowIndex][colIndex] !== '.'}
-								onChangeText={(text) =>
-									handleInputChange(rowIndex,colIndex, text)
-								}
-								maxLength={1}
-							/>
-											</View>
-										))}
-									</View>
-								))}
+				<View>
+					{grid?.map((row, rowIndex) => (
+						<View key={rowIndex} style={styles.row}>
+							{row.map((cell, colIndex) => (
+								<View key={colIndex} style={styles.cellContainer}>
+									{crosswordData[level]?.map((entry) => {
+										const { startx, starty, position } = entry;
+										if (rowIndex !== startx || colIndex !== starty) return null;
+										return (
+											<Text key={`digit-${position}`} style={styles.smallDigit}>
+												{position}
+											</Text>
+										);
+									})}
+									<TextInput
+										style={[styles.cell, grid[rowIndex][colIndex] === '.' ? styles.staticCell : null]}
+										value={cell}
+										editable={grid[rowIndex][colIndex] !== '.'}
+										onChangeText={(text) => handleInputChange(rowIndex, colIndex, text)}
+										maxLength={1}
+									/>
+								</View>
+							))}
+						</View>
+					))}
+				</View>
 			</ScrollView>
 		</View>
 	);
 
+	
 	const renderQuestions = () => {
 		const questions = { across: [], down: [] };
 
@@ -163,7 +160,11 @@ const CrosswordGrid = ({ crosswordData }) => {
 
 
 	return (
-		<View style={styles.container}>
+		<ScrollView
+			style={styles.screenScroll}
+			contentContainerStyle={styles.container}
+			showsVerticalScrollIndicator={false}
+		>
 			{renderQuestions()}
 			{renderGrid()}
 			<View style={styles.buttonContainer}>
@@ -187,17 +188,21 @@ const CrosswordGrid = ({ crosswordData }) => {
 						onPress={handleSolve} 
 						style={styles.button} />
 			</View>
-		</View>
+		</ScrollView>
 	);
 };
 
+
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		flexGrow: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
+		paddingTop: 24,
+		paddingBottom: 80,
 		marginBottom:57,
 	},
+	screenScroll: {flex: 1, width: '100%'},
 	row: {flexDirection: 'row'},
 	cellContainer: {position: 'relative'},
 	cell: {
@@ -221,14 +226,8 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 		padding: 10,
 	},
-	questionText: {
-		fontSize: 16,
-		fontStyle: 'italic',
-	},
-	headingContainer: {
-		marginTop: 10,
-		marginBottom: 5,
-	},
+	questionText: { fontSize: 16, fontStyle: 'italic'},
+	headingContainer: { marginTop: 10, marginBottom: 5},
 	headingText: {
 		fontSize: 18,
 		fontWeight: 'bold',

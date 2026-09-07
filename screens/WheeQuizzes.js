@@ -196,13 +196,13 @@ export default function WheeQuizzes() {
         loadedQuizzes = loadedQuizzes.filter(c => 
           c && c.id && c.title && c.category &&
           c.title.trim() !== "" && c.category.trim() !== "" &&
-          Array.isArray(c.quiz) && c.quiz.length === 4 &&
+          Array.isArray(c.quiz) && c.quiz.length >= 10 &&
           c.quiz.every(qItem => {
             const optionCount = qItem?.options?.length || 0;
             return qItem && qItem.question?.trim() !== "" &&
               Array.isArray(qItem.options) &&
               (optionCount === 1 || optionCount === 2 || optionCount === 4 || (optionCount >= 5 && optionCount <= 7)) &&
-              qItem.options.every(opt => opt?.trim() !== "");
+              (optionCount === 1 || qItem.options.every(opt => opt?.trim() !== ""));
           })
         );
  
@@ -564,8 +564,8 @@ export default function WheeQuizzes() {
   useFocusEffect(
     useCallback(() => {
       if ( mode !== "view" ) clearAppCache();
-      if ( mode !== "add" && mode !== "view" ) loadQuizzes();
-    }, [])
+      if (mode === "main" || mode === "list") loadQuizzes();
+    }, [mode])
   );
 
 
@@ -654,7 +654,7 @@ export default function WheeQuizzes() {
 
         if (!quizItem || typeof quizItem !== 'object') continue;
         if (!quizItem.title?.trim() || !quizItem.category?.trim()) continue;
-        if (!Array.isArray(quizItem.quiz) || quizItem.quiz.length !== 4) continue;
+        if (!Array.isArray(quizItem.quiz) || quizItem.quiz.length < 10) continue;
         rawQuizzes.push(quizItem);
       }
       
