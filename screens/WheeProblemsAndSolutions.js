@@ -995,7 +995,7 @@ export default function ProblemAndSolution() {
 
   
   const MyHeader = () => (
-    <View style={styles.silverDivider}>
+    <View style={styles.problemsDivider}>
       <ImageBackground style={{width: "100%", height: "100%"}} resizeMode="cover" source={require('../assets/silverdivider.png')}/>
     </View>
   );
@@ -1545,6 +1545,7 @@ const styles = StyleSheet.create({
   importIcon: { width: 45, height: 45 },
   infoIcon: { width: 45, height: 45 },
   silverDivider: { width: '99%', height: 10, alignSelf: 'center', marginVertical: 5 },
+  problemsDivider: { width: '76%', height: 38, alignSelf: 'center', marginVertical: 5 },
   smallGap: { height: 12 },
   card: { width: '100%', alignItems: 'center', marginVertical: 6 },
   categoryMenuSelectionRowItem: { width: '80%', height: 55, justifyContent: 'center', alignItems: 'center' },

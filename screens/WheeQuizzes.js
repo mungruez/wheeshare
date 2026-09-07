@@ -1069,7 +1069,7 @@ export default function WheeQuizzes() {
 
   
   return (
-    <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/quizzes/quizzesbg.jpg')}>
+    <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/quizzes/quizzesbg.png')}>
       <StatusBar barStyle="light-content"/>
       <SafeAreaView style={{flex: 1}}>
         <View style={styles.centerLogoWrapper}>
