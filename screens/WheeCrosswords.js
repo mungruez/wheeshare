@@ -82,6 +82,8 @@ export default function WheeCrosswords() {
       if (existing !== '.' && existing !== word[charIdx]) return false;
       if (existing !== '.') crossingCount++;
 
+      if (existing !== '.') continue;
+
       const sideX = orientation === "across" ? [x - 1, x + 1] : [x, x];
       const sideY = orientation === "across" ? [y, y] : [y - 1, y + 1];
       for (let sideIdx = 0; sideIdx < 2; sideIdx++) {
@@ -449,6 +451,7 @@ export default function WheeCrosswords() {
       Alert.alert('Success', `${incomingCrosswords.length} crossword(s) saved!`);
     } catch (e) {
       Alert.alert('Save Failed', e.message);
+      throw e;
     } finally {
       isLoadingRef.current = false;
       setIsLoading(false);
@@ -842,8 +845,8 @@ export default function WheeCrosswords() {
 
   useFocusEffect(
     useCallback(() => {
-      loadCrosswords();
-    }, [])
+      if (mode === "main" || mode === "list") loadCrosswords();
+    }, [mode, crosswordCategory, prevCategory])
   );
 
 

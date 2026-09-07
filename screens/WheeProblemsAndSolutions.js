@@ -496,6 +496,7 @@ export default function ProblemAndSolution() {
       setMode(prevMode);
     } catch (e) {
       Alert.alert('Save Failed', e.message);
+      throw e;
     } finally {
       isLoadingRef.current = false;
       setLoading(false);
@@ -798,8 +799,8 @@ export default function ProblemAndSolution() {
   useFocusEffect(
     useCallback(() => {
       if ( mode !== "view" ) clearAppCache();
-      if ( mode !== "add" && mode !== "view" ) loadPsItems();
-    }, [])
+      if (mode === "main" || mode === "list") loadPsItems();
+    }, [mode, psItemCategory, prevCategory])
   );
 
 
@@ -873,7 +874,7 @@ export default function ProblemAndSolution() {
       } catch (e) {}
       
       const rawItems = [];
-      const itemDirs = manifest.count > 1 
+      const itemDirs = manifest.count > 0 
           ? Array.from({length: manifest.count}, (_, i) => `item_${i}/`) 
         : [''];
       

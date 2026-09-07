@@ -278,6 +278,7 @@ export default function WheeQuizzes() {
       setMode('list');
     } catch (e) {
       Alert.alert('Save Failed', e.message);
+      throw e;
     } finally {
       isLoadingRef.current = false;
       setLoading(false);
@@ -565,7 +566,7 @@ export default function WheeQuizzes() {
     useCallback(() => {
       if ( mode !== "view" ) clearAppCache();
       if (mode === "main" || mode === "list") loadQuizzes();
-    }, [mode])
+    }, [mode, quizCategory, prevCategory])
   );
 
 
