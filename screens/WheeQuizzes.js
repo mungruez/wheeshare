@@ -1028,28 +1028,28 @@ export default function WheeQuizzes() {
                   <Pressable onPress={handleMultipleChoiceClick}> 
                     <MaterialCommunityIcons name={multiplechoice ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
                   </Pressable> 
-                  <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>Multi Choice</Text> 
+                  <Text style={{fontSize: 10, color: "#000", marginLeft: 3, fontWeight: "600"}}>Multi Choice</Text> 
                 </View>
                 
                 <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius:12, borderWidth:.7, borderColor: '#b62730'}}> 
                   <Pressable onPress={handleTrueFalseClick}> 
                     <MaterialCommunityIcons name={truefalse ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
                   </Pressable> 
-                  <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>True/False</Text> 
+                  <Text style={{fontSize: 10, color: "#000", marginLeft: 3, fontWeight: "600"}}>True/False</Text> 
                 </View>
 
                 <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f8f0f0', borderRadius: 12, borderWidth:.7, borderColor: '#b62730'}}> 
                   <Pressable onPress={handleMultipleAnswersClick}> 
                     <MaterialCommunityIcons name={multipleanswers ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
                   </Pressable> 
-                  <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>Multi Ans</Text> 
+                  <Text style={{fontSize: 10, color: "#000", marginLeft: 3, fontWeight: "600"}}>Multi Ans</Text> 
                 </View>
 
                 <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f8f0f0', borderRadius: 12, borderWidth:.7, borderColor: '#b62730'}}> 
                   <Pressable onPress={handleLongAnswerClick}> 
                     <MaterialCommunityIcons name={longanswer ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
                   </Pressable> 
-                  <Text style={{fontSize: 10, color: "#000", marginLeft: 0, fontWeight: "600"}}>Long Ans</Text> 
+                  <Text style={{fontSize: 10, color: "#000", marginLeft: 3, fontWeight: "600"}}>Long Ans</Text> 
                 </View>
               </View>
               

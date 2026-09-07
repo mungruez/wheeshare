@@ -1135,12 +1135,12 @@ export default function WheeCrosswords() {
               <View style = {styles.flatlistContainer}> 
                 <FlatList
                   data={hcrosswords || []}
-                  keyExtractor={(item, index) => item.category || index.toString()}
+                  keyExtractor={(item, index) => item?.data ? `category-${item.category}` : String(item?.id || index)}
                   style = {{ flex: 1 }}
                   nestedScrollEnabled={true}
                   contentContainerStyle={{ paddingBottom: 57 }}
                   showsVerticalScrollIndicator={false}
-                  renderItem={({ item }) => crosswordCategory === 'allcategories' ? (
+                  renderItem={({ item }) => item?.data ? (
                     <View style={styles.crosswordSection}>
                       <Text style={styles.crosswordSectionHeader}>{item.category}</Text>
                       <FlatList

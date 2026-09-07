@@ -1189,7 +1189,10 @@ export default function ProblemAndSolution() {
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>
         
           <View style={styles.vcHeader}>
-            <Text style={styles.streamHeadingDivider}>⚠️ PROBLEM SECTIONS</Text>
+            <View style={styles.formStreamSectionDivider}>
+              <Image source={require('../assets/problems/problemicon.png')} style={styles.formStreamSectionDividerIcon} resizeMode="contain" />
+              <Text style={styles.formStreamSectionDividerText}>PROBLEM SECTIONS</Text>
+            </View>
             <TouchableOpacity onPress={() => setPDropdownVisible(!pDropdownVisible)} style={styles.vcToggleBtn}>
               <Text style={styles.vcToggleText}>{!pDropdownVisible ? '▼' : '▲'}</Text>
             </TouchableOpacity>
@@ -1210,7 +1213,10 @@ export default function ProblemAndSolution() {
           ))}
 
           <View style={styles.vcHeader}>
-            <Text style={styles.streamHeadingDivider}>✅ SOLUTION SECTIONS</Text>
+            <View style={styles.formStreamSectionDivider}>
+              <Image source={require('../assets/problems/solutionicon.png')} style={styles.formStreamSectionDividerIcon} resizeMode="contain" />
+              <Text style={styles.formStreamSectionDividerText}>SOLUTION SECTIONS</Text>
+            </View>
             <TouchableOpacity onPress={() => setSDropdownVisible(!sDropdownVisible)} style={styles.vcToggleBtn}>
               <Text style={styles.vcToggleText}>{!sDropdownVisible ? '▼' : '▲'}</Text>
             </TouchableOpacity>
@@ -1591,7 +1597,7 @@ const styles = StyleSheet.create({
   input: { height: 40, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, color: '#000', borderWidth: 1, borderColor: '#590f85', marginBottom: 4 },
   descInput: { height: 70, textAlignVertical: 'top', paddingVertical: 8 },
   formStreamSectionDivider: { flexDirection: 'row', alignItems: 'center', marginTop: 22, marginBottom: 10, borderBottomWidth: 2, borderBottomColor: '#590f85', paddingBottom: 4 },
-  formStreamSectionDividerIcon: { width: 20, height: 20, marginRight: 6 },
+  formStreamSectionDividerIcon: { width: 24, height: 24, marginRight: 3 },
   formStreamSectionDividerText: { color: '#b155fc', fontSize: 13, fontWeight: 'bold' },
   sectionContainerBlock: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 10, padding: 12, marginVertical: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   sectionIndexLabel: { color: '#b155fc', fontWeight: 'bold', fontSize: 11, marginBottom: 6 },
