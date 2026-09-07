@@ -1333,7 +1333,7 @@ export default function ProblemAndSolution() {
             </View>
             
             <TouchableOpacity onPress={() => { if (isPicking || isPickingRef.current) return; setMode(prevMode); resetForm(); }} style={styles.discardBtn}>
-              <ImageBackground style={{ alignSelf:'center', height:67, width:"100%", opacity: 1}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
+              <ImageBackground style={{ alignSelf:'center', height: 57, width: "100%", opacity: 1}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
               <Text style={styles.discardText}>CANCEL</Text>
             </TouchableOpacity>
 
@@ -1445,7 +1445,7 @@ export default function ProblemAndSolution() {
       <StatusBar barStyle="light-content"/>
       <SafeAreaView style={{flex: 1}}>
         <View style={styles.centerLogoWrapper}>
-          <ImageBackground style={styles.icon} resizeMode='contain' source={require('../assets/problems/problemstitle.png')} /> 
+          <ImageBackground style={styles.iconmain} resizeMode='contain' source={require('../assets/problems/problemstitle.png')} /> 
         </View>
 
         <View style={styles.header}>
@@ -1530,9 +1530,10 @@ export default function ProblemAndSolution() {
 const styles = StyleSheet.create({
   imgBackground: { flex: 1, width: '100%', height: '100%' },
   viewLayoutContainer: { flex: 1, backgroundColor: '#323232', width: '100%', height: '100%' },
-  centerLogoWrapper: { marginBottom: 5, marginTop: -19, justifyContent: 'center', alignItems: 'center' },
+  centerLogoWrapper: { marginBottom: 1, marginTop: -7, justifyContent: 'center', alignItems: 'center' },
   icon: { height: 70, width: width * 0.9 },
-  iconAM: { height: 60, width: width * 0.8 },
+  iconmain: { height: 78, width: width * 0.9 },
+  iconAM: { height: 76, width: width * 0.9 },
   header: { paddingHorizontal: 16, marginBottom: 10, width: '100%' },
   searchRow: { flexDirection: 'row', paddingHorizontal: 9, paddingVertical: 4, gap: 8, marginBottom: 7, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 9, alignItems: 'center', justifyBontent: 'center', width: '100%', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
   searchInput: { height: 38, width: '70%', backgroundColor: 'rgba(255, 255, 255, 0.79)', borderRadius: 8, paddingHorizontal: 8, color: 'black', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', fontSize: 11 },
@@ -1581,8 +1582,8 @@ const styles = StyleSheet.create({
   vcDescScroll: { flexGrow: 1, marginTop: 4 },
   vcDescText: { color: 'honeydew', fontSize: 12, lineHeight: 16 },
   streamHeadingDivider: { color: '#d9acee', backgroundColor: '#3f154293', fontSize: 13, fontWeight: 'bold', paddingVertical: 6, paddingHorizontal: 16, marginVertical: 12, letterSpacing: 1 },
-  formHeaderTitleRow: { width: '100%', alignItems: 'center', marginVertical: 10 },
-  discardBtn: { backgroundColor: 'rgba(206, 26, 26, 0.32)', borderWidth: 1, borderColor: '#dc262623', marginBottom: 9, marginLeft: 12, height: 70, width: 67, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1},
+  formHeaderTitleRow: { width: '100%', alignItems: 'center', marginBottom: 10, marginTop: -7 },
+  discardBtn: { borderWidth: 1, borderColor: '#dc262623', marginBottom: 9, marginLeft: 12, height: 70, width: 67, borderRadius: 10, justifyContent: 'center', alignItems: 'center', opacity: 1},
   discardText: { color: '#ef4444', fontWeight: 'bold', fontSize: 11 },
   formScroller: { flex: 1, paddingHorizontal: 16 },
   label: { color: '#b155fc', fontSize: 12, fontWeight: 'bold', marginTop: 10, marginBottom: 4 },

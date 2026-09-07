@@ -186,8 +186,8 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   if (qmode === "start") {
     return (
       <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/quizzes/quizlistbg.png')}>
-        <SafeAreaView style={{ marginTop: 25, height: "100%" }}>
-          <Image resizeMode="stretch" source={require('../assets/quizzes/redquiztitle.jpg')} style={{ marginTop: 25, borderWidth: 2, borderColor: '#9a9aa1', width: "100%", height: "27%", borderRadius: 5 }} />
+        <SafeAreaView style={{ marginTop: 5, height: "100%" }}>
+          <Image resizeMode="contain" source={require('../assets/quizzes/redquiztitle.png')} style={{ marginTop: 5, borderWidth: 2, borderColor: '#9a9aa1', width: "100%", height: "17%", borderRadius: 5 }} />
 
           <View style={{ padding: 10, flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <Text style={styles.rulesHeader}>QUIZ RULES</Text>
