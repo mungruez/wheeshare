@@ -204,8 +204,10 @@ export default function ProblemAndSolution() {
   };
 
 
-  const populateForEdit = (psItem, mvcat) => {
+  const populateForEdit = (psItem, mvcat, sourceMode = mode) => {
     if (psItem === null) {
+      const nextPrevMode = sourceMode === "list" ? "list" : "main";
+
       setSelectedIds([]);
       setPsItemTitle("");
       setPsItemDesc("");
@@ -222,20 +224,21 @@ export default function ProblemAndSolution() {
 
       setProblemSections([]);
       setSolutionSections([]);
-      setPrevMode(mode === "list" ? "list" : "main");
+      setPrevMode(nextPrevMode);
       setMode("add");
-    } else {
-      setCurrentPSItem(psItem);
-      setPsItemId(psItem.id);
-      setPsItemTitle(psItem.title);
-      setPsItemCategory(mvcat);
-      setPrevCategory(mvcat);
-      setPsItemDesc(psItem.description || "");
-      setProblemSections(psItem.problemSections || []);
-      setSolutionSections(psItem.solutionSections || []);
-      setPrevMode("list");
-      setMode("add");
+      return;
     }
+
+    setCurrentPSItem(psItem);
+    setPsItemId(psItem.id);
+    setPsItemTitle(psItem.title);
+    setPsItemCategory(mvcat);
+    setPrevCategory(mvcat);
+    setPsItemDesc(psItem.description || "");
+    setProblemSections(psItem.problemSections || []);
+    setSolutionSections(psItem.solutionSections || []);
+    setPrevMode("list");
+    setMode("add");
   };
 
 
@@ -318,48 +321,65 @@ export default function ProblemAndSolution() {
     const targetSection = activeSections.find(s => s.id === id);
     if (!targetSection) return;
 
+    const sectionType = targetSection.type;
+
+    if (sectionType === SECTION_TYPES.VIDEO || sectionType === SECTION_TYPES.IMAGE) {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Denied", "Gallery access is needed!");
+        return;
+      }
+    }
+
     try {
       isPickingRef.current = true;
       setIsPicking(true);
       let pickedUri = "";
 
-      if (targetSection.type === SECTION_TYPES.PDF) {
+      if (sectionType === SECTION_TYPES.PDF) {
         const result = await DocumentPicker.getDocumentAsync({ type: 'application/pdf' });
-        if (!result.canceled && result.assets?.[0]) {
+        if (!result.canceled && result.assets && result.assets.length > 0) {
           pickedUri = result.assets[0].uri;
         }
-      } else if (targetSection.type === SECTION_TYPES.AUDIO) {
+      } else if (sectionType === SECTION_TYPES.AUDIO) {
         const result = await DocumentPicker.getDocumentAsync({
           type: ['audio/*', 'audio/mpeg', 'audio/mp3', 'audio/wav']
         });
-        if (!result.canceled && result.assets?.[0]) {
+        if (!result.canceled && result.assets && result.assets.length > 0) {
           pickedUri = result.assets[0].uri;
         }
       } else {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("Permission Denied", "Gallery access is needed!");
-          return;
-        }
-
-        const mediaType = targetSection.type === SECTION_TYPES.VIDEO ? 'videos' : 'images';
-        const res = await ImagePicker.launchImageLibraryAsync({
+        const mediaType = sectionType === SECTION_TYPES.VIDEO ? 'videos' : 'images';
+        const result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: [mediaType],
           allowsEditing: false,
           quality: 1.0,
         });
-        if (!res.canceled && res.assets?.[0]) {
-          pickedUri = res.assets[0].uri; 
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+          pickedUri = result.assets[0].uri;
         }
       }
-      
+
       if (!pickedUri) return;
 
-      const ext = getMediaFileExtension(pickedUri, targetSection.type);
+      const ext = getMediaFileExtension(pickedUri, sectionType);
       const mediaFileName = `${Date.now()}${ext}`;
-      const cachedUri = await copyPickedMediaToCache(pickedUri, mediaFileName);
+      const finalUri = await copyPickedMediaToCache(pickedUri, mediaFileName);
+      const updatedSections = [...activeSections];
+      const targetIndex = updatedSections.findIndex(s => s.id === id);
 
-      updateSection(id, 'mediaUri', cachedUri, stream, true);
+      if (targetIndex !== -1) {
+        updatedSections[targetIndex] = {
+          ...updatedSections[targetIndex],
+          mediaUri: finalUri,
+        };
+
+        if (stream === 'problem') {
+          setProblemSections(updatedSections);
+        } else {
+          setSolutionSections(updatedSections);
+        }
+      }
     } catch (err) {
       Alert.alert("Copy Media Failed", "Please try again or select a smaller asset file.");
     } finally {
@@ -1013,7 +1033,7 @@ export default function ProblemAndSolution() {
         <Text style={styles.psCardTitle} numberOfLines={1}>{item.title}</Text>
         <Text style={styles.psCardCount}>{`${item.problemSections?.length || 0} Problems / ${item.solutionSections?.length || 0} Solutions`}</Text>
         { selectedIds.includes(item.id) && selectedIds.length === 1 && ( <View style={styles.psCardFooter}>
-          <TouchableOpacity style={styles.editBtnCard} onPress={() => populateForEdit(item, item.category)}>
+          <TouchableOpacity style={styles.editBtnCard} onPress={() => populateForEdit(item, item.category, "list")}>
             <Text style={styles.editBtnText}>EDIT</Text>
           </TouchableOpacity>
         </View> ) }
@@ -1269,7 +1289,7 @@ export default function ProblemAndSolution() {
               <TouchableOpacity onPress={() => { setSelectedIds([]); setMode("main"); }} style={styles.plusIconAM}>
                 <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/problems/backpurple.png')}/>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => populateForEdit(null, psItemCategory)} style={styles.plusIcon}>
+              <TouchableOpacity onPress={() => populateForEdit(null, psItemCategory, "list")} style={styles.plusIcon}>
                 <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/problems/addproblembtn.png')}/>         
               </TouchableOpacity>
             </View>
@@ -1473,7 +1493,7 @@ export default function ProblemAndSolution() {
           </View>
 
           <View style={styles.dashboardIconsControlsRow}>
-            <TouchableOpacity onPress={() => populateForEdit(null, "")} style={styles.plusIcon}>
+            <TouchableOpacity onPress={() => populateForEdit(null, "", "main")} style={styles.plusIcon}>
               <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/problems/addproblembtn.png')}/>         
             </TouchableOpacity> 
             <TouchableOpacity onPress={handleImportPSItems} style={styles.importIcon}>

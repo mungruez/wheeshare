@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, Pressable, ImageBackground, FlatList, ScrollView } from "react-native";
+import { StyleSheet, Text, View, Image, Pressable, ImageBackground, FlatList, ScrollView, TextInput } from "react-native";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from "@react-navigation/native";
@@ -91,96 +91,98 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 
 
   useEffect(() => {
-    if (selectedAnswerIndex !== null && currentQuestion) {
-      const qType = getInferredType(currentQuestion);
-      let isCorrect = false;
+    if (selectedAnswerIndex === null || !currentQuestion || answerStatus !== null) return;
 
-      if (qType === "single" || qType === "truefalse") {
-        isCorrect = selectedAnswerIndex === currentQuestion.correctAnswerIndex;
-      } else if (qType === "multiple") {
-        const selections = Array.isArray(selectedAnswerIndex) ? selectedAnswerIndex : [];
-        const targets = Array.isArray(currentQuestion.correctAnswerIndex) ? currentQuestion.correctAnswerIndex : [];
-          isCorrect = selections.length === targets.length && selections.every(v => targets.includes(v));
-      } else if (qType === "long") {
-        const userText = typeof selectedAnswerIndex === "string" ? selectedAnswerIndex.trim().toLowerCase() : "";
-        const targetText = String(currentQuestion.correctAnswerIndex).trim().toLowerCase();
-        isCorrect = userText === targetText && targetText !== "";
-      }
-      
-      if (isCorrect) {
-        setPoints((prevPoints) => prevPoints + 10);
-        setAnswerStatus(true);
-      } else {
-        setAnswerStatus(false);
-      }
+    const qType = getInferredType(currentQuestion);
+    let isCorrect = false;
 
-      const newAnswerRecord = {
-        question: index + 1,
-        answer: isCorrect,
-        q: currentQuestion.question || "Question Text",
-        explanation: currentQuestion.explanation || "",
-        corra: currentQuestion.correctAnswerIndex,
-        curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : [],
-        a: selectedAnswerIndex,
-        inferredType: qType
-      };
-
-      setAnswers((prevAnswers) => [...prevAnswers, newAnswerRecord]);
+    if (qType === "single" || qType === "truefalse") {
+      isCorrect = selectedAnswerIndex === currentQuestion.correctAnswerIndex;
+    } else if (qType === "multiple") {
+      const selections = Array.isArray(selectedAnswerIndex) ? selectedAnswerIndex : [];
+      const targets = Array.isArray(currentQuestion.correctAnswerIndex) ? currentQuestion.correctAnswerIndex : [];
+      isCorrect = selections.length === targets.length && selections.every(v => targets.includes(v));
+    } else if (qType === "long") {
+      const userText = typeof selectedAnswerIndex === "string" ? selectedAnswerIndex.trim().toLowerCase() : "";
+      const targetText = String(currentQuestion.correctAnswerIndex ?? "").trim().toLowerCase();
+      isCorrect = userText === targetText && targetText !== "";
     }
-  }, [selectedAnswerIndex]);
+
+    if (isCorrect) {
+      setPoints((prevPoints) => prevPoints + 10);
+      setAnswerStatus(true);
+    } else {
+      setAnswerStatus(false);
+    }
+
+    const newAnswerRecord = {
+      question: index + 1,
+      answer: isCorrect,
+      q: currentQuestion.question || currentQuestion.q || "Question Text",
+      explanation: currentQuestion.explanation || "",
+      corra: currentQuestion.correctAnswerIndex,
+      curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : [],
+      a: selectedAnswerIndex,
+      inferredType: qType
+    };
+
+    setAnswers((prevAnswers) => [...prevAnswers, newAnswerRecord]);
+  }, [selectedAnswerIndex, currentQuestion, answerStatus, index]);
  
   
   useEffect(() => {
-    if (qmode !== "quiz") return;
+    if (qmode !== "quiz" || !currentQuestion) return;
 
     const myInterval = () => {
-      if (counter >= 1) {
-        setCounter((state) => state - 1);
-      }
-      if (counter === 0) {
-        if (selectedAnswerIndex === null && currentQuestion) {
-          const qType = getInferredType(currentQuestion);
-          let timeoutAns = -1;
-          if (qType === "multiple") timeoutAns = [];
-          if (qType === "long") timeoutAns = "";
+      setCounter((state) => {
+        if (state <= 1) {
+          if (selectedAnswerIndex === null) {
+            const qType = getInferredType(currentQuestion);
+            let timeoutAns = -1;
+            if (qType === "multiple") timeoutAns = [];
+            if (qType === "long") timeoutAns = "";
 
-          const timeoutRecord = {
-            question: index + 1,
-            answer: false,
-            q: currentQuestion.question || "Question Text",
-            explanation: currentQuestion.explanation || "Time limit exceeded.",
-            corra: currentQuestion.correctAnswerIndex,
-            curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : [],
-            a: timeoutAns,
-            inferredType: qType
-          };
-          setAnswers((prevAnswers) => [...prevAnswers, timeoutRecord]);
+            const timeoutRecord = {
+              question: index + 1,
+              answer: false,
+              q: currentQuestion.question || currentQuestion.q || "Question Text",
+              explanation: currentQuestion.explanation || "Time limit exceeded.",
+              corra: currentQuestion.correctAnswerIndex,
+              curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : [],
+              a: timeoutAns,
+              inferredType: qType
+            };
+            setAnswers((prevAnswers) => [...prevAnswers, timeoutRecord]);
+            setAnswerStatus(false);
+          }
+
+          setIndex((prevIndex) => prevIndex + 1);
+          return 15;
         }
-        setIndex((prevIndex) => prevIndex + 1);
-        setCounter(15);
-      }
+
+        return state - 1;
+      });
     };
-  
-    interval = setTimeout(myInterval, 1007);
-    return () => {
-      clearTimeout(interval);
-    };
-  }, [counter, qmode]);
+
+    interval = setTimeout(myInterval, 1000);
+    return () => clearTimeout(interval);
+  }, [counter, qmode, currentQuestion, selectedAnswerIndex, index]);
    
 
 
   useEffect(() => {
     if (qmode !== "quiz") return;
 
-    if (index >= qarr.length || (answers.length === qnum && qnum > 0)) {
+    if (index >= qarr.length || (answers.length >= qnum && qnum > 0)) {
       clearTimeout(interval);
       setQmode("results");
-    } else {
-      setCounter(15);
+      return;
     }
+
+    setCounter(15);
     setSelectedAnswerIndex(null);
     setAnswerStatus(null);
-  }, [index, qarr.length]);
+  }, [index, qarr.length, qmode, answers.length, qnum]);
 
  
 
@@ -256,7 +258,17 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   }
 
 
+  if (qmode === "quiz" && !currentQuestion) {
+    return (
+      <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc' }}>
+        <Text style={{ fontSize: 16, fontWeight: '600', color: '#334155' }}>Loading question...</Text>
+      </SafeAreaView>
+    );
+  }
+
   if (qmode === "quiz" && currentQuestion) {
+    const questionText = currentQuestion?.question || currentQuestion?.q || "Question Prompt Missing";
+
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "#f8fafc" }}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
@@ -281,7 +293,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 
         <View style={{ marginTop: 25, marginHorizontal: 10, backgroundColor: "#F0F8FF", padding: 16, borderRadius: 12, borderWidth: 1, borderColor: "#cbd5e1" }} >
           <Text style={{ fontSize: 16, fontWeight: "bold", color: "#0f172a", textAlign: "center", marginBottom: 15 }}>
-           {currentQuestion?.q || currentQuestion?.title || "Question Prompt Missing"}
+            {questionText}
           </Text>
           
           <View style={{ marginTop: 6, gap: 10 }}>
@@ -528,9 +540,28 @@ const styles = StyleSheet.create({
   startQuizBtn: { backgroundColor: '#004d40', paddingVertical: 14, borderRadius: 8, marginHorizontal: 20, marginBottom: 30, elevation: 3 },
   questionContainer: { paddingHorizontal: 14, paddingVertical: 10, width: '100%', borderBottomWidth: 1, borderBottomColor: '#e6e6e6' },
   unselectedAnswer: { flexDirection: 'row', alignItems: 'center', width: '100%', padding: 12, backgroundColor: '#fff', borderRadius: 8, marginVertical: 6, borderWidth: 1.5, borderColor: '#cbd5e1', elevation: 2 },
+  selectedMultipleAnswer: { flexDirection: 'row', alignItems: 'center', width: '100%', padding: 12, backgroundColor: '#e0f2fe', borderRadius: 8, marginVertical: 6, borderWidth: 1.5, borderColor: '#7dd3fc', elevation: 2 },
   correctAnswer: { flexDirection: 'row', alignItems: 'center', width: '100%', padding: 12, backgroundColor: '#ecfdf5', borderRadius: 8, marginVertical: 6, borderWidth: 1.5, borderColor: 'green', elevation: 2 },
   incorrectAnswer: { flexDirection: 'row', alignItems: 'center', width: '100%', padding: 12, backgroundColor: '#fef2f2', borderRadius: 8, marginVertical: 6, borderWidth: 1.5, borderColor: 'red', elevation: 2 },
   options: { fontSize: 14, fontWeight: 'bold', color: '#475569', minWidth: 20 },
   correctAnswerIndex: { minWidth: 20 },
-  closeIconContainer: { padding: 6, justifyContent: 'center', alignItems: 'center' }
+  closeIconContainer: { padding: 6, justifyContent: 'center', alignItems: 'center' },
+  textInput: {
+    minHeight: 120,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    borderRadius: 10,
+    padding: 12,
+    backgroundColor: '#fff',
+    color: '#0f172a',
+    textAlignVertical: 'top'
+  },
+  compositeSubmitBtn: {
+    backgroundColor: '#0f766e',
+    borderRadius: 10,
+    paddingVertical: 12,
+    marginTop: 12,
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
 });

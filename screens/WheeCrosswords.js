@@ -805,14 +805,9 @@ export default function WheeCrosswords() {
   };
   
   
-  const viewCrossword = (viewCategory) => {
-    let crossList = [];
-    for (let cNum = 0; cNum < crosswords.length; cNum++) {
-      if( crosswords[cNum].category === viewCategory) {
-        crossList.push(crosswords[cNum].questions);
-      }
-    }
-    setCwordList(crossList);
+  const viewCrossword = (selectedCrossword) => {
+    const questionsForView = Array.isArray(selectedCrossword?.questions) ? selectedCrossword.questions : [];
+    setCwordList(questionsForView);
     setPrevMode("list");
     setMode('view');
   };
@@ -898,7 +893,7 @@ export default function WheeCrosswords() {
       <TouchableOpacity
         style={[styles.listCard, isSelected && styles.selectedListCard]}
         onLongPress={() => toggleSelect(item.id)}
-        onPress={() => selectedIds.length > 0 ? toggleSelect(item.id) : viewCrossword(item.category)}
+        onPress={() => selectedIds.length > 0 ? toggleSelect(item.id) : viewCrossword(item)}
         activeOpacity={0.8}
       >
         <View style={styles.listRow}>
