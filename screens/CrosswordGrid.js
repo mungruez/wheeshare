@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, TextInput, StyleSheet, Text, Button, ScrollView } from 'react-native';
+import { View, TextInput, StyleSheet, Text, Button, ScrollView, Alert } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 
 const ROW_COUNT = 12;
@@ -74,9 +74,9 @@ const CrosswordGrid = ({ crosswordData }) => {
     const answerGrid = generateAnswerGrid(puzzle);
     const isCorrect = JSON.stringify(grid) === JSON.stringify(answerGrid);
     if (isCorrect) {
-      alert('Congratulations! Your Crossword is correct.');
+      Alert.alert('Congratulations!', 'Your Crossword is correct.');
     } else {
-      alert('Incorrect. Please try again.');
+      Alert.alert('Incorrect!', 'Please try again.');
     }
   };
 
@@ -168,23 +168,23 @@ const CrosswordGrid = ({ crosswordData }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, alignItems: 'center', paddingTop: 24, paddingBottom: 80, backgroundColor: '#f8fff6' },
+  container: { flexGrow: 1, alignItems: 'center', paddingTop: 19, paddingBottom: 80, backgroundColor: '#f8fff6' },
   screenScroll: { flex: 1, width: '100%', backgroundColor: '#f8fff6' },
   questionsWrapper: { width: '100%', paddingHorizontal: 16 },
-  questionsContainer: { marginBottom: 10, paddingHorizontal: 10 },
-  questionText: { fontSize: 15, fontStyle: 'italic', color: '#1d460b', marginBottom: 4 },
-  headingContainer: { marginTop: 10, marginBottom: 5 },
-  headingText: { fontSize: 18, fontWeight: 'bold', color: '#228B22', textAlign: 'center' },
-  gridWrapper: { paddingVertical: 12, paddingHorizontal: 8 },
+  questionsContainer: { marginBottom: 5, paddingHorizontal: 10 },
+  questionText: { fontSize: 12, fontStyle: 'italic', color: '#1d460b', marginBottom: 3 },
+  headingContainer: { marginTop: 7, marginBottom: 5 },
+  headingText: { fontSize: 14, fontWeight: 'bold', color: '#228B22', textAlign: 'center' },
+  gridWrapper: { paddingVertical: 12, paddingHorizontal: 0, flex: 1, width: '100%'},
   row: { flexDirection: 'row' },
   cellContainer: { position: 'relative' },
-  cell: { borderWidth: 1, borderColor: '#228B22', width: 30, height: 30, textAlign: 'center', backgroundColor: '#ffffff', color: '#1d460b', margin: 1, fontWeight: 'bold' },
+  cell: { borderWidth: 1, borderColor: '#228B22', width: 30, height: 30, textAlign: 'center', textAlignVertical: 'center', backgroundColor: '#ffffff', color: '#1d460b', margin: 1, fontWeight: 'bold', fontSize: 11, lineHeight: 16, padding: 0, includeFontPadding: false },
   blockedCell: { backgroundColor: '#111111', borderColor: '#111111', color: '#111111' },
   smallDigit: { position: 'absolute', top: 2, left: 4, fontSize: 9, fontWeight: 'bold', color: '#228B22', zIndex: 2 },
-  buttonContainer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 16, marginBottom: 16, paddingHorizontal: 12 },
+  buttonContainer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 12, marginBottom: 12, paddingHorizontal: 12 },
   gap: { width: 10 },
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fff6' },
-  emptyStateText: { fontSize: 18, color: '#228B22', fontWeight: '600' },
+  emptyStateText: { fontSize: 16, color: '#228B22', fontWeight: '600' },
 });
 
 export default CrosswordGrid;
