@@ -18,7 +18,7 @@ export default function HomeScreen() {
       <SafeAreaView style={{ flexDirection:"column", height: "100%", marginTop: 19, opacity: 1}}>
 
         <View style={{ width: '100%', marginBottom: 5, marginTop: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ImageBackground style={{ height: 70, width: "95%", alignSelf: 'center', transform: [{ translateX: 8 }] }} resizeMode='contain' source={require('../assets/wheesharetitle.png')} /> 
+          <ImageBackground style={{ height: 70, width: "95%", alignSelf: 'center' }} resizeMode='contain' source={require('../assets/wheesharetitle.png')} /> 
         </View>
          
         <View style={{ flexDirection:" row", justifyContent: "center"}}>
