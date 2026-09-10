@@ -1121,14 +1121,22 @@ export default function WheeQuizzes() {
                   <TouchableOpacity
                     style={{ width: 152, height: 57, justifyContent:'center', alignItems:'center' }}
                     onPress={() => { setHquizzes(getQuizzes(item.category, quizzes)); setQuizCategory(item.category); setPrevCategory(item.category); setMode("list"); }}>
-                    <ImageBackground style={{flex: 1, justifyContent:'center', alignItems:'center'}} resizeMode='stretch' source={require('../assets/quizzes/redbtnbg.png')}>
+                    <ImageBackground
+                      style={{ width: 152, height: 57, justifyContent:'center', alignItems:'center' }}
+                      resizeMode='stretch'
+                      source={require('../assets/quizzes/redbtnbg.png')}>
                       { item.id === 'q-all' ? 
                         ( <Image
                           resizeMode="contain"
                           style={{ height: "57%", width: "63%", alignSelf:"center"}}
                           source={require('../assets/allstyles.png')}
                         /> ) : (
-                          <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>{ item.category.length > 20 ? item.category.substring(0, 20) : item.category }</Text>
+                          <Text
+                            numberOfLines={1}
+                            ellipsizeMode="clip"
+                            style={[styles.cardText, { width: '88%', textAlign: 'center', paddingHorizontal: 8 }]}>
+                            { item.category.length > 20 ? item.category.substring(0, 20) : item.category }
+                          </Text>
                         ) }
                     </ImageBackground>
                   </TouchableOpacity> 
@@ -1173,10 +1181,10 @@ const styles = StyleSheet.create({
   importIcon: { width: 45, height: 45 },
   infoIcon: { width: 45, height: 45 },
   silverDivider: { width: '99%', height: 10, alignSelf: 'center', marginVertical: 5 },
-  quizzesDivider: { width: '76%', height: 38, alignSelf: 'center', marginVertical: 5 },
+  quizzesDivider: { width: '67%', height: 30, alignSelf: 'center', marginVertical: 5 },
   smallGap: { height: 12 },
   card: { width: '100%', alignItems: 'center', marginVertical: 6 },
-  cardText: { fontSize: 16, fontWeight: 'bold', color: '#f3bdbd', paddingHorizontal: 5},
+  cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#fefeff', paddingHorizontal: 5,  opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7},
   categoryMenuSelectionRowItem: { width: '80%', height: 55, justifyContent: 'center', alignItems: 'center' },
   cardTextMenuTitle: { color: '#313030', fontWeight: 'bold', fontSize: 15, textAlign: 'center', width: '90%' },
   centerNotificationFlexPanel: { flex: 1, paddingHorizontal: 30, justifyContent: 'center', alignItems: 'center' },

@@ -1263,7 +1263,7 @@ const styles = StyleSheet.create({
   myDojoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 15, backgroundColor: 'rgba(0,0,0,0.76)', opacity: 1 },
   title: { fontSize: 17, fontWeight: 'bold', color: '#15943b', height: 38, width: '100%', textAlign: 'center', marginBottom: 2 },
   card: {  marginVertical: -4, alignSelf: 'center', borderRadius: 10, width: "100%", opacity: 1, alignItems: "center", justifyContent: "center", flex: 1 },
-  cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#12863f', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
+  cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#e7e7eb', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
   infoText: { fontSize: 14, fontWeight: 'bold', color: '#0e8644', minHeight: 76, width: '94%', textAlign: 'center', marginTop: -95, paddingHorizontal: 19, backgroundColor: 'rgba(0,0,0,0.5)' },
   icon: { height: 57, width: '89%', alignSelf: 'center', textAlign: 'center', marginLeft: 19, marginBottom: 3, opacity: 1 },
   saveBtn: { width: 133, height: 114, borderRadius: 15, marginTop: -12, alignSelf:'center' },
