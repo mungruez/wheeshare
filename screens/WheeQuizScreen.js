@@ -19,10 +19,22 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   const [qarr, setQarr] = useState([]);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState(null);
   const [counter, setCounter] = useState(15);
+  const [timerLimit, setTimerLimit] = useState(15);
+  const [timerInput, setTimerInput] = useState("15");
   const navigation = useNavigation();
   
   let interval = null;
   const totalQuestionsCount = qnum > 0 ? qnum : 1;
+  const MIN_TIMER_SECONDS = 5;
+  const MAX_TIMER_SECONDS = 180 * 60;
+
+
+  const sanitizeTimerSeconds = (value) => {
+    const parsedValue = Number(value);
+    if (!Number.isFinite(parsedValue)) return 15;
+    return Math.min(MAX_TIMER_SECONDS, Math.max(MIN_TIMER_SECONDS, Math.floor(parsedValue)));
+  };
+
 
   const handleTenClick = () => { setTen(!ten); setTwenty(false); setThirty(false); setFourty(false); };
   const handleTwentyClick = () => { setTen(false); setTwenty(!twenty); setThirty(false); setFourty(false); };
@@ -62,12 +74,16 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   }, [navigation]);
 
   
-  const initializeQuizArray = (selectedNum) => {
+  const initializeQuizArray = (selectedNum, selectedTimer = timerLimit) => {
     if (!Array.isArray(data) || data.length === 0) return;
 
     const safeSelectedNum = Number.isFinite(selectedNum) ? Math.floor(selectedNum) : data.length;
     const finalCount = Math.max(1, Math.min(data.length, safeSelectedNum));
+    const safeTimer = sanitizeTimerSeconds(selectedTimer);
+
     setQnum(finalCount);
+    setTimerLimit(safeTimer);
+    setTimerInput(String(safeTimer));
 
     const randomIndices = [];
     const usedIndexes = new Set();
@@ -85,7 +101,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     setIndex(0);
     setPoints(0);
     setAnswers([]);
-    setCounter(15);
+    setCounter(safeTimer);
     setQmode("quiz");
   };
 
@@ -160,7 +176,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
           }
 
           setIndex((prevIndex) => prevIndex + 1);
-          return 15;
+          return timerLimit;
         }
 
         return state - 1;
@@ -169,7 +185,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 
     interval = setTimeout(myInterval, 1000);
     return () => clearTimeout(interval);
-  }, [counter, qmode, currentQuestion, selectedAnswerIndex, index]);
+  }, [counter, qmode, currentQuestion, selectedAnswerIndex, index, timerLimit]);
    
 
 
@@ -182,10 +198,10 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
       return;
     }
 
-    setCounter(15);
+    setCounter(timerLimit);
     setSelectedAnswerIndex(null);
     setAnswerStatus(null);
-  }, [index, qarr.length, qmode, answers.length, qnum]);
+  }, [index, qarr.length, qmode, answers.length, qnum, timerLimit]);
 
  
 
@@ -193,6 +209,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     return (
       <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/quizzes/quizlistbg.png')}>
         <StatusBar barStyle="light-content"/>
+        
         <SafeAreaView style={{ marginTop: 5, height: "100%" }}>
           <Image resizeMode="contain" source={require('../assets/quizzes/redquiztitle.png')} style={{ marginTop: 5, width: "100%", height: "17%" }} />
 
@@ -212,7 +229,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 
               <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5 }}>
                 <Text style={{ color: "#d1fafa", marginRight: 6 }}>•</Text>
-                <Text style={styles.ruleText}>Each question has a time limit of 15 seconds</Text>
+                <Text style={styles.ruleText}>Each question has a time limit</Text>
               </View>
 
               <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5 }}>
@@ -222,7 +239,28 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
             </View>
           </View>
 
+          <View style={{ width: '88%', marginTop: 12, marginBottom: 14, alignSelf: 'center', backgroundColor: 'rgba(15, 23, 42, 0.45)', borderRadius: 10, borderWidth: 1, borderColor: '#d1fafa', padding: 10 }}>
+            <Text style={{ color: '#d1fafa', fontSize: 13, fontWeight: '600', marginBottom: 6 }}>Timer per question (seconds)</Text>
+            <TextInput
+              value={timerInput}
+              onChangeText={(value) => {
+                const numericValue = value.replace(/[^0-9]/g, '');
+                setTimerInput(numericValue);
+                if (numericValue === '') return;
+                setTimerLimit(sanitizeTimerSeconds(numericValue));
+              }}
+              keyboardType="number-pad"
+              placeholder="15"
+              placeholderTextColor="#d1fafa"
+              style={{ backgroundColor: '#ffffff', color: '#111827', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8, fontWeight: '600' }}
+            />
+            <Text style={{ color: '#d1fafa', fontSize: 11, marginTop: 6 }}>
+              Allowed: {MIN_TIMER_SECONDS} sec to {MAX_TIMER_SECONDS} sec ({Math.floor(MAX_TIMER_SECONDS / 60)} mins max)
+            </Text>
+          </View>
+          
           <Text style={{marginLeft: 2, color: "#d1fafa", fontSize: 15, fontWeight: "600", textAlign: "center"}}>Total Questions:</Text>
+
           <View style={{ flexDirection: "row", flex: 1, maxHeight: 57, justifyContent: "center", alignItems: "center", marginBottom: 19}}>
             <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius: 12, borderWidth:.7, borderColor: '#d1fafa'}}> 
               <Pressable onPress={handleTenClick}> 
@@ -253,7 +291,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
             </View>
           </View>
 
-          <Pressable onPress={() => initializeQuizArray(getQnum())} style={styles.startQuizBtn}>
+          <Pressable onPress={() => initializeQuizArray(getQnum(), sanitizeTimerSeconds(timerInput))} style={styles.startQuizBtn}>
             <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Start Quiz</Text>
           </Pressable>
         </SafeAreaView>
@@ -270,12 +308,13 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     );
   }
 
+
   if (qmode === "quiz" && currentQuestion) {
     const questionText = currentQuestion?.question || currentQuestion?.q || "Question Prompt Missing";
-
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "#f8fafc" }}>
         <StatusBar barStyle="dark-content"/>
+
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
           <Pressable onPress={() => { if (onBackToDashboard) {onBackToDashboard();}}} style={styles.closeIconContainer} >
             <AntDesign name="close" size={22} color="red" />
@@ -439,6 +478,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     return (
       <SafeAreaView style={{ flex: 1, padding: 10, backgroundColor: "#f8fafc" }}>
         <StatusBar barStyle="dark-content"/>
+
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <Text>Your Results</Text>
         </View>
@@ -509,7 +549,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 
                   {!!item.explanation && (
                     <Text style={{ fontSize: 11, fontStyle: "italic", color: "#64748b", marginTop: 4 }}>
-                      Note: {item.explanation}
+                      Explanation: {item.explanation}
                     </Text>
                   )}
                 </View>
@@ -544,22 +584,6 @@ const styles = StyleSheet.create({
   options: { fontSize: 14, fontWeight: 'bold', color: '#475569', minWidth: 20 },
   correctAnswerIndex: { minWidth: 20 },
   closeIconContainer: { padding: 6, justifyContent: 'center', alignItems: 'center' },
-  textInput: {
-    minHeight: 120,
-    borderWidth: 1,
-    borderColor: '#cbd5e1',
-    borderRadius: 10,
-    padding: 12,
-    backgroundColor: '#fff',
-    color: '#0f172a',
-    textAlignVertical: 'top'
-  },
-  compositeSubmitBtn: {
-    backgroundColor: '#0f766e',
-    borderRadius: 10,
-    paddingVertical: 12,
-    marginTop: 12,
-    justifyContent: 'center',
-    alignItems: 'center'
-  }
+  textInput: {minHeight: 120,borderWidth: 1,borderColor: '#cbd5e1',borderRadius: 10,padding: 12,backgroundColor: '#fff',color: '#0f172a',textAlignVertical: 'top'},
+  compositeSubmitBtn: {backgroundColor: '#0f766e',borderRadius: 10,paddingVertical: 12,marginTop: 12,justifyContent: 'center',alignItems: 'center'}
 });
