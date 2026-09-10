@@ -146,7 +146,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
               question: index + 1,
               answer: false,
               q: currentQuestion.question || currentQuestion.q || "Question Text",
-              explanation: currentQuestion.explanation || "Time limit exceeded.",
+              explanation: currentQuestion.explanation || "",
               corra: currentQuestion.correctAnswerIndex,
               curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : [],
               a: timeoutAns,
@@ -423,7 +423,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
             </Pressable>
           ) : answerStatus === null ? null : (
             <Pressable 
-              onPress={() => setIndex(index + 1)} 
+              onPress={() => setIndex((prevIndex) => prevIndex + 1)}
               style={{ backgroundColor: "green", padding: 12, marginTop: 12, borderRadius: 8, justifyContent: "center" }}
             >
               <Text style={{ color: "white", textAlign: "center", fontWeight: "bold" }}>Next Question</Text>
