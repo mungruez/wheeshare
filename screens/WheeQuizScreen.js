@@ -290,7 +290,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
         </View>
 
         <View style={{ backgroundColor: "#e2e8f0", width: "95%", height: 10, borderRadius: 20, marginTop: 15, marginLeft: 10, overflow: "hidden", position: "relative" }}>
-          <View style={{ backgroundColor: "#FFC0CB", borderRadius: 12, position: "absolute", left: 0, top: 0, bottom: 0, width: `${progressPercentage}%` }} />
+          <View style={{ backgroundColor: "#FFC0CB", borderRadius: 12, position: "absolute", left: 0, top: 0, bottom: 0, width: `${Math.floor((index / totalQuestionsCount) * 100)}%` }} />
         </View>
 
         <View style={{ marginTop: 25, marginHorizontal: 10, backgroundColor: "#F0F8FF", padding: 16, borderRadius: 12, borderWidth: 1, borderColor: "#cbd5e1" }} >
