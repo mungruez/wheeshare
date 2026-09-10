@@ -25,16 +25,20 @@ export default function Resources() {
     <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/resbg.png')}>
       <View style={styles.tintOverlay} />
       <StatusBar barStyle="light-content" />
+
       <SafeAreaView style={styles.safeArea}>
+        
         <View style={styles.headerWrap}>
           <ImageBackground style={styles.icon} resizeMode='contain' source={require('../assets/abouttitle.png')} />
         </View>
 
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
           <View style={styles.contentBox}>
+
             <Text style={styles.title}>
               Thank you for downloading WheeShare. Your support helps us continue building a connected, knowledge-sharing community and improving the experience for learners, creators, and collaborators alike. We are grateful to everyone who has contributed time, effort, and insight to bring this platform to life.
             </Text>
+
             <Text style={styles.title}>
               WheeShare does not collect personal data from your device. The app is designed for efficient battery usage, low memory consumption, and smooth performance. Future upgrades will remain free, and we are committed to making the experience both accessible and reliable.
             </Text>
@@ -72,6 +76,7 @@ export default function Resources() {
     </ImageBackground>
   );
 }
+
 
 const styles = StyleSheet.create({
   imgBackground: {
