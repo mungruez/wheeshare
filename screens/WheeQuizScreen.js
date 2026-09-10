@@ -442,10 +442,6 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
         <StatusBar barStyle="dark-content"/>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <Text>Your Results</Text>
-          <View style={{ flexDirection: "row", alignItems: "center", marginRight: 14 }}>
-            <Text>Share</Text>
-            <AntDesign style={{ marginLeft: 4 }} name="sharealt" size={18} color="black" />
-          </View>
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 10 }}>
