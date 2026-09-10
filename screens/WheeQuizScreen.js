@@ -64,20 +64,23 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   
   const initializeQuizArray = (selectedNum) => {
     if (!Array.isArray(data) || data.length === 0) return;
-    let finalCount = selectedNum;
-    if (finalCount > data.length) finalCount = data.length;
+
+    const safeSelectedNum = Number.isFinite(selectedNum) ? Math.floor(selectedNum) : data.length;
+    const finalCount = Math.max(1, Math.min(data.length, safeSelectedNum));
     setQnum(finalCount);
 
     const randomIndices = [];
-    const maxBound = data.length;
+    const usedIndexes = new Set();
 
-    for (let ri = 0; ri < finalCount; ri++) {
-      let rand = Math.floor(Math.random() * maxBound);
-      while (randomIndices.includes(rand)) {
-        rand = Math.floor(Math.random() * maxBound);
+    for (let i = 0; i < finalCount; i++) {
+      let nextIndex = Math.floor(Math.random() * data.length);
+      while (usedIndexes.has(nextIndex)) {
+        nextIndex = Math.floor(Math.random() * data.length);
       }
-      randomIndices.push(rand);
+      usedIndexes.add(nextIndex);
+      randomIndices.push(nextIndex);
     }
+
     setQarr(randomIndices);
     setIndex(0);
     setPoints(0);
