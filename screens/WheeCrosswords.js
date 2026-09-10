@@ -80,12 +80,12 @@ export default function WheeCrosswords() {
       const existing = gridT[x][y];
 
       if (existing !== '.' && existing !== word[charIdx]) return false;
-      if (existing !== '.') crossingCount++;
 
+      if (existing !== '.') crossingCount++;
       if (existing !== '.') continue;
 
-      const sideX = orientation === "across" ? [x - 1, x + 1] : [x, x];
-      const sideY = orientation === "across" ? [y, y] : [y - 1, y + 1];
+      const sideX = orientation === "across" ? [x, x] : [x - 1, x + 1];
+      const sideY = orientation === "across" ? [y - 1, y + 1] : [y, y];
       for (let sideIdx = 0; sideIdx < 2; sideIdx++) {
         const neighborX = sideX[sideIdx];
         const neighborY = sideY[sideIdx];

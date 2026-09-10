@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 
 const ROW_COUNT = 12;
 const COLUMN_COUNT = 12;
+const isInBounds = (row, col) => row >= 0 && row < ROW_COUNT && col >= 0 && col < COLUMN_COUNT;
 
 const normalizePuzzle = (crosswordData) => {
   if (!Array.isArray(crosswordData)) return [];
@@ -13,37 +14,37 @@ const normalizePuzzle = (crosswordData) => {
   return crosswordData;
 };
 
+const placeWord = (grid, answer, startx, starty, orientation, fillValue) => {
+  if (!answer || startx === undefined || starty === undefined || !['across', 'down'].includes(orientation)) return;
+
+  for (let i = 0; i < answer.length; i++) {
+    const row = orientation === 'down' ? startx + i : startx;
+    const col = orientation === 'across' ? starty + i : starty;
+
+    if (!isInBounds(row, col)) continue;
+    grid[row][col] = fillValue(i, answer);
+  }
+};
+
 const generateInitialGrid = (crosswordData) => {
   const puzzle = normalizePuzzle(crosswordData);
   const initialGrid = Array(ROW_COUNT).fill(0).map(() => Array(COLUMN_COUNT).fill('.'));
-  
+
   puzzle.forEach(({ answer, startx, starty, orientation }) => {
-    if (!answer || startx === undefined || starty === undefined) return;
-    for (let i = 0; i < answer.length; i++) {
-      if (orientation === 'across') {
-        initialGrid[startx][starty + i] = '';
-      } else if (orientation === 'down') {
-        initialGrid[startx + i][starty] = '';
-      }
-    }
+    placeWord(initialGrid, answer, startx, starty, orientation, () => '');
   });
+
   return initialGrid;
 };
 
 const generateAnswerGrid = (crosswordData) => {
   const puzzle = normalizePuzzle(crosswordData);
   const answerGrid = Array(ROW_COUNT).fill(0).map(() => Array(COLUMN_COUNT).fill('.'));
-  
+
   puzzle.forEach(({ answer, startx, starty, orientation }) => {
-    if (!answer || startx === undefined || starty === undefined) return;
-    for (let i = 0; i < answer.length; i++) {
-      if (orientation === 'across') {
-        answerGrid[startx][starty + i] = String(answer[i]).toUpperCase();
-      } else if (orientation === 'down') {
-        answerGrid[startx + i][starty] = String(answer[i]).toUpperCase();
-      }
-    }
+    placeWord(answerGrid, answer, startx, starty, orientation, (_, value) => String(value).toUpperCase());
   });
+
   return answerGrid;
 };
 
@@ -126,7 +127,7 @@ const CrosswordGrid = ({ crosswordData }) => {
   return (
     <ScrollView style={styles.screenScroll} contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       {renderQuestions()}
-      
+
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={styles.gridWrapper}>
           {grid.map((row, rowIndex) => (
@@ -134,7 +135,6 @@ const CrosswordGrid = ({ crosswordData }) => {
               {row.map((cell, colIndex) => {
                 const isBlocked = cell === '.';
                 const startCell = puzzle.find((entry) => entry.startx === rowIndex && entry.starty === colIndex);
-                
                 return (
                   <View key={`cell-${rowIndex}-${colIndex}`} style={styles.cellContainer}>
                     {startCell && <Text style={styles.smallDigit}>{startCell.position}</Text>}

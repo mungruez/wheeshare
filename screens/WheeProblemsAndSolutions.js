@@ -1457,7 +1457,7 @@ export default function ProblemAndSolution() {
               </View>
 
               <TouchableOpacity style={styles.saveBtnBlock} onPress={savePSItem}>
-                <ImageBackground style={{ height: 54, width: "100%", justifyContent: 'center', alignItems: 'center' }} resizeMode='cover' source={require('../assets/problems/saveproblemandsolutionbtn.png')}>
+                <ImageBackground style={{ height: 48, width: "95%", justifyContent: 'center', alignItems: 'center' }} resizeMode='contain' source={require('../assets/problems/saveproblemandsolutionbtn.png')}>
                 </ImageBackground>
               </TouchableOpacity>
             </ScrollView>
@@ -1539,7 +1539,7 @@ export default function ProblemAndSolution() {
           />
         ) : (
           <View style={styles.centerNotificationFlexPanel}>
-            <Text style={styles.infoTextDashboardFallback}>Tap the gold (+) icon to define a fresh Problem & Solution vector workspace or load an external iDojo backup file.</Text>
+            <Text style={styles.infoTextDashboardFallback}>Tap the purple (+) icon to create a new Problem & Solution.</Text>
           </View>
         ) }
 
@@ -1646,7 +1646,7 @@ const styles = StyleSheet.create({
   orText: { color: '#c89eeb', fontWeight: 'bold', fontSize: 16, marginTop: 19, marginBottom: -7, marginLeft: 38 },
   toggleModeBtn: { alignSelf: 'center', marginTop: 45, marginBottom: 19, padding: 5, backgroundColor: 'rgba(186, 55, 212, 0.12)', borderRadius: 6, borderWidth: 1, borderColor: 'rgba(149, 55, 212, 0.5)', flexDirection: "row" },
   toggleModeText: { color: '#c89eeb', fontSize: 14, fontWeight: '600', marginLeft: 4 },
-  saveBtnBlock: { width: 152, height: 61, borderRadius: 10, alignSelf:'center', marginTop: 25, marginBottom: 20 },
+  saveBtnBlock: { width: 152, height: 57, borderRadius: 10, alignSelf:'center', marginTop: 25, marginBottom: 20 },
   saveBtnTextInternal: { color: '#c89eeb', fontWeight: 'bold', fontSize: 14, letterSpacing: 1 },
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.76)', justifyContent: 'center', alignItems: 'center', zIndex: 999 },
   loadingText: { color: '#9e37f3', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 }

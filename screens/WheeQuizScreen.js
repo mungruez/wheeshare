@@ -31,11 +31,11 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   const handleFourtyClick = () => { setTen(false); setTwenty(false); setThirty(false); setFourty(!fourty); };
 
   const getQnum = () => {
-    if (ten) return 10;
-    if (twenty) return 20;
-    if (thirty) return 30;
-    if (fourty) return 40;
-    return 5;
+    if (ten) return data.length / 4;
+    if (twenty) return data.length / 2;
+    if (thirty) return (data.length * 3) / 4;
+    if (fourty) return data.length;
+    return data.length;
   };
   
 
@@ -189,8 +189,9 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   if (qmode === "start") {
     return (
       <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/quizzes/quizlistbg.png')}>
+        <StatusBar barStyle="light-content"/>
         <SafeAreaView style={{ marginTop: 5, height: "100%" }}>
-          <Image resizeMode="contain" source={require('../assets/quizzes/redquiztitle.png')} style={{ marginTop: 5, borderWidth: 2, borderColor: '#9a9aa1', width: "100%", height: "17%", borderRadius: 5 }} />
+          <Image resizeMode="contain" source={require('../assets/quizzes/redquiztitle.png')} style={{ marginTop: 5, width: "100%", height: "17%" }} />
 
           <View style={{ padding: 10, flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <Text style={styles.rulesHeader}>QUIZ RULES</Text>
@@ -220,32 +221,32 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 
           <Text style={{marginLeft: 2, color: "#d1fafa", fontSize: 15, fontWeight: "600", textAlign: "center"}}>Total Questions:</Text>
           <View style={{ flexDirection: "row", flex: 1, maxHeight: 57, justifyContent: "center", alignItems: "center", marginBottom: 19}}>
-            <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius: 12, borderWidth:.7, borderColor: '#b62730'}}> 
+            <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius: 12, borderWidth:.7, borderColor: '#d1fafa'}}> 
               <Pressable onPress={handleTenClick}> 
                 <MaterialCommunityIcons name={ten ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
               </Pressable> 
-              <Text style={{fontSize: 12, color: "#000", fontWeight: "600"}}>10</Text> 
+              <Text style={{fontSize: 12, color: "#000", fontWeight: "600"}}>25%</Text> 
             </View>
                           
-            <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius:12, borderWidth:.7, borderColor: '#b62730'}}> 
+            <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius:12, borderWidth:.7, borderColor: '#d1fafa'}}> 
               <Pressable onPress={handleTwentyClick}> 
                 <MaterialCommunityIcons name={twenty ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
               </Pressable> 
-              <Text style={{fontSize: 12, color: "#000", fontWeight: "600"}}>20</Text> 
+              <Text style={{fontSize: 12, color: "#000", fontWeight: "600"}}>50%</Text> 
             </View>
             
-            <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius:12, borderWidth:.7, borderColor: '#b62730'}}> 
+            <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f3e4e5', borderRadius:12, borderWidth:.7, borderColor: '#d1fafa'}}> 
               <Pressable onPress={handleThirtyClick}> 
                 <MaterialCommunityIcons name={thirty ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
               </Pressable> 
-              <Text style={{fontSize: 12, color: "#000", fontWeight: "600"}}>30</Text> 
+              <Text style={{fontSize: 12, color: "#000", fontWeight: "600"}}>75%</Text> 
             </View>
           
-            <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f8f0f0', borderRadius: 12, borderWidth:.7, borderColor: '#b62730'}}> 
+            <View style={{justifyContent: "flex-start", alignItems: "center", flexDirection: "column", width: 47, height: 57, marginTop: 5,marginBottom: 4, marginHorizontal: 0,backgroundColor: '#f8f0f0', borderRadius: 12, borderWidth:.7, borderColor: '#d1fafa'}}> 
               <Pressable onPress={handleFourtyClick}> 
                 <MaterialCommunityIcons name={fourty ? "checkbox-marked" : "checkbox-blank-outline"} size={21} color="#5e1919" /> 
               </Pressable> 
-              <Text style={{fontSize: 12, color: "#000", fontWeight: "600"}}>40</Text> 
+              <Text style={{fontSize: 12, color: "#000", fontWeight: "600"}}>ALL</Text> 
             </View>
           </View>
 
@@ -271,6 +272,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "#f8fafc" }}>
+        <StatusBar barStyle="dark-content"/>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
           <Pressable onPress={() => { if (onBackToDashboard) {onBackToDashboard();}}} style={styles.closeIconContainer} >
             <AntDesign name="close" size={22} color="red" />
@@ -436,7 +438,8 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 
   if (qmode === "results") {
     return (
-      <SafeAreaView style={{ margin: 10, flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, padding: 10, backgroundColor: "#f8fafc" }}>
+        <StatusBar barStyle="dark-content"/>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <Text>Your Results</Text>
           <View style={{ flexDirection: "row", alignItems: "center", marginRight: 14 }}>
@@ -444,87 +447,87 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
             <AntDesign style={{ marginLeft: 4 }} name="sharealt" size={18} color="black" />
           </View>
         </View>
-  
+
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 10 }}>
           <Text>Questions Answered</Text>
           <Text>({points}/{answers.length})</Text>
         </View>
-  
-        <View style={{ backgroundColor: "white", borderRadius: 7, marginTop: 10, marginBottom: 20, paddingBottom: 76, minHeight: "100%" }}>
+
+        <View style={{ flex: 1, backgroundColor: "white", borderRadius: 7, marginTop: 10, overflow: "hidden" }}>
           <Text style={{ color: "#E30B5C", fontSize: 15, fontWeight: "700", textAlign: "center", marginTop: 7, textDecorationLine: "underline" }}>Score Card</Text>
 
-          <View style={{ flex: 1 }}>
-            <FlatList
-              data={answers || []}
-              keyExtractor={(item, index) => {
-                return item.question?.toString() || index.toString();
-              }}
-              contentContainerStyle={{ paddingBottom: 120 }}
-              renderItem={({ item }) => {
-                const displayOptions = Array.isArray(item.curra)
-                  ? item.curra.map((opt, optIdx) => ({ opt, optIdx })).filter(({ opt }) => opt?.trim())
-                  : [];
-                const isLongText = item.inferredType === "long" || !Array.isArray(item.curra) || displayOptions.length === 1;
-                const isMultipleAns = item.inferredType === "multiple" || displayOptions.length > 4;
+          <FlatList
+            data={answers || []}
+            keyExtractor={(item, index) => item.question?.toString() || index.toString()}
+            contentContainerStyle={{ paddingBottom: 16 }}
+            showsVerticalScrollIndicator={false}
+            style={{ flex: 1 }}
+            renderItem={({ item }) => {
+              const displayOptions = Array.isArray(item.curra)
+                ? item.curra.map((opt, optIdx) => ({ opt, optIdx })).filter(({ opt }) => opt?.trim())
+                : [];
+              const isLongText = item.inferredType === "long" || !Array.isArray(item.curra) || displayOptions.length === 1;
+              const isMultipleAns = item.inferredType === "multiple" || displayOptions.length > 4;
 
-                return (
-                  <View style={styles.questionContainer}>
-                    <Text style={{ fontSize: 14, fontWeight: "bold", color: "#1e293b", marginBottom: 6 }}>
-                      {item.question}. {item.q}
-                    </Text>
-                    
-                    {isLongText ? (
-                      <View style={{ backgroundColor: "#f8fafc", padding: 10, borderRadius: 6, borderWidth: 1, borderColor: item.answer ? "green" : "red" }}>
-                        <Text style={{ fontSize: 12, color: "#475569" }}>
-                          <Text style={{ fontWeight: "bold" }}>Your Entry:</Text> {item.a === "" ? "[Timed Out/Blank]" : `"${item.a}"`}
-                        </Text>
-                        <Text style={{ fontSize: 12, color: "green", marginTop: 2 }}>
-                          <Text style={{ fontWeight: "bold" }}>Correct Keyword:</Text> "{item.corra}"
-                        </Text>
-                      </View>
-                    ) : (
-                      <View style={{ gap: 4 }}>
-                        {displayOptions.map(({ opt, optIdx }) => {
-                          const isCorrectOption = isMultipleAns 
-                            ? (Array.isArray(item.corra) && item.corra.includes(optIdx))
-                            : Number(item.corra) === optIdx;
+              return (
+                <View style={styles.questionContainer}>
+                  <Text style={{ fontSize: 14, fontWeight: "bold", color: "#1e293b", marginBottom: 6 }}>
+                    {item.question}. {item.q}
+                  </Text>
 
-                          const isUserSelected = isMultipleAns
-                            ? (Array.isArray(item.a) && item.a.includes(optIdx))
-                            : Number(item.a) === optIdx;
-
-                          return (
-                            <View key={`rev-opt-${optIdx}`} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: "#f2f2f2", padding: 8, borderRadius: 4 }}>
-                              <Text style={{ fontSize: 13, color: "#334155" }}>
-                                {item.inferredType === "truefalse" ? "" : (optIdx === 0 ? "(A) " : optIdx === 1 ? "(B) " : optIdx === 2 ? "(C) " : "(D) " || `(${optIdx + 1}) `)} 
-                                {opt}
-                              </Text>
-                              {isCorrectOption ? (
-                                <AntDesign name="checkcircle" size={18} color="green" />
-                              ) : (!item.answer && isUserSelected) ? (
-                                <AntDesign name="closecircle" size={18} color="red" />
-                              ) : null}
-                            </View>
-                          );
-                        })}
-                      </View>
-                    )}
-                    
-                    {!!item.explanation && (
-                      <Text style={{ fontSize: 11, fontStyle: "italic", color: "#64748b", marginTop: 4 }}>
-                        Note: {item.explanation}
+                  {isLongText ? (
+                    <View style={{ backgroundColor: "#f8fafc", padding: 10, borderRadius: 6, borderWidth: 1, borderColor: item.answer ? "green" : "red" }}>
+                      <Text style={{ fontSize: 12, color: "#475569" }}>
+                        <Text style={{ fontWeight: "bold" }}>Your Entry:</Text> {item.a === "" ? "[Timed Out/Blank]" : `"${item.a}"`}
                       </Text>
-                    )}
-                  </View>
-                );
-              }}
-            />
-          </View>         
+                      <Text style={{ fontSize: 12, color: "green", marginTop: 2 }}>
+                        <Text style={{ fontWeight: "bold" }}>Correct Keyword:</Text> "{item.corra}"
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={{ gap: 4 }}>
+                      {displayOptions.map(({ opt, optIdx }) => {
+                        const isCorrectOption = isMultipleAns
+                          ? (Array.isArray(item.corra) && item.corra.includes(optIdx))
+                          : Number(item.corra) === optIdx;
 
-          <Pressable style={{ backgroundColor: "#159215", padding: 12, marginVertical: 19, borderRadius: 9, width: 133, alignSelf: "center", justifyContent: "center" }}
-            onPress={() => { setQmode("start"); }}>
-            <Text style={{ color: "white", textAlign: "center", fontWeight: "700", fontSize: 13 }}>Start Quiz</Text>
-          </Pressable>
+                        const isUserSelected = isMultipleAns
+                          ? (Array.isArray(item.a) && item.a.includes(optIdx))
+                          : Number(item.a) === optIdx;
+
+                        return (
+                          <View key={`rev-opt-${optIdx}`} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: "#f2f2f2", padding: 8, borderRadius: 4 }}>
+                            <Text style={{ fontSize: 13, color: "#334155" }}>
+                              {item.inferredType === "truefalse" ? "" : (optIdx === 0 ? "(A) " : optIdx === 1 ? "(B) " : optIdx === 2 ? "(C) " : "(D) " || `(${optIdx + 1}) `)}
+                              {opt}
+                            </Text>
+                            {isCorrectOption ? (
+                              <MaterialCommunityIcons name="check-circle" size={20} color="#16a34a" />
+                            ) : (!item.answer && isUserSelected) ? (
+                              <MaterialCommunityIcons name="close-circle" size={20} color="#dc2626" />
+                            ) : null}
+                          </View>
+                        );
+                      })}
+                    </View>
+                  )}
+
+                  {!!item.explanation && (
+                    <Text style={{ fontSize: 11, fontStyle: "italic", color: "#64748b", marginTop: 4 }}>
+                      Note: {item.explanation}
+                    </Text>
+                  )}
+                </View>
+              );
+            }}
+          />
+
+          <View style={{ paddingHorizontal: 16, paddingVertical: 14, borderTopWidth: 1, borderTopColor: "#e2e8f0", backgroundColor: "#fff" }}>
+            <Pressable style={{ backgroundColor: "#159215", padding: 12, borderRadius: 9, alignSelf: "center", width: 133, justifyContent: "center" }}
+              onPress={() => { setQmode("start"); }}>
+              <Text style={{ color: "white", textAlign: "center", fontWeight: "700", fontSize: 13 }}>Restart Quiz</Text>
+            </Pressable>
+          </View>
         </View>
       </SafeAreaView>
     );
@@ -537,7 +540,7 @@ const styles = StyleSheet.create({
   rulesHeader: { fontSize: 22, fontWeight: 'bold', color: '#001414', textAlign: 'center', letterSpacing: 0.5, marginTop: 10 },
   ruleText: { color: '#d1fafa', fontSize: 13, marginLeft: 8, fontWeight: '500', flex: 1, flexWrap: 'wrap' },
   container: { flexDirection: 'row', justifyContent: 'center', gap: 14, marginVertical: 12, paddingHorizontal: 10 },
-  startQuizBtn: { backgroundColor: '#004d40', paddingVertical: 14, borderRadius: 8, marginHorizontal: 20, marginBottom: 30, elevation: 3 },
+  startQuizBtn: { backgroundColor: '#5e1919', paddingVertical: 14, borderRadius: 8, marginHorizontal: 20, marginBottom: 30, elevation: 3 },
   questionContainer: { paddingHorizontal: 14, paddingVertical: 10, width: '100%', borderBottomWidth: 1, borderBottomColor: '#e6e6e6' },
   unselectedAnswer: { flexDirection: 'row', alignItems: 'center', width: '100%', padding: 12, backgroundColor: '#fff', borderRadius: 8, marginVertical: 6, borderWidth: 1.5, borderColor: '#cbd5e1', elevation: 2 },
   selectedMultipleAnswer: { flexDirection: 'row', alignItems: 'center', width: '100%', padding: 12, backgroundColor: '#e0f2fe', borderRadius: 8, marginVertical: 6, borderWidth: 1.5, borderColor: '#7dd3fc', elevation: 2 },
