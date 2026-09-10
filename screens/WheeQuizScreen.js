@@ -23,13 +23,13 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   
   let interval = null;
   const totalQuestionsCount = qnum > 0 ? qnum : 1;
-  const progressPercentage = Math.floor((index / totalQuestionsCount) * 100);
 
   const handleTenClick = () => { setTen(!ten); setTwenty(false); setThirty(false); setFourty(false); };
   const handleTwentyClick = () => { setTen(false); setTwenty(!twenty); setThirty(false); setFourty(false); };
   const handleThirtyClick = () => { setTen(false); setTwenty(false); setThirty(!thirty); setFourty(false); };
   const handleFourtyClick = () => { setTen(false); setTwenty(false); setThirty(false); setFourty(!fourty); };
 
+  
   const getQnum = () => {
     if (ten) return data.length / 4;
     if (twenty) return data.length / 2;
@@ -287,10 +287,6 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginHorizontal: 10 }}>
           <Text style={{ fontSize: 13, color: "#64748b" }}>Your Progress</Text>
           <Text style={{ fontSize: 13, color: "#64748b", fontWeight: "600" }}>({index}/{totalQuestionsCount}) questions answered</Text>
-        </View>
-
-        <View style={{ backgroundColor: "#e2e8f0", width: "95%", height: 10, borderRadius: 20, marginTop: 15, marginLeft: 10, overflow: "hidden", position: "relative" }}>
-          <View style={{ backgroundColor: "#FFC0CB", borderRadius: 12, position: "absolute", left: 0, top: 0, bottom: 0, width: `${Math.floor((index / totalQuestionsCount) * 100)}%` }} />
         </View>
 
         <View style={{ marginTop: 25, marginHorizontal: 10, backgroundColor: "#F0F8FF", padding: 16, borderRadius: 12, borderWidth: 1, borderColor: "#cbd5e1" }} >
