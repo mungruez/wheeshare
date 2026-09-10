@@ -10,19 +10,15 @@ const normalizePuzzle = (crosswordData) => {
   if (crosswordData.length > 0 && Array.isArray(crosswordData[0])) {
     return crosswordData[0];
   }
-  if (crosswordData.length > 0 && crosswordData[0] && typeof crosswordData[0] === 'object' && 'answer' in crosswordData[0]) {
-    return crosswordData;
-  }
-  return [];
+  return crosswordData;
 };
 
 const generateInitialGrid = (crosswordData) => {
   const puzzle = normalizePuzzle(crosswordData);
   const initialGrid = Array(ROW_COUNT).fill(0).map(() => Array(COLUMN_COUNT).fill('.'));
-
+  
   puzzle.forEach(({ answer, startx, starty, orientation }) => {
     if (!answer || startx === undefined || starty === undefined) return;
-
     for (let i = 0; i < answer.length; i++) {
       if (orientation === 'across') {
         initialGrid[startx][starty + i] = '';
@@ -31,17 +27,15 @@ const generateInitialGrid = (crosswordData) => {
       }
     }
   });
-
   return initialGrid;
 };
 
 const generateAnswerGrid = (crosswordData) => {
   const puzzle = normalizePuzzle(crosswordData);
   const answerGrid = Array(ROW_COUNT).fill(0).map(() => Array(COLUMN_COUNT).fill('.'));
-
+  
   puzzle.forEach(({ answer, startx, starty, orientation }) => {
     if (!answer || startx === undefined || starty === undefined) return;
-
     for (let i = 0; i < answer.length; i++) {
       if (orientation === 'across') {
         answerGrid[startx][starty + i] = String(answer[i]).toUpperCase();
@@ -50,7 +44,6 @@ const generateAnswerGrid = (crosswordData) => {
       }
     }
   });
-
   return answerGrid;
 };
 
@@ -71,7 +64,7 @@ const CrosswordGrid = ({ crosswordData }) => {
 
   const handleInputChange = (row, col, text) => {
     const newGrid = grid.map((gridRow) => [...gridRow]);
-    const normalizedText = (text || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 1);
+    const normalizedText = (text || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 1);
     newGrid[row][col] = normalizedText;
     setGrid(newGrid);
   };
@@ -96,7 +89,6 @@ const CrosswordGrid = ({ crosswordData }) => {
 
   const renderQuestions = () => {
     const questions = { across: [], down: [] };
-
     puzzle.forEach(({ hint, orientation, position }) => {
       if (!hint) return;
       const key = `${orientation}-${position}`;
@@ -113,7 +105,6 @@ const CrosswordGrid = ({ crosswordData }) => {
         <View style={styles.questionsContainer}>
           {questions.across.length ? questions.across : <Text style={styles.questionText}>No across clues</Text>}
         </View>
-
         <View style={styles.headingContainer}>
           <Text style={styles.headingText}>Down</Text>
         </View>
@@ -133,13 +124,9 @@ const CrosswordGrid = ({ crosswordData }) => {
   }
 
   return (
-    <ScrollView
-      style={styles.screenScroll}
-      contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}
-    >
+    <ScrollView style={styles.screenScroll} contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       {renderQuestions()}
-
+      
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={styles.gridWrapper}>
           {grid.map((row, rowIndex) => (
@@ -147,15 +134,13 @@ const CrosswordGrid = ({ crosswordData }) => {
               {row.map((cell, colIndex) => {
                 const isBlocked = cell === '.';
                 const startCell = puzzle.find((entry) => entry.startx === rowIndex && entry.starty === colIndex);
-
+                
                 return (
                   <View key={`cell-${rowIndex}-${colIndex}`} style={styles.cellContainer}>
-                    {startCell ? (
-                      <Text style={styles.smallDigit}>{startCell.position}</Text>
-                    ) : null}
+                    {startCell && <Text style={styles.smallDigit}>{startCell.position}</Text>}
                     <TextInput
                       style={[styles.cell, isBlocked && styles.blockedCell]}
-                      value={cell === '.' ? '' : cell}
+                      value={isBlocked ? "" : cell}
                       editable={!isBlocked}
                       onChangeText={(text) => handleInputChange(rowIndex, colIndex, text)}
                       maxLength={1}
@@ -183,97 +168,23 @@ const CrosswordGrid = ({ crosswordData }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    alignItems: 'center',
-    paddingTop: 24,
-    paddingBottom: 80,
-    backgroundColor: '#f8fff6',
-  },
-  screenScroll: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: '#f8fff6',
-  },
-  questionsWrapper: {
-    width: '100%',
-    paddingHorizontal: 16,
-  },
-  questionsContainer: {
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  questionText: {
-    fontSize: 15,
-    fontStyle: 'italic',
-    color: '#1d460b',
-    marginBottom: 4,
-  },
-  headingContainer: {
-    marginTop: 10,
-    marginBottom: 5,
-  },
-  headingText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#228B22',
-    textAlign: 'center',
-  },
-  gridWrapper: {
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-  },
-  row: {
-    flexDirection: 'row',
-  },
-  cellContainer: {
-    position: 'relative',
-  },
-  cell: {
-    borderWidth: 1,
-    borderColor: '#228B22',
-    width: 30,
-    height: 30,
-    textAlign: 'center',
-    backgroundColor: '#ffffff',
-    color: '#1d460b',
-    margin: 1,
-    fontWeight: 'bold',
-  },
-  blockedCell: {
-    backgroundColor: '#111111',
-    borderColor: '#111111',
-    color: '#111111',
-  },
-  smallDigit: {
-    position: 'absolute',
-    top: 2,
-    left: 4,
-    fontSize: 9,
-    fontWeight: 'bold',
-    color: '#228B22',
-    zIndex: 2,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 16,
-    paddingHorizontal: 12,
-  },
+  container: { flexGrow: 1, alignItems: 'center', paddingTop: 24, paddingBottom: 80, backgroundColor: '#f8fff6' },
+  screenScroll: { flex: 1, width: '100%', backgroundColor: '#f8fff6' },
+  questionsWrapper: { width: '100%', paddingHorizontal: 16 },
+  questionsContainer: { marginBottom: 10, paddingHorizontal: 10 },
+  questionText: { fontSize: 15, fontStyle: 'italic', color: '#1d460b', marginBottom: 4 },
+  headingContainer: { marginTop: 10, marginBottom: 5 },
+  headingText: { fontSize: 18, fontWeight: 'bold', color: '#228B22', textAlign: 'center' },
+  gridWrapper: { paddingVertical: 12, paddingHorizontal: 8 },
+  row: { flexDirection: 'row' },
+  cellContainer: { position: 'relative' },
+  cell: { borderWidth: 1, borderColor: '#228B22', width: 30, height: 30, textAlign: 'center', backgroundColor: '#ffffff', color: '#1d460b', margin: 1, fontWeight: 'bold' },
+  blockedCell: { backgroundColor: '#111111', borderColor: '#111111', color: '#111111' },
+  smallDigit: { position: 'absolute', top: 2, left: 4, fontSize: 9, fontWeight: 'bold', color: '#228B22', zIndex: 2 },
+  buttonContainer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 16, marginBottom: 16, paddingHorizontal: 12 },
   gap: { width: 10 },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f8fff6',
-  },
-  emptyStateText: {
-    fontSize: 18,
-    color: '#228B22',
-    fontWeight: '600',
-  },
+  emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fff6' },
+  emptyStateText: { fontSize: 18, color: '#228B22', fontWeight: '600' },
 });
 
-export default CrosswordGrid
+export default CrosswordGrid;

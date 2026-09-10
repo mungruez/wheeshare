@@ -916,7 +916,6 @@ export default function WheeCrosswords() {
   };
 
 
-
   if(mode === "view") {
     return (
       <View style={{flex: 1, justifyContent: "center", alignItems: "center" }}>
