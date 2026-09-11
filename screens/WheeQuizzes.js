@@ -1119,10 +1119,10 @@ export default function WheeQuizzes() {
               <View style={styles.card}>
                 {item && item.category && (
                   <TouchableOpacity
-                    style={{ width: 152, height: 57, justifyContent:'center', alignItems:'center' }}
+                    style={{ width: "76%", height: 57 }}
                     onPress={() => { setHquizzes(getQuizzes(item.category, quizzes)); setQuizCategory(item.category); setPrevCategory(item.category); setMode("list"); }}>
                     <ImageBackground
-                      style={{ width: 152, height: 57, justifyContent:'center', alignItems:'center' }}
+                      style={{ flex: 1, justifyContent:'center', alignItems:'center' }}
                       resizeMode='stretch'
                       source={require('../assets/quizzes/redbtnbg.png')}>
                       { item.id === 'q-all' ? 
