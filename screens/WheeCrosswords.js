@@ -483,6 +483,7 @@ export default function WheeCrosswords() {
       setCrosswordTitle(cwrd.title);
       setCrosswordCategory(cwrdcat);
       setQuestions(cwrd.questions || []);
+      setPrevMode("list");
       setMode("add");
     }
   };
@@ -841,7 +842,7 @@ export default function WheeCrosswords() {
   useFocusEffect(
     useCallback(() => {
       if (mode === "main" || mode === "list") loadCrosswords();
-    }, [mode, crosswordCategory, prevCategory])
+    }, [])
   );
 
 

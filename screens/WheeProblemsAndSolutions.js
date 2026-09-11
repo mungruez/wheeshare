@@ -820,7 +820,7 @@ export default function ProblemAndSolution() {
     useCallback(() => {
       if ( mode !== "view" ) clearAppCache();
       if (mode === "main" || mode === "list") loadPsItems();
-    }, [mode, psItemCategory, prevCategory])
+    }, [])
   );
 
 
@@ -1267,7 +1267,7 @@ export default function ProblemAndSolution() {
       <View style={styles.loadingOverlay}>
         <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
           <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24,  borderRadius: 12, opacity: 1 } } resizeMode='contain' source={require('../assets/icon.png')} />
-          <ActivityIndicator size="large" color="#7a0891" style={{ transform: [{ scale: 1.9 }], marginBottom: 17,  }} />
+          <ActivityIndicator size="large" color="#7a0891" style={{ transform: [{ scale: 1.9 }], marginBottom: 17 }} />
           <Text style={styles.loadingText}>Please Wait...</Text>
         </View>
       </View> 
@@ -1648,6 +1648,6 @@ const styles = StyleSheet.create({
   toggleModeText: { color: '#c89eeb', fontSize: 14, fontWeight: '600', marginLeft: 4 },
   saveBtnBlock: { width: 152, height: 57, borderRadius: 10, alignSelf:'center', marginTop: 25, marginBottom: 20 },
   saveBtnTextInternal: { color: '#c89eeb', fontWeight: 'bold', fontSize: 14, letterSpacing: 1 },
-  loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.76)', justifyContent: 'center', alignItems: 'center', zIndex: 999 },
-  loadingText: { color: '#9e37f3', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 }
+  loadingOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '93%', backgroundColor: 'rgba(19, 19, 19, 0.76)', alignItems: 'center', justifyContent: 'center', zIndex: 19, elevation: 50 },
+  loadingText: { color: '#9e37f3', fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7 },
 });

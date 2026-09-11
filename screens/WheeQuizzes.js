@@ -528,6 +528,7 @@ export default function WheeQuizzes() {
       setQuizCategory(mvcat);
       setQuizDesc(quizItem.description || "");
       setQuestionsList(quizItem.quiz || []);
+      setPrevMode("list");
       setMode("add");
     }
   };
@@ -566,20 +567,21 @@ export default function WheeQuizzes() {
     useCallback(() => {
       if ( mode !== "view" ) clearAppCache();
       if (mode === "main" || mode === "list") loadQuizzes();
-    }, [mode, quizCategory, prevCategory])
+    }, [])
   );
 
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       if (mode === 'view') {
+        setCurrentQuiz(null);
         setMode('list');
         return true;
       }
 
       if (mode === 'add') {
         if (isLoadingRef.current) return true;
-        setMode(prevMode || "main");
+        setMode(prevMode === "list" ? "list" : "main");
         resetForm();
         return true;
       }
@@ -587,6 +589,7 @@ export default function WheeQuizzes() {
       if (mode === 'list') {
         setSelectedIds([]);
         setQuizCategory('');
+        setPrevCategory('');
         setMode('main');
         return true;
       }
@@ -890,7 +893,7 @@ export default function WheeQuizzes() {
     <View style={styles.loadingOverlay}>
       <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
         <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24, opacity: 1, borderRadius: 12 } } resizeMode='contain' source={require('../assets/icon.png')} />
-        <ActivityIndicator size="large" color="#b41919" style={{ transform: [{ scale: 1.9 }], marginBottom: 17,  }} />
+        <ActivityIndicator size="large" color="#b41919" style={{ transform: [{ scale: 1.9 }], marginBottom: 17 }} />
         <Text style={styles.loadingText}>Please Wait...</Text>
       </View>
     </View>
@@ -904,7 +907,7 @@ export default function WheeQuizzes() {
         <StatusBar barStyle="light-content"/>
         <SafeAreaView style={{ flex: 1}}>
           <View style={styles.centerLogoWrapper}>
-            <ImageBackground style={styles.icon} resizeMode='contain' source={require('../assets/quizzes/quizlisttitle.png')} /> 
+            <ImageBackground style={styles.iconlist} resizeMode='contain' source={require('../assets/quizzes/quizlisttitle.png')} /> 
           </View>
     
           <View style={styles.myDojoHeader}>
@@ -985,7 +988,7 @@ export default function WheeQuizzes() {
               <ImageBackground style={styles.iconAM} resizeMode='contain' source={currentQuiz ? require('../assets/quizzes/editquiztitle.png') : require('../assets/quizzes/addquiztitle.png')} /> 
             </View>
             
-            <TouchableOpacity onPress={() => { resetForm(); setMode(prevMode); }} style={styles.discardBtn}>
+            <TouchableOpacity onPress={() => { resetForm(); setSelectedIds([]); setMode(prevMode); }} style={styles.discardBtn}>
               <ImageBackground style={{ height: 57, width: 57, opacity: 1, marginTop: 7}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
               <Text style={styles.discardText}>CANCEL</Text>
             </TouchableOpacity>
@@ -1167,6 +1170,7 @@ const styles = StyleSheet.create({
   viewLayoutContainer: { flex: 1, backgroundColor: '#1e293b', width: '100%', height: '100%' },
   centerLogoWrapper: { marginBottom: 7, marginTop: 12, justifyContent: 'center', alignItems: 'center' },
   icon: { height: 70, width: width * 0.9 },
+  iconlist: { height: 57, width: width * 0.9 },
   iconmain: { height: 57, width: width * 0.83 },
   iconAM: { height: 60, width: width * 0.8 },
   addQuestionBtn: { width: 177, height: 55, borderRadius: 19, marginTop: 7, alignSelf:'center' },
@@ -1241,5 +1245,6 @@ const styles = StyleSheet.create({
   explanationLabelText: { color: '#cf2323', fontSize: 12, fontWeight: 'bold' },
   explanationBodyText: { color: '#cbd5e1', fontSize: 12, marginTop: 4 },
   saveBtnFullBlock: { width: 133, height: 114, borderRadius: 15, marginTop: 7, alignSelf:'center', alignItems: 'center', justifyContent:'center', },
-  loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.75)', justifyContent: 'center', alignItems: 'center', zIndex: 999 },
-  loadingText: { color: '#e02f2f', fontWeight: 'bold', fontSize: 12, marginTop: 10, letterSpacing: 0.5 } });
+  loadingOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '93%', backgroundColor: 'rgba(19, 19, 19, 0.76)', alignItems: 'center', justifyContent: 'center', zIndex: 19, elevation: 50 },
+  loadingText: { color: '#9e37f3', fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7 },
+ });
