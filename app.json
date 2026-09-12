@@ -45,19 +45,14 @@
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-5022889398292450~5423408529",
-          "playServicesAdsVersion": "23.3.0"
+          "androidAppId": "ca-app-pub-5022889398292450~5423408529"
         }
       ],
       [
         "expo-build-properties",
         {
           "android": {
-            "kotlinVersion": "2.2.21",
-            "compilerArgs": [
-              "-Xskip-metadata-version-check",
-              "-Xskip-prerelease-check"
-            ]
+            "kotlinVersion": "2.2.21"
           }
         }
       ],
