@@ -7,10 +7,18 @@ import WheeProblemsAndSolutions from './screens/WheeProblemsAndSolutions';
 import WheeChapters from './screens/WheeChapters';
 import WheeCrosswords from './screens/WheeCrosswords';
 import WheeQuizzes from './screens/WheeQuizzes';
+import React, { useEffect } from 'react';
+import mobileAds from 'react-native-google-mobile-ads';
    
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  useEffect(() => {
+    mobileAds().initialize().then(adapterStatuses => {
+    });
+  }, []);
+
+
   return (
      <NavigationContainer>
       <StatusBar style="dark" />

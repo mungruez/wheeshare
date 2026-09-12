@@ -1,22 +1,24 @@
-import { Image,StyleSheet,View,Text,ScrollView,TextInput,TouchableOpacity,ImageBackground,StatusBar } from 'react-native'
-import React, {useLayoutEffect} from 'react'
+import { Image,StyleSheet,View,Text,ScrollView,TouchableOpacity,ImageBackground,StatusBar } from 'react-native';
+import { BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native';
+import React, {useLayoutEffect} from 'react';
+
+const BANNER_A_ID = __DEV__ ? TestIds.BANNER : 'ca-app-pub-5022889398292450/4030435808';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
 
   useLayoutEffect(()=> {
-    navigation.setOptions({
-      headerShown: false,
-    });
+    navigation.setOptions({ headerShown: false,});
   }, []);
 
   return (
     <ImageBackground style={ styles.imgBackground } imageStyle={{ opacity: 1.0 }} resizeMode='cover' source={require('../assets/homescreen.png')}>
       <StatusBar barStyle="light-content"/>
-      <SafeAreaView style={{ flexDirection:"column", height: "100%", marginTop: 19, opacity: 1}}>
 
+      <SafeAreaView style={{ flexDirection:"column", height: "100%", marginTop: 19, opacity: 1}}>
+        
         <View style={{ width: '100%', marginBottom: 5, marginTop: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ImageBackground style={{ height: 70, width: "95%", alignSelf: 'center' }} resizeMode='contain' source={require('../assets/wheesharetitle.png')} /> 
         </View>
@@ -65,6 +67,14 @@ export default function HomeScreen() {
                 <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>ABOUT</Text>
               </ImageBackground>
             </TouchableOpacity> 
+
+            <View style={{ flex:1, justifyContent: "space-between"}}>
+              <BannerAd
+                unitId={BANNER_A_ID}
+                size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
+                requestOptions={{requestNonPersonalizedAds: true,}}
+              />
+            </View>
           </ScrollView>
       </SafeAreaView>
     </ImageBackground>
