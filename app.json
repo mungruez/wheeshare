@@ -48,14 +48,6 @@
           "androidAppId": "ca-app-pub-5022889398292450~5423408529"
         }
       ],
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "kotlinVersion": "2.2.21"
-          }
-        }
-      ],
       "expo-video",
       "expo-audio",
       "expo-asset",

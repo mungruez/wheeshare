@@ -1,40 +1,34 @@
 import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 
-const REWARDED_VIDEO_ID = __DEV__ ? TestIds.REWARDED : 'ca-app-pub-xxxxxxxxxxxx/your-real-id';
+const REWARDED_VIDEO_ID = __DEV__ ? TestIds.REWARDED : 'ca-app-pub-5022889398292450/5390000963';
 const COOLDOWN_TIME_MS = 10 * 60 * 1000; 
 
 class AdManager {
   constructor() {
-    this.rewarded = RewardedAd.createForAdRequest(REWARDED_VIDEO_ID, {
-      requestNonPersonalizedAdsOnly: true,
-    });
+    this.rewarded = null;
     this.isLoaded = false;
     this.lastShownTime = 0;
     this.onAdClosedCallback = null;
-
-    this.setupListeners();
   }
 
   setupListeners() {
+    if (!this.rewarded) return;
+
     this.rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
       this.isLoaded = true;
-      console.log('AdMob: Video cached and ready to play.');
     });
 
-    // 1. CATCH DOWNLOAD FILING FAILURES (e.g., No Network or No Fill)
     this.rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
       this.isLoaded = false;
       console.warn('AdMob Loading Error Encountered:', error.message);
       
-      // If an ad fails to load, gracefully clear the navigation block if one was waiting
       if (this.onAdClosedCallback) {
         this.onAdClosedCallback();
         this.onAdClosedCallback = null;
       }
 
-      // Quietly attempt to retry downloading a fresh ad asset in the background after 30 seconds
       setTimeout(() => {
-        this.rewarded.load();
+        if (this.rewarded) this.rewarded.load();
       }, 30000);
     });
 
@@ -44,7 +38,7 @@ class AdManager {
 
     this.rewarded.addAdEventListener(RewardedAdEventType.CLOSED, () => {
       this.isLoaded = false;
-      this.rewarded.load(); 
+      if (this.rewarded) this.rewarded.load(); 
       
       if (this.onAdClosedCallback) {
         this.onAdClosedCallback();
@@ -54,6 +48,13 @@ class AdManager {
   }
 
   initialize() {
+    if (!this.rewarded) {
+      this.rewarded = RewardedAd.createForAdRequest(REWARDED_VIDEO_ID, {
+        requestNonPersonalizedAdsOnly: true,
+      });
+      this.setupListeners();
+    }
+    
     this.rewarded.load();
   }
 
@@ -64,7 +65,7 @@ class AdManager {
   }
 
   isAdReady() {
-    return this.isLoaded;
+    return this.isLoaded && this.rewarded !== null;
   }
 
   showAdIfEligible(onAdClosedAction) {
@@ -76,11 +77,10 @@ class AdManager {
         this.lastShownTime = Date.now(); 
         return true; 
       } catch (runtimeError) {
-        // 2. CATCH RUNTIME CRASHES DURING AD INJECTION
         console.error('AdMob Crash intercepted during playback attempt:', runtimeError);
         this.isLoaded = false;
-        this.rewarded.load(); // instantly try recovery load
-        return false; // let the navigation function fire safely instead of freezing
+        if (this.rewarded) this.rewarded.load(); 
+        return false; 
       }
     }
     return false; 
