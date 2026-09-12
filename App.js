@@ -10,18 +10,21 @@ import WheeQuizzes from './screens/WheeQuizzes';
 import React, { useEffect } from 'react';
 import { adManagerInstance } from './screens/AdManager';
 import mobileAds from 'react-native-google-mobile-ads';
-   
+
+mobileAds()
+  .initialize()
+  .then(adapterStatuses => {
+    console.log('AdMob Initialized successfully');
+  })
+  .catch(err => console.log('AdMob init error: ', err));
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   useEffect(() => {
     adManagerInstance.initialize(); 
-
-    mobileAds().initialize().then(adapterStatuses => {
-    });
   }, []);
 
-  
   return (
      <NavigationContainer>
       <StatusBar style="dark" />
