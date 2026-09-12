@@ -52,7 +52,7 @@
         "expo-build-properties",
         {
           "android": {
-            "kotlinVersion": "2.1.20",
+            "kotlinVersion": "2.2.21",
             "compilerArgs": [
               "-Xskip-metadata-version-check",
               "-Xskip-prerelease-check"
