@@ -1227,7 +1227,7 @@ export default function WheeCrosswords() {
                 <View style={styles.card}>
                   { item && item.category && 
                     ( <TouchableOpacity
-                    style={{ width: '79%', height: 43 }}
+                    style={{ width: "74%", height: 67 }}
                     onPress={() => { setHcrosswords(getCrosswords(item.category, crosswords)); setCrosswordCategory(item.category); setPrevCategory(item.category); setMode("list"); setPrevMode("main"); }}>
                     <ImageBackground style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} resizeMode='stretch' source={require('../assets/crosswords/greenbtnbg.png')}>
                       {item.id === 'c-all' ? 

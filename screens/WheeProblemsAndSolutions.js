@@ -1528,7 +1528,7 @@ export default function ProblemAndSolution() {
                     {item.id === 'ps-all' ? (
                       <ImageBackground style={styles.fullWidthBtnAsset} resizeMode='contain' source={require('../assets/allcategoriesbtn.png')} />
                     ) : (
-                      <ImageBackground style={styles.fullWidthBtnAssetTextured} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
+                      <ImageBackground style={styles.fullWidthBtnAssetTextured} resizeMode='contain' source={require('../assets/problems/purplegoldbtn.png')}>
                         <Text numberOfLines={1} style={styles.cardTextMenuTitle}>{item.category}</Text>
                       </ImageBackground>
                     )}
@@ -1576,10 +1576,10 @@ const styles = StyleSheet.create({
   smallGap: { height: 12 },
   card: { width: '100%', alignItems: 'center', marginVertical: 6 },
   categoryMenuSelectionRowItem: { width: '80%', height: 55, justifyContent: 'center', alignItems: 'center' },
-  fullWidthBtnAsset: { width: '100%', height: '100%' },
-  fullWidthBtnAssetTextured: { width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' },
-  cardTextMenuTitle: { color: '#313030', fontWeight: 'bold', fontSize: 15, textAlign: 'center', width: '90%' },
+  fullWidthBtnAsset: { width: '67%', height: 67, justifyContent: 'center', alignItems: 'center' },
+  fullWidthBtnAssetTextured: { width: '67%', height: 67, justifyContent: 'center', alignItems: 'center' },
   centerNotificationFlexPanel: { flex: 1, paddingHorizontal: 30, justifyContent: 'center', alignItems: 'center' },
+  cardTextMenuTitle: { width: "100%", fontSize: 15, fontWeight: '800', color: '#5a4f07', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
   infoTextDashboardFallback: { color: '#b155fc', textAlign: 'center', fontSize: 13, lineHeight: 18 },
   categoryHeaderText: { color: '#9e37f3', fontSize: 12, flex: 1, textTransform: 'uppercase', fontWeight: "500" },
   flatlistContainer: { flex: 1, width: '100%' },

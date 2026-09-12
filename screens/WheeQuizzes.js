@@ -1122,7 +1122,7 @@ export default function WheeQuizzes() {
               <View style={styles.card}>
                 {item && item.category && (
                   <TouchableOpacity
-                    style={{ width: "76%", height: 57 }}
+                    style={{ width: "72%", height: 67 }}
                     onPress={() => { setHquizzes(getQuizzes(item.category, quizzes)); setQuizCategory(item.category); setPrevCategory(item.category); setMode("list"); }}>
                     <ImageBackground
                       style={{ flex: 1, justifyContent:'center', alignItems:'center' }}
