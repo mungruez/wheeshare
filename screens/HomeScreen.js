@@ -3,7 +3,7 @@ import { BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import React, { useLayoutEffect, useState, useRef } from 'react';
-import { getAdManager } from './screens/AdManager'; 
+import { getAdManager } from './AdManager'; 
 
 const BANNER_A_ID = __DEV__ ? TestIds.BANNER : 'ca-app-pub-5022889398292450/4030435808';
 
