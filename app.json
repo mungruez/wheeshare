@@ -35,8 +35,6 @@
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_MEDIA_VIDEO",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ]
@@ -63,5 +61,9 @@
       }
     },
     "owner": "mungruez"
+  },
+  
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-5022889398292450~5423408529"
   }
 }

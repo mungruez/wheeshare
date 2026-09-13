@@ -8,21 +8,20 @@ import WheeChapters from './screens/WheeChapters';
 import WheeCrosswords from './screens/WheeCrosswords';
 import WheeQuizzes from './screens/WheeQuizzes';
 import React, { useEffect } from 'react';
-import { adManagerInstance } from './screens/AdManager';
 import mobileAds from 'react-native-google-mobile-ads';
+import { getAdManager } from './screens/AdManager';
 
 mobileAds()
   .initialize()
   .then(adapterStatuses => {
-    console.log('AdMob Initialized successfully');
-  })
-  .catch(err => console.log('AdMob init error: ', err));
+    
+  }).catch(err => console.log('AdMob init error: ', err));
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   useEffect(() => {
-    adManagerInstance.initialize(); 
+    getAdManager.initialize(); 
   }, []);
 
   return (

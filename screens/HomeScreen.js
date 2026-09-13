@@ -3,7 +3,7 @@ import { BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import React, { useLayoutEffect, useState, useRef } from 'react';
-import { adManagerInstance } from './AdManager';
+import { getAdManager } from './screens/AdManager'; 
 
 const BANNER_A_ID = __DEV__ ? TestIds.BANNER : 'ca-app-pub-5022889398292450/4030435808';
 
@@ -23,8 +23,8 @@ export default function HomeScreen() {
       navigation.navigate(scrname);
     };
 
-    if (adManagerInstance.isTimerExpired()) {
-      if (!adManagerInstance.isAdReady()) {
+    if (getAdManager().isTimerExpired()) {
+      if (!getAdManager().isAdReady()) {
         setIsLoadingAd(true);
         loadingRef.current = true;
 

@@ -54,7 +54,6 @@ class AdManager {
       });
       this.setupListeners();
     }
-    
     this.rewarded.load();
   }
 
@@ -87,4 +86,19 @@ class AdManager {
   }
 }
 
-export const adManagerInstance = new AdManager();
+let instance = null;
+
+export const getAdManager = () => {
+  if (!instance) {
+    instance = new AdManager();
+  }
+  return instance;
+};
+
+
+export const getAdManager = () => {
+  if (!instance) {
+    instance = new AdManager();
+  }
+  return instance;
+};
