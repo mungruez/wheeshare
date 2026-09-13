@@ -15,7 +15,7 @@ mobileAds()
   .initialize()
   .then(adapterStatuses => {
     
-  }).catch(err => console.log('AdMob init error: ', err));
+  }).catch(err => alert('AdMob init error: ' || err));
 
 const Stack = createNativeStackNavigator();
 
