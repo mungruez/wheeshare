@@ -12,7 +12,6 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const loadingRef = useRef(false);
 
-  
   useLayoutEffect(()=> {
     navigation.setOptions({ headerShown: false,});
   }, []);
@@ -39,13 +38,12 @@ export default function HomeScreen() {
       
       setIsLoadingAd(true);
       loadingRef.current = true;
-      adManagerInstance.showAdIfEligible(navigateToNextScreen);
+      getAdManager().showAdIfEligible(navigateToNextScreen);
 
     } else {
       navigateToNextScreen();
     }
   };
-
 
   return (
     <ImageBackground style={ styles.imgBackground } imageStyle={{ opacity: 1.0 }} resizeMode='cover' source={require('../assets/homescreen.png')}>
@@ -57,7 +55,7 @@ export default function HomeScreen() {
           <ImageBackground style={{ height: 70, width: "95%", alignSelf: 'center' }} resizeMode='contain' source={require('../assets/wheesharetitle.png')} /> 
         </View>
          
-        <View style={{ flexDirection:" row", justifyContent: "center"}}>
+        <View style={{ flexDirection: "row", justifyContent: "center"}}>
           <ImageBackground style={ styles.menubar } imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/menubar.png')} /> 
         </View>
 
@@ -142,4 +140,4 @@ const styles = StyleSheet.create({
     cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#5a4f07', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
     container: { flex: 1, justifyContent: 'center', alignItems: 'center',backgroundColor: '#F5F5F5'},
     buttonText: {color: '#FFFFFF',fontSize: 16,fontWeight: '600'},
-  });
+});
