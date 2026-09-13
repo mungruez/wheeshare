@@ -12,6 +12,7 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const loadingRef = useRef(false);
 
+  
   useLayoutEffect(()=> {
     navigation.setOptions({ headerShown: false,});
   }, []);
@@ -29,7 +30,7 @@ export default function HomeScreen() {
         loadingRef.current = true;
 
         setTimeout(() => {
-          if (!adManagerInstance.isAdReady() && loadingRef.current) {
+          if (!getAdManager().isAdReady() && loadingRef.current) {
             navigateToNextScreen();
           }
         }, 2000);
@@ -44,6 +45,7 @@ export default function HomeScreen() {
       navigateToNextScreen();
     }
   };
+
 
   return (
     <ImageBackground style={ styles.imgBackground } imageStyle={{ opacity: 1.0 }} resizeMode='cover' source={require('../assets/homescreen.png')}>
