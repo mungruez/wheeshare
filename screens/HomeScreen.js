@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator } from 'react-native';
 import { BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
