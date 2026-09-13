@@ -20,8 +20,6 @@ class AdManager {
 
     this.rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
       this.isLoaded = false;
-      console.warn('AdMob Loading Error Encountered:', error.message);
-      
       if (this.onAdClosedCallback) {
         this.onAdClosedCallback();
         this.onAdClosedCallback = null;
@@ -33,7 +31,7 @@ class AdManager {
     });
 
     this.rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-      console.log(`User earned reward: ${reward.amount} ${reward.type}`);
+    
     });
 
     this.rewarded.addAdEventListener(RewardedAdEventType.CLOSED, () => {
@@ -86,7 +84,9 @@ class AdManager {
   }
 }
 
+
 let instance = null;
+
 export const getAdManager = () => {
   if (!instance) {
     instance = new AdManager();
