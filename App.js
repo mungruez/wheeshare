@@ -21,7 +21,7 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   useEffect(() => {
-    getAdManager().initialize(); 
+    //getAdManager().initialize(); 
   }, []);
 
   return (
