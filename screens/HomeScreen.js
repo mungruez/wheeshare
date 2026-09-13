@@ -22,7 +22,7 @@ export default function HomeScreen() {
       loadingRef.current = false;
       navigation.navigate(scrname);
     };
-
+  navigateToNextScreen();
     if (getAdManager().isTimerExpired()) {
       if (!getAdManager().isAdReady()) {
         setIsLoadingAd(true);
