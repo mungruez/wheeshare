@@ -55,7 +55,7 @@ export default function Resources() {
 
             <Text style={styles.crosswords}>Crosswords</Text>
             <Text style={styles.title}>
-              Build and manage your own crosswords with ease. Each crossword may contain a set of four words, and the app supports secure sharing and importing of crossword content within WheeShare. This feature offers a practical and engaging way to reinforce vocabulary, comprehension, and learning through interactive play.
+              Build and manage your own crosswords with ease. Each crossword contains a set of four words, and the app supports secure sharing and importing of crossword content within WheeShare. This feature offers a practical and engaging way to reinforce vocabulary, comprehension, and learning through interactive play.
             </Text>
 
             <Text style={styles.quizzes}>Quizzes</Text>

@@ -6,7 +6,7 @@ const COOLDOWN_TIME_MS = 10 * 60 * 1000;
 class AdManager {
   constructor() {
     this.rewarded = null;
-    this.isLoaded = false;
+    this.isLoaded = false; 
     this.lastShownTime = 0;
     this.onAdClosedCallback = null;
   }
