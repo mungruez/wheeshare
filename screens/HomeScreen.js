@@ -1,9 +1,10 @@
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator } from 'react-native';
-import { BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
+import { RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import React, { useLayoutEffect, useState, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import React, { useLayoutEffect, useState, useRef } from 'react';
-import { getAdManager } from './AdManager'; 
+import * as FileSystem from 'expo-file-system/legacy';
+import { AdMTimer } from './AdTimer';
 
 const BANNER_A_ID = __DEV__ ? TestIds.BANNER : 'ca-app-pub-5022889398292450/4030435808';
 
@@ -16,35 +17,53 @@ export default function HomeScreen() {
     navigation.setOptions({ headerShown: false,});
   }, []);
 
-  const handleNavigate = (scrname) => {
-    const navigateToNextScreen = () => {
-      setIsLoadingAd(false);
-      loadingRef.current = false;
-      navigation.navigate(scrname);
-    };
-  navigateToNextScreen();
-    if (getAdManager().isTimerExpired()) {
-      if (!getAdManager().isAdReady()) {
+
+  const handleNavigate = async (scrname) => {
+    try {
+      const isEligible = await AdTimer.shouldShowAd();
+
+      if (isEligible) {
         setIsLoadingAd(true);
-        loadingRef.current = true;
 
-        setTimeout(() => {
-          if (!getAdManager().isAdReady() && loadingRef.current) {
-            navigateToNextScreen();
+        const rewarded = RewardedAd.createForAdRequest(
+          __DEV__ ? TestIds.REWARDED : 'ca-app-pub-5022889398292450/5390000963'
+        );
+
+        const backupTimer = setTimeout(() => {
+          setIsLoadingAd(false);
+          navigation.navigate(scrname);
+        }, 2500);
+
+        rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+          clearTimeout(backupTimer);
+          setIsLoadingAd(false);
+          
+          try {
+            rewarded.show();
+            AdTimer.saveTimestamp(); 
+          } catch (showError) {
           }
-        }, 2000);
-        return;
-      }
-      
-      setIsLoadingAd(true);
-      loadingRef.current = true;
-      getAdManager().showAdIfEligible(navigateToNextScreen);
+          
+          navigation.navigate(scrname);
+        });
 
-    } else {
-      navigateToNextScreen();
+        rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
+          clearTimeout(backupTimer);
+          setIsLoadingAd(false);
+          navigation.navigate(scrname); 
+        });
+
+        rewarded.load();
+      } else {
+        navigation.navigate(scrname);
+      }
+    } catch (globalError) {
+      setIsLoadingAd(false);
+      navigation.navigate(scrname);
     }
   };
 
+  
   return (
     <ImageBackground style={ styles.imgBackground } imageStyle={{ opacity: 1.0 }} resizeMode='cover' source={require('../assets/homescreen.png')}>
       <StatusBar barStyle="light-content"/>
@@ -125,7 +144,6 @@ export default function HomeScreen() {
     </ImageBackground>
   )
 }
-
 
 const styles = StyleSheet.create({
     searchcontainer: {flexDirection: 'row',marginTop: 57, alignItems:'center', justifyContent:'center', alignSelf: 'center',width:'100%',marginBottom: 76,padding: 5},

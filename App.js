@@ -9,21 +9,19 @@ import WheeCrosswords from './screens/WheeCrosswords';
 import WheeQuizzes from './screens/WheeQuizzes';
 import React, { useEffect } from 'react';
 import mobileAds from 'react-native-google-mobile-ads';
-import { getAdManager } from './screens/AdManager';
 
 mobileAds()
   .initialize()
   .then(adapterStatuses => {
+  
+  })
+  .catch(err => {
     
-  }).catch(err => alert('AdMob init error: ' || err));
+  });
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  useEffect(() => {
-    //getAdManager().initialize(); 
-  }, []);
-
   return (
      <NavigationContainer>
       <StatusBar style="dark" />
