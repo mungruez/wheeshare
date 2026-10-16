@@ -8,16 +8,6 @@ import WheeChapters from './screens/WheeChapters';
 import WheeCrosswords from './screens/WheeCrosswords';
 import WheeQuizzes from './screens/WheeQuizzes';
 import React, { useEffect } from 'react';
-import mobileAds from 'react-native-google-mobile-ads';
-
-mobileAds()
-  .initialize()
-  .then(adapterStatuses => {
-  
-  })
-  .catch(err => {
-    
-  });
 
 const Stack = createNativeStackNavigator();
 

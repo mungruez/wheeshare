@@ -1,22 +1,21 @@
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator } from 'react-native';
 import { RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
-import React, { useLayoutEffect, useState, useRef } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import * as FileSystem from 'expo-file-system/legacy';
-import { AdMTimer } from './AdTimer';
+import { AdTimer } from './AdTimer';
 
-const BANNER_A_ID = __DEV__ ? TestIds.BANNER : 'ca-app-pub-5022889398292450/4030435808';
+const BANNER_A_ID = TestIds.BANNER; 
+const REWARDED_A_ID = TestIds.REWARDED;
 
 export default function HomeScreen() {
   const [isLoadingAd, setIsLoadingAd] = useState(false);
   const navigation = useNavigation();
-  const loadingRef = useRef(false);
 
   useLayoutEffect(()=> {
     navigation.setOptions({ headerShown: false,});
   }, []);
-
 
   const handleNavigate = async (scrname) => {
     try {
@@ -24,10 +23,7 @@ export default function HomeScreen() {
 
       if (isEligible) {
         setIsLoadingAd(true);
-
-        const rewarded = RewardedAd.createForAdRequest(
-          __DEV__ ? TestIds.REWARDED : 'ca-app-pub-5022889398292450/5390000963'
-        );
+        const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
 
         const backupTimer = setTimeout(() => {
           setIsLoadingAd(false);
@@ -37,13 +33,10 @@ export default function HomeScreen() {
         rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
           clearTimeout(backupTimer);
           setIsLoadingAd(false);
-          
           try {
             rewarded.show();
             AdTimer.saveTimestamp(); 
-          } catch (showError) {
-          }
-          
+          } catch (showError) {}
           navigation.navigate(scrname);
         });
 
@@ -63,11 +56,9 @@ export default function HomeScreen() {
     }
   };
 
-  
   return (
     <ImageBackground style={ styles.imgBackground } imageStyle={{ opacity: 1.0 }} resizeMode='cover' source={require('../assets/homescreen.png')}>
       <StatusBar barStyle="light-content"/>
-
       <SafeAreaView style={{ flexDirection:"column", height: "100%", marginTop: 19, opacity: 1}}>
         
         <View style={{ width: '100%', marginBottom: 5, marginTop: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -157,5 +148,5 @@ const styles = StyleSheet.create({
     buttonimage: { width: "67%", flex: 1, height: 67, alignItems: "center", justifyContent: "center", opacity: 1, alignSelf:"center" },
     cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#5a4f07', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
     container: { flex: 1, justifyContent: 'center', alignItems: 'center',backgroundColor: '#F5F5F5'},
-    buttonText: {color: '#FFFFFF',fontSize: 16,fontWeight: '600'},
+    buttonText: {color: '#FFFFFF',fontSize: 16,fontWeight: '600'}
 });
