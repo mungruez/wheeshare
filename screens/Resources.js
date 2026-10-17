@@ -1,9 +1,17 @@
 import { StyleSheet, Text, View, ImageBackground, ScrollView, StatusBar, TouchableOpacity, Alert, Linking } from 'react-native'
+import { RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { AdTimer } from './AdTimer';
 import React from 'react';
+  
+
+const BANNER_A_ID = TestIds.BANNER; 
+const REWARDED_A_ID = TestIds.REWARDED;
+
 
 export default function Resources() {
+  const [isLoadingAd, setIsLoadingAd] = useState(false);
   const navigation = useNavigation();
 
 
@@ -19,6 +27,43 @@ export default function Resources() {
       Alert.alert('Error', 'An unexpected error occurred while trying to launch the policy page.');
     }
   };
+  
+
+  useLayoutEffect(()=> {
+    navigation.setOptions({ headerShown: false,});
+
+    try {
+        const isEligible = await AdTimer.shouldShowAd();
+  
+        if (isEligible) {
+          setIsLoadingAd(true);
+          const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+          const backupTimer = setTimeout(() => {
+            setIsLoadingAd(false);
+          }, 2500);
+  
+          rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+            clearTimeout(backupTimer);
+            setIsLoadingAd(false);
+            try {
+              rewarded.show();
+              AdTimer.saveTimestamp(); 
+            } catch (showError) {}
+          });
+  
+          rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
+            clearTimeout(backupTimer);
+            setIsLoadingAd(false); 
+          });
+  
+          rewarded.load();
+        } else {
+          return;
+        }
+      } catch (globalError) {
+        setIsLoadingAd(false);
+      }
+  }, []); 
 
 
   return (
@@ -36,7 +81,7 @@ export default function Resources() {
           <View style={styles.contentBox}>
 
             <Text style={styles.title}>
-              Thank you for downloading WheeShare. Your support helps us continue building a connected, knowledge-sharing community and improving the experience for learners, creators, and collaborators alike. We are grateful to everyone who has contributed time, effort, and insight to bring this platform to life.
+              Thank you for downloading WheeShare the best File Sharing App. Your support helps us continue building a connected, knowledge-sharing community and improving the experience for learners, creators, and collaborators alike. We are grateful to everyone who has contributed time, effort, and insight to bring this platform to life. The free version of wheeShare contains ads the paid version has no ads, improved crosswords and quizzes and a free Hidden Password Manager.
             </Text>
 
             <Text style={styles.title}>
@@ -72,6 +117,14 @@ export default function Resources() {
             </TouchableOpacity>
           </View>
         </ScrollView>
+
+        <View style={{ flex:1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center'}}>
+          <BannerAd
+            unitId={BANNER_A_ID}
+            size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
+            requestOptions={{requestNonPersonalizedAdsOnly: true}}
+          />
+        </View>
       </SafeAreaView>
     </ImageBackground>
   );
