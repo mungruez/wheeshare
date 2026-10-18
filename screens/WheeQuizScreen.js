@@ -188,7 +188,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   useEffect(() => {
     if (qmode !== "quiz") return;
 
-    if (index >= qarr.length || (answers.length >= qnum && qnum > 0)) {
+    if (index >= qarr.length) {
       setQmode("results");
       return;
     }
@@ -196,7 +196,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     setCounter(timerLimit);
     setSelectedAnswerIndex(null);
     setAnswerStatus(null);
-  }, [index, qarr.length, qmode, answers.length, qnum, timerLimit]);
+  }, [index, qarr.length, qmode, timerLimit]);
 
  
 
