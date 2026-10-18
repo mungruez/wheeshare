@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Image, Pressable, ImageBackground, FlatList, ScrollView, TextInput } from "react-native";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from '@expo/vector-icons'; 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
