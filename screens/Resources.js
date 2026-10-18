@@ -3,7 +3,7 @@ import { RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { AdTimer } from './AdTimer';
-import React from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
   
 
 const BANNER_A_ID = TestIds.BANNER; 
@@ -29,41 +29,55 @@ export default function Resources() {
   };
   
 
-  useLayoutEffect(()=> {
-    navigation.setOptions({ headerShown: false,});
+  useLayoutEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
 
-    try {
+  useEffect(() => {
+    let isMounted = true;
+    let backupTimer;
+    let unsubscribeLoaded;
+    let unsubscribeError;
+
+    const loadRewardedAd = async () => {
+      try {
         const isEligible = await AdTimer.shouldShowAd();
-  
-        if (isEligible) {
-          setIsLoadingAd(true);
-          const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
-          const backupTimer = setTimeout(() => {
-            setIsLoadingAd(false);
-          }, 2500);
-  
-          rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-            clearTimeout(backupTimer);
-            setIsLoadingAd(false);
-            try {
-              rewarded.show();
-              AdTimer.saveTimestamp(); 
-            } catch (showError) {}
-          });
-  
-          rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
-            clearTimeout(backupTimer);
-            setIsLoadingAd(false); 
-          });
-  
-          rewarded.load();
-        } else {
-          return;
-        }
-      } catch (globalError) {
-        setIsLoadingAd(false);
+        if (!isEligible || !isMounted) return;
+
+        setIsLoadingAd(true);
+        const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+        backupTimer = setTimeout(() => {
+          if (isMounted) setIsLoadingAd(false);
+        }, 2500);
+
+        unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+          clearTimeout(backupTimer);
+          if (!isMounted) return;
+          setIsLoadingAd(false);
+          rewarded.show();
+          AdTimer.saveTimestamp();
+        });
+
+        unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
+          clearTimeout(backupTimer);
+          if (isMounted) setIsLoadingAd(false);
+        });
+
+        rewarded.load();
+      } catch (error) {
+        if (isMounted) setIsLoadingAd(false);
       }
-  }, []); 
+    };
+
+    loadRewardedAd();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(backupTimer);
+      unsubscribeLoaded?.();
+      unsubscribeError?.();
+    };
+  }, []);
 
 
   return (
@@ -188,6 +202,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     height: 70,
+    width: '100%',
     elevation: 3,
     marginTop: 3,
     textAlign: 'center',
