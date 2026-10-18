@@ -24,7 +24,6 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   const [timerInput, setTimerInput] = useState("15");
   const navigation = useNavigation();
   
-  let interval = null;
   const totalQuestionsCount = qnum > 0 ? qnum : 1;
   const MIN_TIMER_SECONDS = 5;
   const MAX_TIMER_SECONDS = 180 * 60;
@@ -151,42 +150,38 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
  
   
   useEffect(() => {
-    if (qmode !== "quiz" || !currentQuestion) return;
+    if (qmode !== "quiz" || !currentQuestion || answerStatus !== null) return;
 
-    const myInterval = () => {
-      setCounter((state) => {
-        if (state <= 1) {
-          if (selectedAnswerIndex === null) {
-            const qType = getInferredType(currentQuestion);
-            let timeoutAns = -1;
-            if (qType === "multiple") timeoutAns = [];
-            if (qType === "long") timeoutAns = "";
+    if (counter <= 0) {
+      if (selectedAnswerIndex === null) {
+        const qType = getInferredType(currentQuestion);
+        let timeoutAns = -1;
+        if (qType === "multiple") timeoutAns = [];
+        if (qType === "long") timeoutAns = "";
 
-            const timeoutRecord = {
-              question: index + 1,
-              answer: false,
-              q: currentQuestion.question || currentQuestion.q || "Question Text",
-              explanation: currentQuestion.explanation || "",
-              corra: currentQuestion.correctAnswerIndex,
-              curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : [],
-              a: timeoutAns,
-              inferredType: qType
-            };
-            setAnswers((prevAnswers) => [...prevAnswers, timeoutRecord]);
-            setAnswerStatus(false);
-          }
+        const timeoutRecord = {
+          question: index + 1,
+          answer: false,
+          q: currentQuestion.question || currentQuestion.q || "Question Text",
+          explanation: currentQuestion.explanation || "",
+          corra: currentQuestion.correctAnswerIndex,
+          curra: Array.isArray(currentQuestion.options) ? [...currentQuestion.options] : [],
+          a: timeoutAns,
+          inferredType: qType
+        };
+        setAnswers((prevAnswers) => [...prevAnswers, timeoutRecord]);
+        setAnswerStatus(false);
+      }
 
-          setIndex((prevIndex) => prevIndex + 1);
-          return timerLimit;
-        }
+      setIndex((prevIndex) => prevIndex + 1);
+      return;
+    }
 
-        return state - 1;
-      });
-    };
-
-    interval = setTimeout(myInterval, 1000);
-    return () => clearTimeout(interval);
-  }, [counter, qmode, currentQuestion, selectedAnswerIndex, index, timerLimit]);
+    const timeoutId = setTimeout(() => {
+      setCounter((state) => Math.max(0, state - 1));
+    }, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [counter, qmode, currentQuestion, selectedAnswerIndex, answerStatus, index]);
    
 
 
@@ -194,7 +189,6 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     if (qmode !== "quiz") return;
 
     if (index >= qarr.length || (answers.length >= qnum && qnum > 0)) {
-      clearTimeout(interval);
       setQmode("results");
       return;
     }
