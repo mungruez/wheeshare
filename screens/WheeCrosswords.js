@@ -14,6 +14,7 @@ const CARD_WIDTH = width * 0.76;
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const GRID_PADDING = 3; 
 const COLUMN_COUNT = 12;
+const MAX_ANSWER_LENGTH = 10;
 const CALCULATED_CELL_SIZE = (SCREEN_WIDTH - (GRID_PADDING * 2)) / COLUMN_COUNT;
 const CELL_SIZE = Math.max(CALCULATED_CELL_SIZE, 21);
 
@@ -62,82 +63,95 @@ export default function WheeCrosswords() {
     let crossingCount = 0;
     const stepX = orientation === "down" ? 1 : 0;
     const stepY = orientation === "across" ? 1 : 0;
+    
     const endX = startX + stepX * word.length;
     const endY = startY + stepY * word.length;
-
+    
     if (startX < 0 || startY < 0 || endX > 12 || endY > 12) return false;
-
+    
     const beforeX = startX - stepX;
     const beforeY = startY - stepY;
     const afterX = endX;
     const afterY = endY;
-    if ((beforeX >= 0 && beforeY >= 0 && gridT[beforeX][beforeY] !== '.') ||
-        (afterX < 12 && afterY < 12 && gridT[afterX][afterY] !== '.')) return false;
-
+    
+    if (beforeX >= 0 && beforeY >= 0 && gridT[beforeX][beforeY] !== '.') return false;
+    if (afterX < 12 && afterY < 12 && gridT[afterX][afterY] !== '.') return false;
+    
     for (let charIdx = 0; charIdx < word.length; charIdx++) {
       const x = startX + stepX * charIdx;
       const y = startY + stepY * charIdx;
       const existing = gridT[x][y];
-
+      
       if (existing !== '.' && existing !== word[charIdx]) return false;
-
-      if (existing !== '.') crossingCount++;
-      if (existing !== '.') continue;
-
-      const sideX = orientation === "across" ? [x, x] : [x - 1, x + 1];
-      const sideY = orientation === "across" ? [y - 1, y + 1] : [y, y];
+      
+      if (existing === word[charIdx]) {
+        crossingCount++;
+        continue;
+      }
+      
+      const sideX = orientation === "across" ? [x - 1, x + 1] : [x, x];
+      const sideY = orientation === "across" ? [y, y] : [y - 1, y + 1];
+      
       for (let sideIdx = 0; sideIdx < 2; sideIdx++) {
         const neighborX = sideX[sideIdx];
         const neighborY = sideY[sideIdx];
-        if (neighborX >= 0 && neighborX < 12 && neighborY >= 0 && neighborY < 12 && gridT[neighborX][neighborY] !== '.') {
-          return false;
+        
+        if (neighborX >= 0 && neighborX < 12 && neighborY >= 0 && neighborY < 12) {
+          if (gridT[neighborX][neighborY] !== '.') {
+            return false;
+          }
         }
       }
     }
-
+    
     return !requireCrossing || crossingCount > 0;
   };
 
-
+  
   const recCrossword = (crossW, gridT, wordNum, tracker) => {
-    const MAX_X = 12; 
+    const MAX_X = 12;
     const MAX_Y = 12;
+  
     let wordsPlacedSoFar = wordNum - 1;
     if (wordsPlacedSoFar > tracker.maxWordsPlaced) {
       tracker.maxWordsPlaced = wordsPlacedSoFar;
       tracker.bestQuestionsSnapshot = JSON.parse(JSON.stringify(crossW));
       tracker.bestGridSnapshot = JSON.parse(JSON.stringify(gridT));
     }
-
+    
     if (wordNum === 1) {
       let w1 = crossW[0];
       if (w1.starty + w1.answer.length > MAX_Y) return crossW;
+      
       for (let y = 0; y < w1.answer.length; y++) {
         gridT[w1.startx][w1.starty + y] = w1.answer[y];
       }
       return recCrossword(crossW, gridT, 2, tracker);
     }
-
-    for (let wI = 0; wI < wordNum - 1; wI++) {
-      let word1 = crossW[wI].answer;
+    
+    for (let w1 = 0; w1 < wordNum - 1; w1++) {
+      let word1 = crossW[w1].answer;
       let word2 = crossW[wordNum - 1].answer;
       let ix = []; let iy = [];
+      
       for (let l1 = 0; l1 < word1.length; l1++) {
         for (let l2 = 0; l2 < word2.length; l2++) {
-          if (word1[l1] === word2[l2]) { ix.push(l1); iy.push(l2); }
+          if (word1[l1] === word2[l2]) {
+            ix.push(l1);
+            iy.push(l2);
+          }
         }
       }
-      if (ix.length === 0) { ix.push(-1); iy.push(-1); }
-      for (let i = 0; i < ix.length && i < iy.length; i++) {
+    
+      for (let i = 0; i < ix.length; i++) {
         let intersectParent = ix[i];
         let intersectCurrent = iy[i];
-
         if (intersectParent < 0 || intersectCurrent < 0) continue;
-
+        
         let currentStartX, currentStartY;
-        let parent = crossW[wI];
+        let parent = crossW[w1];
         let current = crossW[wordNum - 1];
-
+        
         if (parent.orientation === "across") {
           current.orientation = "down";
           currentStartX = parent.startx - intersectCurrent;
@@ -147,19 +161,20 @@ export default function WheeCrosswords() {
           currentStartX = parent.startx + intersectParent;
           currentStartY = parent.starty - intersectCurrent;
         }
-
+      
         if (currentStartX < 0 || currentStartY < 0) continue;
         if (current.orientation === "across" && currentStartY + current.answer.length > MAX_Y) continue;
         if (current.orientation === "down" && currentStartX + current.answer.length > MAX_X) continue;
+        
         if (!canPlaceWord(current.answer, gridT, currentStartX, currentStartY, current.orientation, true)) continue;
-
+        
         let isValid = true;
         let gridStack = [];
-
+        
         for (let charIdx = 0; charIdx < current.answer.length; charIdx++) {
           let tx = current.orientation === "down" ? currentStartX + charIdx : currentStartX;
           let ty = current.orientation === "across" ? currentStartY + charIdx : currentStartY;
-
+          
           if (gridT[tx][ty] !== '.' && gridT[tx][ty] !== current.answer[charIdx]) {
             isValid = false;
             break;
@@ -168,40 +183,35 @@ export default function WheeCrosswords() {
             gridStack.push({ x: tx, y: ty });
           }
         }
-
+      
         if (isValid) {
           for (let charIdx = 0; charIdx < current.answer.length; charIdx++) {
             let tx = current.orientation === "down" ? currentStartX + charIdx : currentStartX;
             let ty = current.orientation === "across" ? currentStartY + charIdx : currentStartY;
             gridT[tx][ty] = current.answer[charIdx];
           }
-
           current.startx = currentStartX;
           current.starty = currentStartY;
-
+          
           if (wordNum === 4) {
-            let complete = true;
-            for (let w = 0; w < 4; w++) {
-              if (crossW[w].startx === -1 || crossW[w].starty === -1 || !crossW[w].orientation) complete = false;
-            }
-            if (complete) {
-              tracker.maxWordsPlaced = 4;
-              tracker.bestQuestionsSnapshot = JSON.parse(JSON.stringify(crossW));
-              tracker.bestGridSnapshot = JSON.parse(JSON.stringify(gridT));
-              return crossW;
-            }
-          } else {
-            let vCrossword = recCrossword(crossW, gridT, wordNum + 1, tracker);
-            if (vCrossword && vCrossword[0].startx !== -1 && vCrossword[3].startx !== -1) return vCrossword;
+            tracker.maxWordsPlaced = 4;
+            tracker.bestQuestionsSnapshot = JSON.parse(JSON.stringify(crossW));
+            tracker.bestGridSnapshot = JSON.parse(JSON.stringify(gridT));
+            return crossW;
           }
-
+          
+          let vCrossword = recCrossword(crossW, gridT, wordNum + 1, tracker);
+          if (vCrossword && tracker.maxWordsPlaced === 4) {
+            return vCrossword;
+          }
+        
           while (gridStack.length > 0) {
             let cell = gridStack.pop();
             gridT[cell.x][cell.y] = '.';
           }
           current.startx = -1;
           current.starty = -1;
-          current.orientation = '';
+          current.orientation = "";
         }
       }
     }
@@ -212,58 +222,60 @@ export default function WheeCrosswords() {
   const checkCrossword = () => {
     const createFreshGrid = () => Array(12).fill(0).map(() => Array(12).fill('.'));
     let initialGrid = createFreshGrid();
-    let crossW = { 
-      id: crosswordId || currentCrossword?.id || Date.now().toString(), 
-      title : crosswordTitle.trim(), 
-      category: crosswordCategory.trim(), 
+  
+    let crossW = {
+      id: crosswordId || currentCrossword?.id || Date.now().toString(),
+      title: crosswordTitle.trim(),
+      category: crosswordCategory.trim(),
       updatedAt: new Date().toISOString(),
-      questions: [ 
-        { answer: questions[0].answer.trim(), hint: questions[0].hint.trim(), startx: 1, starty: 1, orientation: 'across', position: 1 },
-        { answer: questions[1].answer.trim(), hint: questions[1].hint.trim(), startx: -1, starty: -1, orientation: '', position: 2 },
-        { answer: questions[2].answer.trim(), hint: questions[2].hint.trim(), startx: -1, starty: -1, orientation: '', position: 3 },
-        { answer: questions[3].answer.trim(), hint: questions[3].hint.trim(), startx: -1, starty: -1, orientation: '', position: 4 } 
-      ]  
-    };    
-
-    let overallBestTracker = { maxWordsPlaced: 0, bestQuestionsSnapshot: null };
-    recCrossword(crossW.questions, initialGrid, 1, overallBestTracker);
-    if (overallBestTracker.maxWordsPlaced === 4) {
-      crossW.questions = overallBestTracker.bestQuestionsSnapshot;
-      return {
-        crosswordData: crossW,
-        renderGrid: overallBestTracker.bestGridSnapshot || initialGrid
-      };
-    }
-
-    for (let x = 1; x < 4; x++) {
-      initialGrid = createFreshGrid();
-      let workingQuestions = JSON.parse(JSON.stringify(crossW.questions));
-      workingQuestions.forEach(q => { q.startx = -1; q.starty = -1; q.orientation = ''; });
-      workingQuestions[0].startx = 1; workingQuestions[0].starty = 1; workingQuestions[0].orientation = 'across';
-      let tmp = workingQuestions[0];
-      workingQuestions[0] = workingQuestions[x];
-      workingQuestions[x] = tmp;
-      workingQuestions[0].position = 1;
-      workingQuestions[0].startx = 1; 
-      workingQuestions[0].starty = 1;
-      workingQuestions[0].orientation = 'across';
-      workingQuestions[x].position = x + 1;
-      recCrossword(workingQuestions, initialGrid, 1, overallBestTracker);
-
-      if (overallBestTracker.maxWordsPlaced === 4) {
-        crossW.questions = overallBestTracker.bestQuestionsSnapshot;
-        return {
-          crosswordData: crossW,
-          renderGrid: overallBestTracker.bestGridSnapshot || initialGrid
-        };
+      questions: [
+        { answer: questions[0].answer.trim(), hint: questions[0].hint.trim(), startx: -1, starty: -1, orientation: "", position: 1 },
+        { answer: questions[1].answer.trim(), hint: questions[1].hint.trim(), startx: -1, starty: -1, orientation: "", position: 2 },
+        { answer: questions[2].answer.trim(), hint: questions[2].hint.trim(), startx: -1, starty: -1, orientation: "", position: 3 },
+        { answer: questions[3].answer.trim(), hint: questions[3].hint.trim(), startx: -1, starty: -1, orientation: "", position: 4 }
+      ]
+    };
+    
+    let overallBestTracker = { 
+      maxWordsPlaced: 0, 
+      bestQuestionsSnapshot: null, 
+      bestGridSnapshot: null 
+    };
+  
+    const wordOrders = []; 
+    const buildWordOrders = (remaining, order = []) => {
+      if (remaining.length === 0) {
+        wordOrders.push(order);
+        return;
       }
+      remaining.forEach((wordIndex, index) => {
+        buildWordOrders(
+          remaining.filter((_, remainingIndex) => remainingIndex !== index),
+          [...order, wordIndex]
+        );
+      });
+    };
+    
+    buildWordOrders([0, 1, 2, 3]);
+    for (const order of wordOrders) {
+      initialGrid = createFreshGrid();
+      const workingQuestions = order.map((questionIndex, position) => ({
+        ...crossW.questions[questionIndex],
+        startx: position === 0 ? 1 : -1,
+        starty: position === 0 ? 1 : -1,
+        orientation: position === 0 ? 'across' : '',
+        position: position + 1
+      }));
+      
+      recCrossword(workingQuestions, initialGrid, 1, overallBestTracker);
+      if (overallBestTracker.maxWordsPlaced === 4) break;
     }
-
-    crossW.questions = overallBestTracker.bestQuestionsSnapshot;
+  
+    crossW.questions = overallBestTracker.bestQuestionsSnapshot || crossW.questions;
+    
     let finalCleanGrid = Array(12).fill(0).map(() => Array(12).fill('.'));
     crossW.questions.forEach(q => {
       if (q.startx === -1 || q.starty === -1 || !q.orientation) return;
-
       for (let i = 0; i < q.answer.length; i++) {
         let x = q.orientation === 'down' ? q.startx + i : q.startx;
         let y = q.orientation === 'across' ? q.starty + i : q.starty;
@@ -272,13 +284,13 @@ export default function WheeCrosswords() {
         }
       }
     });
-
+    
     return {
       crosswordData: crossW,
       renderGrid: finalCleanGrid
     };
   };
-    
+  
 
   const parseCategories = (list, query) => {
     if ( !Array.isArray(list) ) {
@@ -547,8 +559,12 @@ export default function WheeCrosswords() {
       
     let response = checkCrossword();
     let vCrossword = response.crosswordData;
-    let generatedGrid = getGridT(vCrossword);
+    let generatedGrid = response.renderGrid;
     let placedWordCount = vCrossword.questions.filter(q => q.startx !== -1 && q.starty !== -1).length;
+    setCrosswordGridT(generatedGrid);
+    setGridWordCount(placedWordCount);
+    setIsGridVisible(true);
+
     if (placedWordCount < 2) {
       Alert.alert(
         "Invalid Formation",
@@ -557,9 +573,6 @@ export default function WheeCrosswords() {
       return;
     }
 
-    setCrosswordGridT(generatedGrid);
-    setGridWordCount(placedWordCount);
-    setIsGridVisible(true);
     if (placedWordCount < 4) {
       Alert.alert(
         "Partial Match Found",
@@ -986,6 +999,7 @@ export default function WheeCrosswords() {
                   <TextInput
                     style={styles.input}
                     placeholder="Answer #1"
+                    maxLength={MAX_ANSWER_LENGTH}
                     value={questions[0].answer}
                     onChangeText={(text) => {
                       const newQuestions = [...questions];
@@ -1008,6 +1022,7 @@ export default function WheeCrosswords() {
                   <TextInput
                     style={styles.input}
                     placeholder="Answer #2"
+                    maxLength={MAX_ANSWER_LENGTH}
                     value={questions[1].answer}
                     onChangeText={(text) => {
                       const newQuestions = [...questions];
@@ -1030,6 +1045,7 @@ export default function WheeCrosswords() {
                   <TextInput
                     style={styles.input}
                     placeholder="Answer #3"
+                    maxLength={MAX_ANSWER_LENGTH}
                     value={questions[2].answer}
                     onChangeText={(text) => {
                       const newQuestions = [...questions];
@@ -1052,6 +1068,7 @@ export default function WheeCrosswords() {
                   <TextInput
                     style={styles.input}
                     placeholder="Answer #4"
+                    maxLength={MAX_ANSWER_LENGTH}
                     value={questions[3].answer}
                     onChangeText={(text) => {
                       const newQuestions = [...questions];
@@ -1063,32 +1080,36 @@ export default function WheeCrosswords() {
                     <ImageBackground style={{ height: 47, width: "100%",justifyContent: 'center', opacity: 1, borderRadius: 12 }} imageStyle={{ opacity: 1, borderRadius:12 }} resizeMode='contain' source={require('../assets/crosswords/savecrosswordbtn.png')} />
                   </TouchableOpacity>
 
-                  { isGridVisible && ( <View style={styles.grid}>
-                    <View style={styles.gridHeaderRow}>
-                      <Text style={styles.sectionIndexLabel}>
-                        {gridWordCount < 4 ? `${gridWordCount} of 4 Words Connected` : 'Crossword Preview'}
-                      </Text>
-                      <TouchableOpacity onPress={() => setIsGridVisible(false)} style={styles.removeGridBtn}>
-                        <Image source={require('../assets/redgoldcloseicon.png')} style={styles.removeGridImage} resizeMode="contain" />
-                      </TouchableOpacity>
-                    </View>
-
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {isGridVisible && (
+                    <View style={styles.grid}>
+                      <View style={styles.gridHeaderRow}>
+                        <Text style={styles.sectionIndexLabel}>
+                          {gridWordCount < 4 ? `${gridWordCount} of 4 Words Connected` : 'Crossword Preview'}
+                        </Text>
+                        <TouchableOpacity onPress={() => setlsGridVisible(false)} style={styles.removeGridBtn}>
+                          <Image source={require('../assets/redgoldcloseicon.png')} style={styles.removeGridImage} resizeMode="contain" />
+                        </TouchableOpacity>
+                      </View>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         <View>
                           {crosswordGridT.map((row, rowIndex) => (
                             <View key={`row-${rowIndex}`} style={styles.row}>
                               {row.map((letter, colIndex) => {
                                 const isEmpty = letter === '.';
                                 return (
-                                  <View 
-                                    key={`cell-${rowIndex}-${colIndex}`} 
+                                  <View
+                                    key={`cell-${rowIndex}-${colIndex}`}
                                     style={[
-                                      styles.cell, 
-                                      { backgroundColor: isEmpty ? '#111111' : '#FFFFFF', borderWidth: isEmpty ? 0 : 1, borderColor: '#259963' }
+                                      styles.cell,
+                                      {
+                                        backgroundColor: isEmpty ? '#111111' : '#FFFFFF',
+                                        borderWidth: isEmpty ? 0 : 1,
+                                        borderColor: '#259963'
+                                      }
                                     ]}
                                   >
                                     <Text style={[styles.cellText, { color: isEmpty ? '#e8ffdd' : '#1d460b' }]}>
-                                      {isEmpty ? '' : letter}
+                                      {isEmpty ? "" : letter}
                                     </Text>
                                   </View>
                                 );
@@ -1096,15 +1117,18 @@ export default function WheeCrosswords() {
                             </View>
                           ))}
                         </View>
-                    </ScrollView>
+                      </ScrollView>
                     </View>
-                  ) }
+                  )}
+
                 </View>
-            </ScrollView>
-          </SafeAreaView>
-        </KeyboardAvoidingView>
-      </ImageBackground> )
-  };  
+              </ScrollView>
+            </SafeAreaView>
+          </KeyboardAvoidingView>
+        </ImageBackground>
+      );
+  };
+
 
 
   if (mode === 'list') {
@@ -1227,7 +1251,7 @@ export default function WheeCrosswords() {
                 <View style={styles.card}>
                   { item && item.category && 
                     ( <TouchableOpacity
-                    style={{ width: "74%", height: 67 }}
+                    style={{ width: "71%", height: 47 }}
                     onPress={() => { setHcrosswords(getCrosswords(item.category, crosswords)); setCrosswordCategory(item.category); setPrevCategory(item.category); setMode("list"); setPrevMode("main"); }}>
                     <ImageBackground style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} resizeMode='stretch' source={require('../assets/crosswords/greenbtnbg.png')}>
                       {item.id === 'c-all' ? 

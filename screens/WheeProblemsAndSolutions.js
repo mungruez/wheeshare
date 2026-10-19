@@ -11,6 +11,7 @@ import SectionPlayer from './SectionPlayer';
 import * as Sharing from 'expo-sharing';
 import PdfMove from './PdfMove';
 
+
 const { height, width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.76;
 
@@ -20,6 +21,7 @@ const SECTION_TYPES = {
   IMAGE: "image",
   AUDIO: "audio",
 };
+
 
 export default function ProblemAndSolution() {
   const [currentPSItem, setCurrentPSItem] = useState(null);
@@ -167,6 +169,7 @@ export default function ProblemAndSolution() {
 
     return normalized;
   };
+
 
   const parseHPsItems = (itemsList) => {
     let hItemsList = [];
@@ -400,6 +403,7 @@ export default function ProblemAndSolution() {
       
       const info = await FileSystem.getInfoAsync(fileUri);
       const trackingInfo = await FileSystem.getInfoAsync(trackingUri);
+
       if (!info.exists && !trackingInfo.exists) {
         await FileSystem.writeAsStringAsync(fileUri, JSON.stringify([]));
         await FileSystem.writeAsStringAsync(trackingUri, "true");
@@ -681,6 +685,7 @@ export default function ProblemAndSolution() {
       const processedSolutionSections = await Promise.all(
         solutionSections.map(async (section) => {
           const newSection = { ...section };
+          
           if (section.mediaUri && typeof section.mediaUri === 'string') {
             const ext = getMediaFileExtension(section.mediaUri, section.type);
             const safeFilename = `idojo_sol_section_${String(section.id).trim()}${ext}`;
@@ -848,10 +853,11 @@ export default function ProblemAndSolution() {
         setMode('main');
         return true;
       }
+      
       return false;
     });
     return () => backHandler.remove();
-  }, [mode, openpdfViewer, isPicking, loading]);
+  }, [mode]);
 
 
 
@@ -1214,6 +1220,7 @@ export default function ProblemAndSolution() {
               <Image source={require('../assets/problems/problemicon.png')} style={styles.formStreamSectionDividerIcon} resizeMode="contain" />
               <Text style={styles.formStreamSectionDividerText}>PROBLEM SECTIONS</Text>
             </View>
+
             <TouchableOpacity onPress={() => setPDropdownVisible(!pDropdownVisible)} style={styles.vcToggleBtn}>
               <Text style={styles.vcToggleText}>{!pDropdownVisible ? '▼' : '▲'}</Text>
             </TouchableOpacity>
@@ -1273,6 +1280,7 @@ export default function ProblemAndSolution() {
       </View> 
     );
   }
+
 
   if (mode === 'list') {
      return (
@@ -1348,6 +1356,7 @@ export default function ProblemAndSolution() {
       </ImageBackground>
     );
   }
+
 
   if (mode === 'add') {
      return (
@@ -1467,6 +1476,7 @@ export default function ProblemAndSolution() {
     );
   }
 
+
   return (
     <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/problems/problemsbg.png')}>
       <StatusBar barStyle="light-content"/>
@@ -1517,7 +1527,7 @@ export default function ProblemAndSolution() {
               <View style={styles.card}>
                 {item && item.category && (
                   <TouchableOpacity
-                    style={styles.categoryMenuSelectionRowItem}
+                    style={{ width: "71%", height: 47 }}
                     onPress={() => {
                       setHPsItems(getPsItems(item.category, psItems));
                       setPsItemCategory(item.category);
@@ -1525,13 +1535,24 @@ export default function ProblemAndSolution() {
                       setMode("list");
                     }}
                   >
-                    {item.id === 'ps-all' ? (
-                      <ImageBackground style={styles.fullWidthBtnAsset} resizeMode='contain' source={require('../assets/allcategoriesbtn.png')} />
-                    ) : (
-                      <ImageBackground style={styles.fullWidthBtnAssetTextured} resizeMode='contain' source={require('../assets/problems/purplegoldbtn.png')}>
-                        <Text numberOfLines={1} style={styles.cardTextMenuTitle}>{item.category}</Text>
-                      </ImageBackground>
-                    )}
+                    <ImageBackground
+                      style={{ flex: 1, justifyContent:'center', alignItems:'center' }}
+                      resizeMode='stretch'
+                      source={require('../assets/quizzes/purplegoldbtn.png')}>
+                      { item.id === 'ps-all' ? 
+                        ( <Image
+                          resizeMode="contain"
+                          style={{ height: "57%", width: "63%", alignSelf:"center"}}
+                          source={require('../assets/allstyles.png')}
+                        /> ) : (
+                          <Text
+                            numberOfLines={1}
+                            ellipsizeMode="clip"
+                            style={[styles.cardText, { width: '88%', textAlign: 'center', paddingHorizontal: 8 }]}>
+                            { item.category.length > 20 ? item.category.substring(0, 20) : item.category }
+                          </Text>
+                        ) }
+                    </ImageBackground>
                   </TouchableOpacity>
                 )}
               </View>
@@ -1554,6 +1575,7 @@ export default function ProblemAndSolution() {
   );
 }
 
+
 const styles = StyleSheet.create({
   imgBackground: { flex: 1, width: '100%', height: '100%' },
   viewLayoutContainer: { flex: 1, backgroundColor: '#323232', width: '100%', height: '100%' },
@@ -1575,9 +1597,6 @@ const styles = StyleSheet.create({
   problemsDivider: { width: '67%', height: 34, alignSelf: 'center', marginVertical: 5 },
   smallGap: { height: 12 },
   card: { width: '100%', alignItems: 'center', marginVertical: 6 },
-  categoryMenuSelectionRowItem: { width: '80%', height: 55, justifyContent: 'center', alignItems: 'center' },
-  fullWidthBtnAsset: { width: '67%', height: 67, justifyContent: 'center', alignItems: 'center' },
-  fullWidthBtnAssetTextured: { width: '67%', height: 67, justifyContent: 'center', alignItems: 'center' },
   centerNotificationFlexPanel: { flex: 1, paddingHorizontal: 30, justifyContent: 'center', alignItems: 'center' },
   cardTextMenuTitle: { width: "100%", fontSize: 15, fontWeight: '800', color: '#5a4f07', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
   infoTextDashboardFallback: { color: '#b155fc', textAlign: 'center', fontSize: 13, lineHeight: 18 },

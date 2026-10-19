@@ -596,7 +596,7 @@ export default function WheeQuizzes() {
       return false;
     });
     return () => backHandler.remove();
-  }, [mode, loading]);
+  }, [mode]);
   
 
 
@@ -1122,7 +1122,7 @@ export default function WheeQuizzes() {
               <View style={styles.card}>
                 {item && item.category && (
                   <TouchableOpacity
-                    style={{ width: "72%", height: 67 }}
+                    style={{ width: "71%", height: 47 }}
                     onPress={() => { setHquizzes(getQuizzes(item.category, quizzes)); setQuizCategory(item.category); setPrevCategory(item.category); setMode("list"); }}>
                     <ImageBackground
                       style={{ flex: 1, justifyContent:'center', alignItems:'center' }}
