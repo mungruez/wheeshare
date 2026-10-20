@@ -124,7 +124,7 @@ export default function HomeScreen() {
           </TouchableOpacity> 
         </ScrollView>
 
-        <View style={{ flex:1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center', backgroundColor: #fff}}>
+        <View style={{ flex:1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center', backgroundColor: "#ffffffff", width: '100%' }}>
           <BannerAd
             unitId={BANNER_A_ID}
             size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
