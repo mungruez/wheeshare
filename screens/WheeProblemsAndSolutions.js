@@ -1576,7 +1576,7 @@ export default function ProblemAndSolution() {
                     <ImageBackground
                       style={{ flex: 1, justifyContent:'center', alignItems:'center' }}
                       resizeMode='stretch'
-                      source={require('../assets/quizzes/purplegoldbtn.png')}>
+                      source={require('../assets/problems/purplegoldbtn.png')}>
                       { item.id === 'ps-all' ? 
                         ( <Image
                           resizeMode="contain"
