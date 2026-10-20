@@ -1,7 +1,7 @@
 import * as FileSystem from 'expo-file-system/legacy';
 
 const FILE_PATH = `${FileSystem.documentDirectory}last_ad_time.txt`;
-const COOLDOWN_TIME_MS = 10 * 60 * 1000; 
+const COOLDOWN_TIME_MS = 5 * 60 * 1000; 
 
 
 export const AdTimer = {
@@ -14,7 +14,7 @@ export const AdTimer = {
       }
 
       const lastAdTimeStr = await FileSystem.readAsStringAsync(FILE_PATH);
-      const lastAdTime = parseInt(lastAdTimeStr, 10);
+      const lastAdTime = parseInt(lastAdTimeStr, 5);
       
       if (isNaN(lastAdTime)) {
         return true;

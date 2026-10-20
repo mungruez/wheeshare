@@ -1,20 +1,61 @@
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator } from 'react-native';
+import { RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import React, { useLayoutEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import * as FileSystem from 'expo-file-system/legacy';
+import { AdTimer } from './AdTimer';
+  
+const BANNER_A_ID = TestIds.BANNER; 
+const REWARDED_A_ID = TestIds.REWARDED;
 
 export default function HomeScreen() {
   const [isLoadingAd, setIsLoadingAd] = useState(false);
   const navigation = useNavigation();
 
+  
   useLayoutEffect(()=> {
     navigation.setOptions({ headerShown: false,});
   }, []);
 
 
   const handleNavigate = async (scrname) => {
-    navigation.navigate(scrname);
+    try {
+      const isEligible = await AdTimer.shouldShowAd();
+
+      if (isEligible) {
+        setIsLoadingAd(true);
+        const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+
+        const backupTimer = setTimeout(() => {
+          setIsLoadingAd(false);
+          navigation.navigate(scrname);
+        }, 2500);
+
+        rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+          clearTimeout(backupTimer);
+          setIsLoadingAd(false);
+          try {
+            rewarded.show();
+            AdTimer.saveTimestamp(); 
+          } catch (showError) {}
+          navigation.navigate(scrname);
+        });
+
+        rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
+          clearTimeout(backupTimer);
+          setIsLoadingAd(false);
+          navigation.navigate(scrname); 
+        });
+
+        rewarded.load();
+      } else {
+        navigation.navigate(scrname);
+      }
+    } catch (globalError) {
+      setIsLoadingAd(false);
+      navigation.navigate(scrname);
+    }
   };
 
 
@@ -86,6 +127,13 @@ export default function HomeScreen() {
           </TouchableOpacity> 
         </ScrollView>
 
+        <View style={{ flex:1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center', backgroundColor: #fff}}>
+          <BannerAd
+            unitId={BANNER_A_ID}
+            size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
+            requestOptions={{requestNonPersonalizedAdsOnly: true}}
+          />
+        </View>
       </SafeAreaView>
     </ImageBackground>
   )

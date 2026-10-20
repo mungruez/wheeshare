@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator } from 'react-native';
+import { RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
 import * as DocumentPicker from 'expo-document-picker';
@@ -9,17 +10,14 @@ import { zip, unzip } from 'react-native-zip-archive';
 import * as ImagePicker from 'expo-image-picker';
 import SectionPlayer from './SectionPlayer';
 import * as Sharing from 'expo-sharing';
+import { AdTimer } from './AdTimer';
 import PdfMove from './PdfMove';
 
-const { height, width } = Dimensions.get('window');
-const CARD_WIDTH = width * 0.76;
 
-const SECTION_TYPES = {
-  VIDEO: "video",
-  PDF: "pdf",
-  IMAGE: "image",
-  AUDIO: "audio",
-};
+const SECTION_TYPES = { VIDEO: "video", PDF: "pdf", IMAGE: "image", AUDIO: "audio"};
+const { height, width } = Dimensions.get('window');
+const REWARDED_A_ID = TestIds.REWARDED;
+const CARD_WIDTH = width * 0.76;
 
 
 export default function Chapters() {
@@ -34,19 +32,20 @@ export default function Chapters() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectedSingles, setSelectedSingles] = useState([]);
   
-  const [chapterId, setChapterId] = useState(null);
-  const [chapterTitle, setChapterTitle] = useState("");
-  const [chapterCategory, setChapterCategory] = useState("");
-  const [prevCategory, setPrevCategory] = useState("");
-  const [chapterDesc, setChapterDesc] = useState("");
-  const [sections, setSections] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeSectionId, setActiveSectionId] = useState(null);
   const [vcDropdownVisible, setVcDropdownVisible] = useState(true);
+  const [activeSectionId, setActiveSectionId] = useState(null);
+  const [chapterCategory, setChapterCategory] = useState("");
   const [openpdfViewer, setOpenpdfViewer] = useState(null);
+  const [isLoadingAd, setIsLoadingAd] = useState(false);
+  const [prevCategory, setPrevCategory] = useState("");
+  const [chapterTitle, setChapterTitle] = useState("");
+  const [chapterDesc, setChapterDesc] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isPicking, setIsPicking] = useState(false);
-
+  const [chapterId, setChapterId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [sections, setSections] = useState([]);
+  
   const isOffline = useNetInfo().isConnected === false;
   const isLoadingRef = useRef(false);
   const isPickingRef = React.useRef(false);
@@ -79,6 +78,55 @@ export default function Chapters() {
 
     }
   };
+
+
+  useEffect(() => {
+    let isMounted = true;
+    let backupTimer;
+    let unsubscribeLoaded;
+    let unsubscribeError;
+
+    const loadRewardedAd = async () => {
+      try {
+        const isEligible = await AdTimer.shouldShowAd();
+
+        if (!isEligible || !isMounted) return;
+        setIsLoadingAd(true);
+        
+        const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+        
+        backupTimer = setTimeout(() => {
+          if (isMounted) setIsLoadingAd(false);
+        }, 2500);
+
+        unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+          clearTimeout(backupTimer);
+          if (!isMounted) return;
+          setIsLoadingAd(false);
+          rewarded.show();
+          AdTimer.saveTimestamp();
+        });
+
+        unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
+          clearTimeout(backupTimer);
+          if (isMounted) setIsLoadingAd(false);
+        });
+
+        rewarded.load();
+      } catch (error) {
+        if (isMounted) setIsLoadingAd(false);
+      }
+    };
+
+    loadRewardedAd();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(backupTimer);
+      unsubscribeLoaded?.();
+      unsubscribeError?.();
+    };
+  }, [mode]);
 
 
   const parseCategories = (list, query) => {
@@ -305,6 +353,7 @@ export default function Chapters() {
               setLoading(true);
               const chaptersToDelete = chapters.filter(m => cleanIdsToDelete.includes(String(m.id).trim()));
               let errfound = false;
+
               for (const chapter of chaptersToDelete) {
                 const folderUri = `${FileSystem.documentDirectory}chapters/${chapter.id}/`;
                 try {
@@ -316,8 +365,10 @@ export default function Chapters() {
                   }
                 }
               }
+
               const updatedList = chapters.filter(m => !cleanIdsToDelete.includes(String(m.id).trim()));
               const fileUri = `${FileSystem.documentDirectory}chapters.json`;
+
               await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(updatedList));
               
               if (updatedList.length === 0) {
@@ -718,6 +769,7 @@ export default function Chapters() {
   const copyPickedMediaToCache = async (sourceUri, fileName, retries = 2) => {
     const cacheDir = `${FileSystem.cacheDirectory}chapter-media/`;
     await FileSystem.makeDirectoryAsync(cacheDir, { intermediates: true });
+
     const destinationUri = `${cacheDir}${fileName}`;
     let lastError = null;
 
@@ -1089,8 +1141,8 @@ export default function Chapters() {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#323232', width: '100%', height:'100%', marginTop: 0 }}>
         <StatusBar barStyle="dark-content"/>
-        <View style={styles.vcHeader}>
 
+        <View style={styles.vcHeader}>
           <Text style={currentChapter.title.length < 32 ? styles.vcTitle : styles.vcTitleTwo} numberOfLines={1} ellipsizeMode="clip">{currentChapter.title}</Text>
           <TouchableOpacity onPress={() => setVcDropdownVisible(!vcDropdownVisible)} style={styles.vcToggleBtn}>
             <Text style={styles.vcToggleText}>
@@ -1142,11 +1194,13 @@ export default function Chapters() {
     );
   }
 
+  
   if (mode === 'list') {
     return (
       <ImageBackground style={{flex: 1, width: '100%', height: '100%', opacity: 1}} resizeMode='cover' imageStyle={{ opacity: 0.9 }} source={require('../assets/chapterslistbg.png')}>
         <StatusBar barStyle="light-content"/>
         <SafeAreaView style={{ flex: 1}}>
+
           <View style={{marginBottom: 12, paddingHorizontal: 5, justifyContent: 'center', alignItems: 'center', opacity: 1}}>
             <ImageBackground style={ styles.icon } resizeMode='contain' imageStyle={{ opacity: 1 }} source={ require('../assets/chapterslisttitle.png') } /> 
           </View>
@@ -1241,6 +1295,7 @@ export default function Chapters() {
       <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 , opacity: 1, height: '100%'}}>
+
           <View style={{ marginBottom: 12, marginTop: -19, opacity : 1, justifyContent: 'center', alignItems: 'center',}}>
             <ImageBackground style={ styles.iconAM } resizeMode='contain' imageStyle={{ opacity: 1 }} source={currentChapter ? require('../assets/editchaptertitle.png') : require('../assets/addchaptertitle.png') } /> 
           </View>
@@ -1453,10 +1508,12 @@ export default function Chapters() {
    );
   }
 
+
   return (
     <ImageBackground style={styles.imgBackground } imageStyle={{ opacity: 1 }} resizeMode='cover' source={require('../assets/chaptersbg.png')}>
       <StatusBar barStyle="dark-content"/>
       <SafeAreaView style={{flex: 1, width: "100%", height: "100%", marginTop: 0}}>
+        
         <View style={{ marginBottom: 5, marginTop: -19, opacity: 1, justifyContent: "center", alignItems: 'center', textAlign: 'center' }}>
           <ImageBackground style={styles.icon} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/chapterstitle.png')} /> 
         </View>
@@ -1567,10 +1624,10 @@ cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#5a4f07', pa
 goldDivider: {width: '57%', height: 43, alignSelf: 'center', marginVertical: 15, shadowColor: '#edf7d6', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 10, opacity: 1},
 smallGap: {height: 12,},
 cardInternal:{ padding: 10, backgroundColor: 'rgba(0,0,0,0.7)', borderRadius: 10 },
-plusIcon: { height: 57, width: 76, backgroundColor: 'rgba(0,0,0,0.57)', borderRadius: 12, marginLeft: 15, marginRight: 7, opacity: 1},
+plusIcon: { height: 51, width: 67, backgroundColor: 'rgba(0,0,0,0.57)', borderRadius: 12, marginLeft: 15, marginRight: 7, opacity: 1},
 editIcon: { height: 57, width: 55, borderRadius: 4, marginLeft: 12, opacity: 1 },
 infoIcon: { height: 47, width: 47, marginLeft: 21, marginBottom: 5, opacity: 1 },
-importIcon: {height: 76, width: 67, borderRadius: 9, marginLeft: 12 },
+importIcon: {height: 51, width: 64, borderRadius: 9, marginLeft: 12 },
 imgBackgroundAM: {  ...StyleSheet.absoluteFillObject, flex: 1 },
 iconAM: { height: 61, width: '95%', alignSelf: 'center', textAlign: 'center', marginLeft: 25, marginBottom: 3, opacity: 1 },
 videoIcon: { height: 95, width: 114, marginLeft: 12, borderRadius: 2, marginTop: 45, justifyContent: 'center', alignItems: 'center'},

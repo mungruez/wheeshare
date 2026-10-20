@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator, Pressable } from 'react-native';
+import { RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
 import { MaterialCommunityIcons } from "@expo/vector-icons"; 
@@ -9,9 +10,13 @@ import { zip, unzip } from 'react-native-zip-archive';
 import * as DocumentPicker from 'expo-document-picker';
 import WheeQuizScreen from "./WheeQuizScreen";
 import * as Sharing from 'expo-sharing';
+import { AdTimer } from './AdTimer';
+
 
 const { height, width } = Dimensions.get('window');
+const REWARDED_A_ID = TestIds.REWARDED;
 const CARD_WIDTH = width * 0.76;
+
 
 export default function WheeQuizzes() {
   const [loading, setLoading] = useState(false);
@@ -53,8 +58,7 @@ export default function WheeQuizzes() {
         onPress: () => setMode("main"),
         style: "cancel" 
       }],
-      {
-         cancelable: false } 
+      { cancelable: false } 
     );
   };
 
@@ -74,6 +78,56 @@ export default function WheeQuizzes() {
     }
   };
 
+
+  useEffect(() => {
+    let isMounted = true;
+    let backupTimer;
+    let unsubscribeLoaded;
+    let unsubscribeError;
+
+    const loadRewardedAd = async () => {
+      try {
+        const isEligible = await AdTimer.shouldShowAd();
+
+        if (!isEligible || !isMounted) return;
+        setIsLoadingAd(true);
+        
+        const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+        
+        backupTimer = setTimeout(() => {
+          if (isMounted) setIsLoadingAd(false);
+        }, 2500);
+
+        unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+          clearTimeout(backupTimer);
+          if (!isMounted) return;
+          setIsLoadingAd(false);
+          rewarded.show();
+          AdTimer.saveTimestamp();
+        });
+
+        unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
+          clearTimeout(backupTimer);
+          if (isMounted) setIsLoadingAd(false);
+        });
+
+        rewarded.load();
+      } catch (error) {
+        if (isMounted) setIsLoadingAd(false);
+      }
+    };
+
+    loadRewardedAd();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(backupTimer);
+      unsubscribeLoaded?.();
+      unsubscribeError?.();
+    };
+  }, [mode]);
+  
+  
   const handleMultipleChoiceClick = () => {
     if(!multiplechoice) setMultipleChoice(true);
     setTrueFalse(false);
@@ -81,6 +135,7 @@ export default function WheeQuizzes() {
     setLongAnswer(false);
   }
   
+
   const handleTrueFalseClick = () => {
     setMultipleChoice(false);
     if(!truefalse) setTrueFalse(true);
@@ -88,6 +143,7 @@ export default function WheeQuizzes() {
     setLongAnswer(false);
   }
   
+
   const handleMultipleAnswersClick = () => {
     setMultipleChoice(false);
     setTrueFalse(false);
@@ -95,6 +151,7 @@ export default function WheeQuizzes() {
     setLongAnswer(false);
   }
   
+
   const handleLongAnswerClick = () => {
     setMultipleChoice(false);
     setTrueFalse(false);
@@ -181,6 +238,7 @@ export default function WheeQuizzes() {
   };
 
 
+
   const loadQuizzes = async () => {
     try {
       if (isLoadingRef.current) return; 
@@ -246,6 +304,7 @@ export default function WheeQuizzes() {
       const trackingUri = `${FileSystem.documentDirectory}.quizzes_user_initialized`;
       await FileSystem.writeAsStringAsync(trackingUri, "true");
       await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(quizzesData));
+
       setQuizzes(quizzesData);
       parseCategories(quizzesData, null);
       if (mode !== "main") setHquizzes(getQuizzes(prevCategory, quizzesData)); 
@@ -256,6 +315,7 @@ export default function WheeQuizzes() {
   };
 
   
+
   const handleSaveQuiz = async (newData) => {
     try {
       if (isLoadingRef.current) return;
@@ -284,6 +344,7 @@ export default function WheeQuizzes() {
       setLoading(false);
     }
   };
+
 
   
   const deleteQuizzes = async (idsFromArg = []) => {
@@ -338,7 +399,7 @@ export default function WheeQuizzes() {
   };
 
 
-
+  
   const saveQuiz = async () => {
     if (isLoadingRef.current || loading) return;
 
@@ -373,6 +434,7 @@ export default function WheeQuizzes() {
       const isTrueFalseLayout = totalOptionsCount === 2;
       const isSingleChoiceLayout = totalOptionsCount === 4;
       const isMultipleAnswersLayout = totalOptionsCount > 4;
+
       if (!isLongTextLayout && !isTrueFalseLayout && !isSingleChoiceLayout && !isMultipleAnswersLayout) {
         Alert.alert('Layout Error', `Question #${i + 1} has an invalid choice configuration (${totalOptionsCount} options). Valid setups are: 1 (Long Text), 2 (True/False), 4 (Single Choice), or 5-7 (Multiple Answers).`);
         return;
@@ -387,7 +449,6 @@ export default function WheeQuizzes() {
         }
       }
     }
-
 
     try {
       setLoading(true);
@@ -1174,12 +1235,12 @@ const styles = StyleSheet.create({
   iconmain: { height: 57, width: width * 0.83 },
   iconAM: { height: 60, width: width * 0.8 },
   addQuestionBtn: { width: 177, height: 55, borderRadius: 19, marginTop: 7, alignSelf:'center' },
-  header: { paddingHorizontal: 16, marginBottom: 10, width: '100%' },
+  header: { paddingHorizontal: 16, marginBottom: 10, width: '100%',backgroundColor: 'rgba(255, 255, 255, 0.06)' },
   searchRow: { flexDirection: 'row', paddingHorizontal: 9, paddingVertical: 4, gap: 8, marginBottom: .5, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 9, alignItems: 'center', justifyContent: 'center', width: '100%', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
   searchInput: { height: 38, width: '70%', backgroundColor: 'rgba(255, 255, 255, 0.79)', borderRadius: 8, paddingHorizontal: 8, color: 'black', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', fontSize: 11 },
   searchBtn: { width: 39, height: 37, backgroundColor: '#e7f5ed4f', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
   clearBtn: { width: 32, height: 32, backgroundColor: '#31303080', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
-  dashboardIconsControlsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 1, minHeight: 50, width: '100%', gap: 19, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 9},
+  dashboardIconsControlsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 1, minHeight: 50, width: '100%', gap: 19, backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 9},
   plusIcon: { width: 45, height: 45,marginLeft: 15, marginRight: 7},
   plusIconAM: { width: 45, height: 45, marginRight: 19 },
   importIcon: { width: 45, height: 45 },

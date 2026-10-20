@@ -33,6 +33,7 @@ export default function Resources() {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
+
   useEffect(() => {
     let isMounted = true;
     let backupTimer;
@@ -45,6 +46,7 @@ export default function Resources() {
         if (!isEligible || !isMounted) return;
 
         setIsLoadingAd(true);
+        
         const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
         backupTimer = setTimeout(() => {
           if (isMounted) setIsLoadingAd(false);
@@ -132,10 +134,10 @@ export default function Resources() {
           </View>
         </ScrollView>
 
-        <View style={{ flex:1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center'}}>
+        <View style={{ flex: 1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center', backgroundColor: #fff}}>
           <BannerAd
             unitId={BANNER_A_ID}
-            size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
+            size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
             requestOptions={{requestNonPersonalizedAdsOnly: true}}
           />
         </View>
@@ -207,15 +209,8 @@ const styles = StyleSheet.create({
     marginTop: 3,
     textAlign: 'center',
   },
-  scrollView: {
-    flexDirection: 'column',
-    marginTop: 5,
-    marginBottom: 1,
-    paddingBottom: 5,
-  },
-  scrollContent: {
-    paddingBottom: 24,
-  },
+  scrollView: {flexDirection: 'column',marginTop: 5,marginBottom: 1,paddingBottom: 5},
+  scrollContent: {paddingBottom: 24},
   contentBox: {
     marginTop: 2,
     borderColor: 'rgba(255,255,255,0.18)',
@@ -286,11 +281,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(142, 203, 255, 0.38)',
   },
-  linkText: {
-    color: '#cfe9ff',
-    fontSize: 15,
-    textDecorationLine: 'underline',
-    fontStyle: 'italic',
-    fontWeight: '700',
-  },
+  linkText: {color: '#cfe9ff',fontSize: 15,textDecorationLine: 'underline',fontStyle: 'italic',fontWeight: '700'},
 });
