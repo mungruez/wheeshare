@@ -13,11 +13,9 @@ export default function HomeScreen() {
   const [isLoadingAd, setIsLoadingAd] = useState(false);
   const navigation = useNavigation();
 
-  
   useLayoutEffect(()=> {
     navigation.setOptions({ headerShown: false,});
   }, []);
-
 
   const handleNavigate = async (scrname) => {
     try {
@@ -57,7 +55,6 @@ export default function HomeScreen() {
       navigation.navigate(scrname);
     }
   };
-
 
   return (
     <ImageBackground style={ styles.imgBackground } imageStyle={{ opacity: 1.0 }} resizeMode='cover' source={require('../assets/homescreen.png')}>

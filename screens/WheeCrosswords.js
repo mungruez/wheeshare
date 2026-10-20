@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator } from 'react-native';
+import { RewardedAd, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -8,15 +9,19 @@ import { zip, unzip } from 'react-native-zip-archive';
 import * as DocumentPicker from 'expo-document-picker';
 import CrosswordGrid from "./CrosswordGrid";
 import * as Sharing from 'expo-sharing';
+import { AdTimer } from './AdTimer';
+
 
 const { height, width } = Dimensions.get('window');
-const CARD_WIDTH = width * 0.76;
 const SCREEN_WIDTH = Dimensions.get('window').width;
+const CARD_WIDTH = width * 0.76;
+const MAX_ANSWER_LENGTH = 10;
 const GRID_PADDING = 3; 
 const COLUMN_COUNT = 12;
-const MAX_ANSWER_LENGTH = 10;
+
 const CALCULATED_CELL_SIZE = (SCREEN_WIDTH - (GRID_PADDING * 2)) / COLUMN_COUNT;
 const CELL_SIZE = Math.max(CALCULATED_CELL_SIZE, 21);
+const REWARDED_A_ID = TestIds.REWARDED;
 
 
 export default function WheeCrosswords() {
@@ -34,6 +39,7 @@ export default function WheeCrosswords() {
   const [crosswordGridT, setCrosswordGridT] = useState([[]]);
   const [isGridVisible, setIsGridVisible] = useState(false);
   const [gridWordCount, setGridWordCount] = useState(0);
+  const [isLoadingAd, setIsLoadingAd] = useState(false);
   const [hcrosswords, setHcrosswords] = useState([]);
   const [scrosswords, setScrosswords] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -42,7 +48,6 @@ export default function WheeCrosswords() {
   const [loading, setLoading] = useState(false);
 
   const isOffline = useNetInfo().isConnected === false;
-  const navigation = useNavigation();
   const isLoadingRef = useRef(false);
 
 
@@ -57,6 +62,55 @@ export default function WheeCrosswords() {
       { cancelable: false } 
     );
   };
+
+
+  useEffect(() => {
+    let isMounted = true;
+    let backupTimer;
+    let unsubscribeLoaded;
+    let unsubscribeError;
+
+    const loadRewardedAd = async () => {
+      try {
+        const isEligible = await AdTimer.shouldShowAd();
+
+        if (!isEligible || !isMounted) return;
+        setIsLoadingAd(true);
+        
+        const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+        
+        backupTimer = setTimeout(() => {
+          if (isMounted) setIsLoadingAd(false);
+        }, 2500);
+
+        unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+          clearTimeout(backupTimer);
+          if (!isMounted) return;
+          setIsLoadingAd(false);
+          rewarded.show();
+          AdTimer.saveTimestamp();
+        });
+
+        unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
+          clearTimeout(backupTimer);
+          if (isMounted) setIsLoadingAd(false);
+        });
+
+        rewarded.load();
+      } catch (error) {
+        if (isMounted) setIsLoadingAd(false);
+      }
+    };
+
+    loadRewardedAd();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(backupTimer);
+      unsubscribeLoaded?.();
+      unsubscribeError?.();
+    };
+  }, [mode]);  
 
 
   const canPlaceWord = (word, gridT, startX, startY, orientation, requireCrossing) => {

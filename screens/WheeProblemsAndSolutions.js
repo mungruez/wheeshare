@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator } from 'react-native';
+import { RewardedAd, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -9,18 +10,14 @@ import { zip, unzip } from 'react-native-zip-archive';
 import * as ImagePicker from 'expo-image-picker';
 import SectionPlayer from './SectionPlayer'; 
 import * as Sharing from 'expo-sharing';
+import { AdTimer } from './AdTimer';
 import PdfMove from './PdfMove';
 
 
+const SECTION_TYPES = {VIDEO: "video", PDF: "pdf", IMAGE: "image", AUDIO: "audio"};
 const { height, width } = Dimensions.get('window');
+const REWARDED_A_ID = TestIds.REWARDED;
 const CARD_WIDTH = width * 0.76;
-
-const SECTION_TYPES = {
-  VIDEO: "video",
-  PDF: "pdf",
-  IMAGE: "image",
-  AUDIO: "audio",
-};
 
 
 export default function ProblemAndSolution() {
@@ -52,6 +49,7 @@ export default function ProblemAndSolution() {
   const [solutionSections, setSolutionSections] = useState([]);
   const [activeSectionId, setActiveSectionId] = useState(null);
   const [problemSections, setProblemSections] = useState([]);
+  const [isLoadingAd, setIsLoadingAd] = useState(false);
   const isOffline = useNetInfo().isConnected === false;
   const [isPicking, setIsPicking] = useState(false);
 
@@ -94,6 +92,55 @@ export default function ProblemAndSolution() {
     if (type === SECTION_TYPES.IMAGE) return '.jpg';
     return '.mp4';
   };
+
+
+  useEffect(() => {
+    let isMounted = true;
+    let backupTimer;
+    let unsubscribeLoaded;
+    let unsubscribeError;
+
+    const loadRewardedAd = async () => {
+      try {
+        const isEligible = await AdTimer.shouldShowAd();
+
+        if (!isEligible || !isMounted) return;
+        setIsLoadingAd(true);
+        
+        const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+        
+        backupTimer = setTimeout(() => {
+          if (isMounted) setIsLoadingAd(false);
+        }, 2500);
+
+        unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+          clearTimeout(backupTimer);
+          if (!isMounted) return;
+          setIsLoadingAd(false);
+          rewarded.show();
+          AdTimer.saveTimestamp();
+        });
+
+        unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
+          clearTimeout(backupTimer);
+          if (isMounted) setIsLoadingAd(false);
+        });
+
+        rewarded.load();
+      } catch (error) {
+        if (isMounted) setIsLoadingAd(false);
+      }
+    };
+
+    loadRewardedAd();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(backupTimer);
+      unsubscribeLoaded?.();
+      unsubscribeError?.();
+    };
+  }, [mode]);  
 
 
   const getSectionPreviewSource = (section) => {
@@ -1527,7 +1574,7 @@ export default function ProblemAndSolution() {
               <View style={styles.card}>
                 {item && item.category && (
                   <TouchableOpacity
-                    style={{ width: "71%", height: 47 }}
+                    style={{ width: "72%", height: 47 }}
                     onPress={() => {
                       setHPsItems(getPsItems(item.category, psItems));
                       setPsItemCategory(item.category);
@@ -1583,12 +1630,12 @@ const styles = StyleSheet.create({
   icon: { height: 70, width: width * 0.9 },
   iconmain: { height: 78, width: width * 0.9 },
   iconAM: { height: 76, width: width * 0.9 },
-  header: { paddingHorizontal: 16, marginBottom: 10, width: '100%' },
+  header: { paddingHorizontal: 16, marginBottom: 10, width: '100%', borderRadius: 9 },
   searchRow: { flexDirection: 'row', paddingHorizontal: 9, paddingVertical: 4, gap: 8, marginBottom: 7, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 9, alignItems: 'center', justifyBontent: 'center', width: '100%', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
   searchInput: { height: 38, width: '70%', backgroundColor: 'rgba(255, 255, 255, 0.79)', borderRadius: 8, paddingHorizontal: 8, color: 'black', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', fontSize: 11 },
   searchBtn: { width: 39, height: 37, backgroundColor: '#e7f5ed4f', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
   clearBtn: { width: 32, height: 32, backgroundColor: '#31303080', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
-  dashboardIconsControlsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 1, minHeight: 50, width: '100%', gap: 15 },
+  dashboardIconsControlsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 1, minHeight: 50, width: '100%', gap: 15, backgroundColor: 'rgba(255, 255, 255, 0.06)' },
   plusIcon: { width: 45, height: 45, marginRight: 7, marginLeft: 10 },
   plusIconAM: { width: 45, height: 44, marginRight: 19 },
   importIcon: { width: 45, height: 45 },

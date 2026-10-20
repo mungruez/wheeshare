@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator, Pressable } from 'react-native';
-import { RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import { RewardedAd, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -25,7 +25,6 @@ export default function WheeQuizzes() {
   const [hquizzes, setHquizzes] = useState([]);
   
   const [squizzes, setSquizzes] = useState([]);
-  const navigation = useNavigation();
   const isOffline = useNetInfo().isConnected === false;
   const isLoadingRef = useRef(false);
 
@@ -39,13 +38,13 @@ export default function WheeQuizzes() {
   const [quizCategory, setQuizCategory] = useState("");
   const [prevCategory, setPrevCategory] = useState("");
   const [quizDesc, setQuizDesc] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activePlayIndices, setActivePlayIndices] = useState([0, 0, 0, 0]); 
+  const [searchQuery, setSearchQuery] = useState(""); 
   
   const [multiplechoice, setMultipleChoice] = useState(true); 
   const [truefalse, setTrueFalse] = useState(false); 
   const [multipleanswers, setMultipleAnswers] = useState(false);
   const [longanswer, setLongAnswer] = useState(false);
+  const [isLoadingAd, setIsLoadingAd] = useState(false);
 
   const [questionsList, setQuestionsList] = useState([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
   
@@ -1240,7 +1239,7 @@ const styles = StyleSheet.create({
   searchInput: { height: 38, width: '70%', backgroundColor: 'rgba(255, 255, 255, 0.79)', borderRadius: 8, paddingHorizontal: 8, color: 'black', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', fontSize: 11 },
   searchBtn: { width: 39, height: 37, backgroundColor: '#e7f5ed4f', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
   clearBtn: { width: 32, height: 32, backgroundColor: '#31303080', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
-  dashboardIconsControlsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 1, minHeight: 50, width: '100%', gap: 19, backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: 9},
+  dashboardIconsControlsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 1, minHeight: 50, width: '100%', gap: 19, backgroundColor: 'rgba(255, 255, 255, 0.06)'},
   plusIcon: { width: 45, height: 45,marginLeft: 15, marginRight: 7},
   plusIconAM: { width: 45, height: 45, marginRight: 19 },
   importIcon: { width: 45, height: 45 },
