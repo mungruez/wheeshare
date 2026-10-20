@@ -1044,6 +1044,7 @@ export default function WheeQuizzes() {
         <StatusBar barStyle="light-content" />
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
           <SafeAreaView style={{ flex: 1 }}>
+            
             <View style={styles.formHeaderTitleRow}>
               <ImageBackground style={styles.iconAM} resizeMode='contain' source={currentQuiz ? require('../assets/quizzes/editquiztitle.png') : require('../assets/quizzes/addquiztitle.png')} /> 
             </View>

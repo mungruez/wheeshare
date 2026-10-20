@@ -143,7 +143,7 @@ export default function Resources() {
           </View>
         </ScrollView>
 
-        <View style={{ flex: 1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center', backgroundColor: #fff}}>
+        <View style={{ flex: 1, justifyContent: "space-between", marginTop: 19, alignSelf: 'center', backgroundColor: #fff}}>
           <BannerAd
             unitId={BANNER_A_ID}
             size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
@@ -219,10 +219,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 12,
   },
-  quizzes: {textDecorationLine: 'underline',textDecorationColor: '#f3b4c3',color: '#f7d6df',fontSize: 19,fontStyle: 'italic',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
-  chapters: {textDecorationLine: 'underline',textDecorationColor: '#f2df75',fontStyle: 'italic',color: '#f2df75',fontSize: 19,fontWeight: '700',marginLeft: 20, marginTop: 4, letterSpacing: 0.2},
-  crosswords: {textDecorationLine: 'underline',textDecorationColor: '#8ee7a7',fontStyle: 'italic',color: '#8ee7a7',fontSize: 19,fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
-  problems: {textDecorationLine: 'underline',textDecorationColor: '#d8a8ff', fontStyle: 'italic', fontSize: 19,color: '#d8a8ff',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
+  quizzes: {textDecorationLine: 'underline',textDecorationColor: '#dd4848',color: '#ce0a0a',fontSize: 19,fontStyle: 'italic',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
+  chapters: {textDecorationLine: 'underline',textDecorationColor: '#ecd866',fontStyle: 'italic',color: '#bba31c',fontSize: 19,fontWeight: '700',marginLeft: 20, marginTop: 4, letterSpacing: 0.2},
+  crosswords: {textDecorationLine: 'underline',textDecorationColor: '#4ee97a',fontStyle: 'italic',color: '#0e8d32',fontSize: 19,fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
+  problems: {textDecorationLine: 'underline',textDecorationColor: '#9e5ad6', fontStyle: 'italic', fontSize: 19,color: '#570b96',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
   linkButton: {paddingVertical: 12,paddingHorizontal: 18,alignItems: 'center',justifyContent: 'center',alignSelf: 'center',marginTop: 8,marginBottom: 14,borderRadius: 14,backgroundColor: 'rgba(142, 203, 255, 0.10)',borderWidth: 1,borderColor: 'rgba(142, 203, 255, 0.38)'},
-  linkText: {color: '#cfe9ff',fontSize: 15,textDecorationLine: 'underline',fontStyle: 'italic',fontWeight: '700'},
+  linkText: {color: '#9ecef8',fontSize: 15,textDecorationLine: 'underline',fontStyle: 'italic',fontWeight: '700'},
 });

@@ -945,7 +945,6 @@ export default function WheeCrosswords() {
   }, [mode]);   
   
 
-
   const MyHeader = () => {
     if (scrosswords.length === 0) return null;
     if (!scrosswords[0]) return null;
@@ -1184,7 +1183,6 @@ export default function WheeCrosswords() {
   };
 
 
-
   if (mode === 'list') {
     return (
       <ImageBackground style={{flex: 1, width: '100%', height: '100%', opacity: 1}} resizeMode='cover' imageStyle={{ opacity: 0.9 }} source={require('../assets/crosswords/crosswordslistbg.png')}>
@@ -1251,7 +1249,7 @@ export default function WheeCrosswords() {
       );
   }
 
-
+  
   return ( 
     <ImageBackground style={styles.imgBackground } imageStyle={{ opacity: 1 }} resizeMode='cover' source={require('../assets/crosswords/crosswordsbg.png')}>
       <StatusBar barStyle="light-content"/>
@@ -1331,7 +1329,6 @@ export default function WheeCrosswords() {
   ); 
 };
 
-
 const styles = StyleSheet.create({
   container: { flex: 1, margin: 4 },
   content: { margin: 5},  
@@ -1368,9 +1365,9 @@ const styles = StyleSheet.create({
   listCard: { width: CARD_WIDTH, backgroundColor: 'rgba(241, 255, 250, 0.84)', marginHorizontal: 7, marginVertical: 7, borderRadius: 12, borderWidth: 2, borderColor: '#259963', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 4, overflow: 'hidden' },
   selectedListCard: { borderColor: '#dc2626', backgroundColor: '#d8ffcf' },
   listRow: { flexDirection: 'row', height: 133 },
-  infoBox: { flex: 1, padding: 7, justifyContent: 'center' },
-  crosswordTitle: { color: '#308d38', fontSize: 12, fontWeight: 'bold', marginBottom: 4 },
-  questionText: { color: '#2b8814', fontSize: 11, fontWeight: 'bold', marginBottom: 5 },
+  infoBox: { flex: 1, padding: 7, alignSelf: 'flex-start' },
+  crosswordTitle: { color: '#07670f', fontSize: 12, fontWeight: 'bold', marginBottom: 4 },
+  questionText: { color: '#2d9912', fontSize: 11, fontWeight: 'bold', marginBottom: 5 },
   typeBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginBottom: 3 },
   crosswordCardFooter: { flexDirection: 'row', justifyContent: 'center', paddingBottom: 9 },
   editBtnCard: { backgroundColor: '#12863f', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },

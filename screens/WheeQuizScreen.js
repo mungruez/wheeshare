@@ -53,13 +53,11 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 
   const getInferredType = (question) => {
     if (!question || !Array.isArray(question.options)) return "long";
-    
     const optionsCount = question.options.filter(option => option?.trim()).length;
     if (optionsCount === 1) return "long";
     if (optionsCount === 2) return "truefalse";
     if (optionsCount === 4) return "single";
     if (optionsCount > 4)  return "multiple";
-    
     return "single";
   };
 
@@ -76,15 +74,12 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   
   const initializeQuizArray = (selectedNum, selectedTimer = timerLimit) => {
     if (!Array.isArray(data) || data.length === 0) return;
-
     const safeSelectedNum = Number.isFinite(selectedNum) ? Math.floor(selectedNum) : data.length;
     const finalCount = Math.max(1, Math.min(data.length, safeSelectedNum));
     const safeTimer = sanitizeTimerSeconds(selectedTimer);
-
     setQnum(finalCount);
     setTimerLimit(safeTimer);
     setTimerInput(String(safeTimer));
-
     const randomIndices = [];
     const usedIndexes = new Set();
 
@@ -96,7 +91,6 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
       usedIndexes.add(nextIndex);
       randomIndices.push(nextIndex);
     }
-
     setQarr(randomIndices);
     setIndex(0);
     setPoints(0);
@@ -105,10 +99,8 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     setQmode("quiz");
   };
 
-
   const currentQuestion = Array.isArray(data) && qarr.length > 0 && index < qarr.length ? data[qarr[index]] : null;
-
-
+  
   useEffect(() => {
     if (selectedAnswerIndex === null || !currentQuestion || answerStatus !== null) return;
 
@@ -180,10 +172,10 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     const timeoutId = setTimeout(() => {
       setCounter((state) => Math.max(0, state - 1));
     }, 1000);
+    
     return () => clearTimeout(timeoutId);
   }, [counter, qmode, currentQuestion, selectedAnswerIndex, answerStatus, index]);
    
-
 
   useEffect(() => {
     if (qmode !== "quiz") return;
@@ -192,14 +184,12 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
       setQmode("results");
       return;
     }
-
     setCounter(timerLimit);
     setSelectedAnswerIndex(null);
     setAnswerStatus(null);
   }, [index, qarr.length, qmode, timerLimit]);
 
  
-
   if (qmode === "start") {
     return (
       <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/quizzes/quizlistbg.png')}>
@@ -294,7 +284,6 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     );
   }
 
-
   if (qmode === "quiz" && !currentQuestion) {
     return (
       <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc' }}>
@@ -302,7 +291,6 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
       </SafeAreaView>
     );
   }
-
 
   if (qmode === "quiz" && currentQuestion) {
     const questionText = currentQuestion?.question || currentQuestion?.q || "Question Prompt Missing";
@@ -468,7 +456,6 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     );
   }
 
-
   if (qmode === "results") {
     return (
       <SafeAreaView style={{ flex: 1, padding: 10, backgroundColor: "#f8fafc" }}>
@@ -563,7 +550,6 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     );
   }
 }
-
 
 const styles = StyleSheet.create({
   imgBackground: { flex: 1, width: '100%', height: '100%' },

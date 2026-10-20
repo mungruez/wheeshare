@@ -372,7 +372,6 @@ export default function ProblemAndSolution() {
     if (!targetSection) return;
 
     const sectionType = targetSection.type;
-
     if (sectionType === SECTION_TYPES.VIDEO || sectionType === SECTION_TYPES.IMAGE) {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
@@ -447,7 +446,6 @@ export default function ProblemAndSolution() {
 
       const fileUri = `${FileSystem.documentDirectory}problem_solution.json`;
       const trackingUri = `${FileSystem.documentDirectory}.ps_user_initialized`;
-      
       const info = await FileSystem.getInfoAsync(fileUri);
       const trackingInfo = await FileSystem.getInfoAsync(trackingUri);
 
@@ -491,7 +489,6 @@ export default function ProblemAndSolution() {
             try {
               const baseDir = `${FileSystem.documentDirectory}problem_solution/`;
               const dirInfo = await FileSystem.getInfoAsync(baseDir);
-                
               if (dirInfo.exists) {
                 const localFolders = await FileSystem.readDirectoryAsync(baseDir);
                 const validIds = loadedItems.map(c => String(c.id).trim());
@@ -529,10 +526,8 @@ export default function ProblemAndSolution() {
     try {
       const fileUri = `${FileSystem.documentDirectory}problem_solution.json`;
       const trackingUri = `${FileSystem.documentDirectory}.ps_user_initialized`;
-      
       await FileSystem.writeAsStringAsync(trackingUri, "true");
       await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(itemsData));
-      
       setPsItems(itemsData);
       parseCategories(itemsData, null);
       
@@ -814,7 +809,6 @@ export default function ProblemAndSolution() {
         };
         
         const itemDir = `${shareDir}item_${itemIdx}/`;
-        
         const processStream = async (sectionsArray, prefix) => {
           return Promise.all(sectionsArray.map(async (section, sectionIdx) => {
             const sectionCopy = { ...section };
@@ -835,13 +829,11 @@ export default function ProblemAndSolution() {
 
         itemCopy.problemSections = await processStream(item.problemSections, 'prob');
         itemCopy.solutionSections = await processStream(item.solutionSections, 'sol');
-        
         await FileSystem.writeAsStringAsync(`${itemDir}item.json`, JSON.stringify(itemCopy));
         return itemCopy;
       });
       
       await Promise.all(exportPromises);
-      
       const manifest = {
         app: 'iDojo_PS',
         version: 1,
@@ -850,7 +842,6 @@ export default function ProblemAndSolution() {
       };
       
       await FileSystem.writeAsStringAsync(`${shareDir}manifest.json`, JSON.stringify(manifest));
-      
       const nakedSource = Platform.OS === 'android' ? shareDir.replace('file://', '').replace(/\/$/, '') : shareDir;
       const nakedTarget = Platform.OS === 'android' ? zipPath.replace('file://', '') : zipPath;
         
@@ -1656,8 +1647,8 @@ const styles = StyleSheet.create({
   verticalWrapper: { width: '100%', alignItems: 'center', paddingVertical: 6 },
   psitemCard: { width: CARD_WIDTH, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, padding: 14, marginHorizontal: 8, borderWidth: 1, borderColor: '#a926dc', elevation: 3 },
   selectedCard: { borderColor: '#b338fa', backgroundColor: '#fcfbfb73', borderWidth: 2 },
-  psCardTitle: { fontSize: 15, fontWeight: 'bold', color: '#261735', marginBottom: 4 },
-  psCardCount: { fontSize: 12, color: '#213b42', marginBottom: 10 },
+  psCardTitle: { fontSize: 15, fontWeight: 'bold', color: '#5e07b4', marginBottom: 4 },
+  psCardCount: { fontSize: 12, color: '#224a55', marginBottom: 10 },
   psCardFooter: { flexDirection: 'row', justifyContent: 'flex-end', width: '76%' },
   editBtnCard: { backgroundColor: '#7821c0', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
   editBtnText: { color: '#edf5ed', fontWeight: 'bold', fontSize: 11 },
