@@ -4,16 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { AdTimer } from './AdTimer';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-  
 
 const BANNER_A_ID = TestIds.BANNER; 
 const REWARDED_A_ID = TestIds.REWARDED;
 
-
 export default function Resources() {
   const [isLoadingAd, setIsLoadingAd] = useState(false);
   const navigation = useNavigation();
-
 
   const handlePress = async () => {
     try {
@@ -28,12 +25,11 @@ export default function Resources() {
     }
   };
   
-
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-
+  
   useEffect(() => {
     let isMounted = true;
     let backupTimer;
@@ -82,6 +78,15 @@ export default function Resources() {
   }, []);
 
 
+  const showEulaModal = () => {
+    Alert.alert(
+      "Terms of Use & EULA",
+      `1. AGE CLASSIFICATION REQUIREMENT: By purchasing, downloading, and using this application, you affirm, represent, and warrant that you are at least 18 years of age. This application targets an adult audience and is strictly restricted from use by individuals under the age of 18.\n\n2. LOCAL STORAGE & DATA USER RESPONSIBILITY: This application operates strictly as a local creation framework tool. All custom moves, fighters, data objects, manifests, and chapters built or imported inside this application are stored exclusively on the user's local device hardware. The developer does not host, stream, view, intercept, or manage user-generated content (UGC) over an external server or cloud database system.\n\n3. CONTENT LIABILITY & IMPORT DISCLAIMER: The user retains 100% individual legal responsibility and liability for all text, files, structural chapters, media assets, and zipped file archives imported into or created within their local application storage space. The developer holds zero liability or responsibility for any user-created, user-imported, or community-shared data structures.\n\n4. TRANSACTIONS AND REFUND POLICY: All financial transactions, application purchases, and licensing rights are executed and managed strictly by the Google Play Billing engine. All refund inquiries, payment processing issues, or transaction updates must comply with and be routed through Google Play's standard consumer terms and conditions.`,
+      [{ text: "I Accept and Agree", style: "default" }]
+    );
+  };  
+
+
   return (
     <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/resbg.png')}>
       <View style={styles.tintOverlay} />
@@ -95,6 +100,10 @@ export default function Resources() {
 
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
           <View style={styles.contentBox}>
+
+            <TouchableOpacity style={styles.eulaButton} onPress={showEulaModal}>
+              <Text style={styles.eulaButtonText}>⚖️ View Terms of Use & EULA (18+)</Text>
+            </TouchableOpacity>
 
             <Text style={styles.title}>
               Thank you for downloading WheeShare the best File Sharing App. Your support helps us continue building a connected, knowledge-sharing community and improving the experience for learners, creators, and collaborators alike. We are grateful to everyone who has contributed time, effort, and insight to bring this platform to life. The free version of wheeShare contains ads the paid version has no ads, improved crosswords and quizzes and a free Hidden Password Manager.
@@ -137,7 +146,7 @@ export default function Resources() {
         <View style={{ flex: 1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center', backgroundColor: #fff}}>
           <BannerAd
             unitId={BANNER_A_ID}
-            size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+            size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
             requestOptions={{requestNonPersonalizedAdsOnly: true}}
           />
         </View>
@@ -148,21 +157,16 @@ export default function Resources() {
 
 
 const styles = StyleSheet.create({
-  imgBackground: {
-    flex: 1,
-    width: '100%',
-    maxHeight: '95%',
-    marginBottom: '5%',
-    backgroundColor: '#07111d',
-  },
+  imgBackground: {flex: 1,width: '100%',maxHeight: '95%',marginBottom: '5%',backgroundColor: '#07111d'},
+  icon: {height: 70,width: '100%',elevation: 3,marginTop: 3,textAlign: 'center'},
+  scrollView: {flexDirection: 'column',marginTop: 5,marginBottom: 1,paddingBottom: 5},
+  eulaButton: {backgroundColor: '#1a331a',borderColor: '#00ff00',borderWidth: 1.5,borderRadius: 8,paddingVertical: 12,paddingHorizontal: 15,marginVertical: 12,alignItems: 'center',shadowColor: '#00ff00',shadowOffset: { width: 0, height: 2 },shadowOpacity: 0.3,shadowRadius: 4,elevation: 4},
+  eulaButtonText: {color: '#00ff00',fontWeight: 'bold',fontSize: 14,textTransform: 'uppercase',letterSpacing: 0.5,},
+  scrollContent: {paddingBottom: 24},
+  safeArea: {flex: 1,height: '100%',marginTop: 7},
   tintOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(7, 15, 24, 0.58)',
-  },
-  safeArea: {
-    flex: 1,
-    height: '100%',
-    marginTop: 7,
   },
   headerWrap: {
     marginBottom: 19,
@@ -202,15 +206,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowRadius: 8,
   },
-  icon: {
-    height: 70,
-    width: '100%',
-    elevation: 3,
-    marginTop: 3,
-    textAlign: 'center',
-  },
-  scrollView: {flexDirection: 'column',marginTop: 5,marginBottom: 1,paddingBottom: 5},
-  scrollContent: {paddingBottom: 24},
   contentBox: {
     marginTop: 2,
     borderColor: 'rgba(255,255,255,0.18)',
@@ -224,62 +219,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 12,
   },
-  quizzes: {
-    textDecorationLine: 'underline',
-    textDecorationColor: '#f3b4c3',
-    color: '#f7d6df',
-    fontSize: 19,
-    fontStyle: 'italic',
-    fontWeight: '700',
-    marginLeft: 20,
-    marginTop: 4,
-    letterSpacing: 0.2,
-  },
-  chapters: {
-    textDecorationLine: 'underline',
-    textDecorationColor: '#f2df75',
-    fontStyle: 'italic',
-    color: '#f2df75',
-    fontSize: 19,
-    fontWeight: '700',
-    marginLeft: 20,
-    marginTop: 4,
-    letterSpacing: 0.2,
-  },
-  crosswords: {
-    textDecorationLine: 'underline',
-    textDecorationColor: '#8ee7a7',
-    fontStyle: 'italic',
-    color: '#8ee7a7',
-    fontSize: 19,
-    fontWeight: '700',
-    marginLeft: 20,
-    marginTop: 4,
-    letterSpacing: 0.2,
-  },
-  problems: {
-    textDecorationLine: 'underline',
-    textDecorationColor: '#d8a8ff',
-    fontStyle: 'italic',
-    fontSize: 19,
-    color: '#d8a8ff',
-    fontWeight: '700',
-    marginLeft: 20,
-    marginTop: 4,
-    letterSpacing: 0.2,
-  },
-  linkButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'center',
-    marginTop: 8,
-    marginBottom: 14,
-    borderRadius: 14,
-    backgroundColor: 'rgba(142, 203, 255, 0.10)',
-    borderWidth: 1,
-    borderColor: 'rgba(142, 203, 255, 0.38)',
-  },
+  quizzes: {textDecorationLine: 'underline',textDecorationColor: '#f3b4c3',color: '#f7d6df',fontSize: 19,fontStyle: 'italic',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
+  chapters: {textDecorationLine: 'underline',textDecorationColor: '#f2df75',fontStyle: 'italic',color: '#f2df75',fontSize: 19,fontWeight: '700',marginLeft: 20, marginTop: 4, letterSpacing: 0.2},
+  crosswords: {textDecorationLine: 'underline',textDecorationColor: '#8ee7a7',fontStyle: 'italic',color: '#8ee7a7',fontSize: 19,fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
+  problems: {textDecorationLine: 'underline',textDecorationColor: '#d8a8ff', fontStyle: 'italic', fontSize: 19,color: '#d8a8ff',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
+  linkButton: {paddingVertical: 12,paddingHorizontal: 18,alignItems: 'center',justifyContent: 'center',alignSelf: 'center',marginTop: 8,marginBottom: 14,borderRadius: 14,backgroundColor: 'rgba(142, 203, 255, 0.10)',borderWidth: 1,borderColor: 'rgba(142, 203, 255, 0.38)'},
   linkText: {color: '#cfe9ff',fontSize: 15,textDecorationLine: 'underline',fontStyle: 'italic',fontWeight: '700'},
 });
