@@ -1,5 +1,5 @@
+import { View, TextInput, StyleSheet, Text, Button, ScrollView, Alert, StatusBar } from 'react-native';
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, TextInput, StyleSheet, Text, Button, ScrollView, Alert } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 
 const ROW_COUNT = 12;
@@ -16,7 +16,6 @@ const normalizePuzzle = (crosswordData) => {
 
 const placeWord = (grid, answer, startx, starty, orientation, fillValue) => {
   if (!answer || startx === undefined || starty === undefined || !['across', 'down'].includes(orientation)) return;
-
   for (let i = 0; i < answer.length; i++) {
     const row = orientation === 'down' ? startx + i : startx;
     const col = orientation === 'across' ? starty + i : starty;
@@ -42,7 +41,7 @@ const generateAnswerGrid = (crosswordData) => {
   const answerGrid = Array(ROW_COUNT).fill(0).map(() => Array(COLUMN_COUNT).fill('.'));
 
   puzzle.forEach(({ answer, startx, starty, orientation }) => {
-    placeWord(answerGrid, answer, startx, starty, orientation, (_, value) => String(value).toUpperCase());
+    placeWord(answerGrid, answer, startx, starty, orientation, (i, value) => String(value[i]).toUpperCase());
   });
 
   return answerGrid;
@@ -129,6 +128,7 @@ const CrosswordGrid = ({ crosswordData }) => {
       {renderQuestions()}
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <StatusBar barStyle="dark-content"/>
         <View style={styles.gridWrapper}>
           {grid.map((row, rowIndex) => (
             <View key={`row-${rowIndex}`} style={styles.row}>

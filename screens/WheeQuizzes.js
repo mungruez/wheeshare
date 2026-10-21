@@ -656,7 +656,7 @@ export default function WheeQuizzes() {
       return false;
     });
     return () => backHandler.remove();
-  }, [mode]);
+  }, []);
   
 
 
@@ -1183,7 +1183,7 @@ export default function WheeQuizzes() {
               <View style={styles.card}>
                 {item && item.category && (
                   <TouchableOpacity
-                    style={{ width: "71%", height: 47 }}
+                    style={{ width: "67%", height: 57 }}
                     onPress={() => { setHquizzes(getQuizzes(item.category, quizzes)); setQuizCategory(item.category); setPrevCategory(item.category); setMode("list"); }}>
                     <ImageBackground
                       style={{ flex: 1, justifyContent:'center', alignItems:'center' }}
@@ -1235,7 +1235,7 @@ const styles = StyleSheet.create({
   iconmain: { height: 57, width: width * 0.83 },
   iconAM: { height: 60, width: width * 0.8 },
   addQuestionBtn: { width: 177, height: 55, borderRadius: 19, marginTop: 7, alignSelf:'center' },
-  header: { paddingHorizontal: 16, marginBottom: 10, width: '100%',backgroundColor: 'rgba(255, 255, 255, 0.06)' },
+  header: { paddingHorizontal: 16, marginBottom: 10, width: '100%'},
   searchRow: { flexDirection: 'row', paddingHorizontal: 9, paddingVertical: 4, gap: 8, marginBottom: .5, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 9, alignItems: 'center', justifyContent: 'center', width: '100%', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
   searchInput: { height: 38, width: '70%', backgroundColor: 'rgba(255, 255, 255, 0.79)', borderRadius: 8, paddingHorizontal: 8, color: 'black', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', fontSize: 11 },
   searchBtn: { width: 39, height: 37, backgroundColor: '#e7f5ed4f', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },

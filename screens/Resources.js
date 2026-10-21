@@ -143,7 +143,7 @@ export default function Resources() {
           </View>
         </ScrollView>
 
-        <View style={{ flex: 1, justifyContent: "space-between", marginTop: 19, alignSelf: 'center', backgroundColor: "#ffffffff", width: '100%' }}>
+        <View style={styles.bannerContainer}>
           <BannerAd
             unitId={BANNER_A_ID}
             size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
@@ -157,13 +157,14 @@ export default function Resources() {
 
 
 const styles = StyleSheet.create({
-  imgBackground: {flex: 1,width: '100%',maxHeight: '95%',marginBottom: '5%',backgroundColor: '#07111d'},
+  imgBackground: { flex: 1, width: '100%', backgroundColor: '#07111d' },
   icon: {height: 70,width: '100%',elevation: 3,marginTop: 3,textAlign: 'center'},
-  scrollView: {flexDirection: 'column',marginTop: 5,marginBottom: 1,paddingBottom: 5},
+  scrollView: { flex: 1, flexDirection: 'column', marginTop: 5, marginBottom: 1, paddingBottom: 5 },
   eulaButton: {backgroundColor: '#1a331a',borderColor: '#00ff00',borderWidth: 1.5,borderRadius: 8,paddingVertical: 12,paddingHorizontal: 15,marginVertical: 12,alignItems: 'center',shadowColor: '#00ff00',shadowOffset: { width: 0, height: 2 },shadowOpacity: 0.3,shadowRadius: 4,elevation: 4},
   eulaButtonText: {color: '#00ff00',fontWeight: 'bold',fontSize: 14,textTransform: 'uppercase',letterSpacing: 0.5,},
   scrollContent: {paddingBottom: 24},
-  safeArea: {flex: 1,height: '100%',marginTop: 7},
+  safeArea: { flex: 1 },
+  bannerContainer: { alignSelf: 'center', backgroundColor: '#ffffffff', width: '100%' },
   tintOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(7, 15, 24, 0.58)',

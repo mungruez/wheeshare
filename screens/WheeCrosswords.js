@@ -942,7 +942,7 @@ export default function WheeCrosswords() {
     });
 
     return () => backHandler.remove();
-  }, [mode]);   
+  }, []);   
   
 
   const MyHeader = () => {
@@ -1013,7 +1013,7 @@ export default function WheeCrosswords() {
               <ImageBackground style={ styles.iconAM } resizeMode='contain' imageStyle={{ opacity: 1 }} source={currentCrossword ? require('../assets/crosswords/editcrosswordtitle.png') : require('../assets/crosswords/addcrosswordtitle.png') } /> 
             </View>
   
-            <TouchableOpacity onPress={() => { resetForm(); setMode(prevMode || "main"); }} style={styles.discardBtn}>
+            <TouchableOpacity onPress={() => { setSelectedIds([]); resetForm(); setMode(prevMode || "main"); }} style={styles.discardBtn}>
               <ImageBackground style={{ alignSelf: 'center', height: 51, width: "100%", opacity: 1}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
               <Text style={styles.discardText}>CANCEL</Text>
             </TouchableOpacity>
@@ -1044,7 +1044,7 @@ export default function WheeCrosswords() {
                     value={questions[0].hint}
                     onChangeText={(text) => {
                       const newQuestions = [...questions];
-                      newQuestions[0].hint = text.trim();
+                      newQuestions[0].hint = text;
                       setQuestions(newQuestions); 
                     }} />
 
@@ -1067,7 +1067,7 @@ export default function WheeCrosswords() {
                     value={questions[1].hint}
                     onChangeText={(text) => {
                       const newQuestions = [...questions];
-                      newQuestions[1].hint = text.trim();
+                      newQuestions[1].hint = text;
                       setQuestions(newQuestions); 
                   }} />
 
@@ -1090,7 +1090,7 @@ export default function WheeCrosswords() {
                     value={questions[2].hint}
                     onChangeText={(text) => {
                       const newQuestions = [...questions];
-                      newQuestions[2].hint = text.trim();
+                      newQuestions[2].hint = text;
                       setQuestions(newQuestions); 
                   }} />
 
@@ -1113,7 +1113,7 @@ export default function WheeCrosswords() {
                     value={questions[3].hint}
                     onChangeText={(text) => {
                       const newQuestions = [...questions];
-                      newQuestions[3].hint = text.trim();
+                      newQuestions[3].hint = text;
                       setQuestions(newQuestions); 
                   }} />
 
@@ -1303,7 +1303,7 @@ export default function WheeCrosswords() {
                 <View style={styles.card}>
                   { item && item.category && 
                     ( <TouchableOpacity
-                    style={{ width: "71%", height: 47 }}
+                    style={{ width: "67%", height: 57 }}
                     onPress={() => { setHcrosswords(getCrosswords(item.category, crosswords)); setCrosswordCategory(item.category); setPrevCategory(item.category); setMode("list"); setPrevMode("main"); }}>
                     <ImageBackground style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} resizeMode='stretch' source={require('../assets/crosswords/greenbtnbg.png')}>
                       {item.id === 'c-all' ? 
@@ -1349,7 +1349,7 @@ const styles = StyleSheet.create({
   searchInput: { height: 38, width: "70%", backgroundColor: 'rgba(255, 255, 255, 0.79)', borderRadius: 8, paddingHorizontal: 8, color: 'black', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', fontSize: 11},
   searchBtn: { width: 39, height: 37, backgroundColor: '#e7f5ed4f', borderRadius: 8, justifyContent: 'center', alignItems: 'center', opacity: 1, paddingHorizontal: 2},
   clearBtn: { width: 32, height: 32, backgroundColor: '#31303080', borderRadius: 8, justifyContent: 'center', alignItems: 'center',},
-  plusIcon: { height: 51, width: 62, backgroundColor: 'rgba(0,0,0,0.57)', borderRadius: 12, marginLeft: 15, marginRight: 7, opacity: 1},
+  plusIcon: { height: 55, width: 67, backgroundColor: 'rgba(0,0,0,0.57)', borderRadius: 12, marginLeft: 15, marginRight: 7, opacity: 1},
   editIcon: { height: 57, width: 55, borderRadius: 4, marginLeft: 12, opacity: 1 },
   infoIcon: { height: 47, width: 47, marginLeft: 21, marginBottom: 5, opacity: 1 },
   importIcon: {height: 51, width: 59, borderRadius: 9, marginLeft: 12 },

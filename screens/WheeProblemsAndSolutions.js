@@ -117,17 +117,22 @@ export default function ProblemAndSolution() {
           clearTimeout(backupTimer);
           if (!isMounted) return;
           setIsLoadingAd(false);
-          rewarded.show();
-          AdTimer.saveTimestamp();
+          rewarded.show()
+            .then(() => AdTimer.saveTimestamp())
+            .catch((error) => {
+              Alert.alert('Failed to show rewarded ad:', error);
+            });
         });
 
-        unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
+        unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
           clearTimeout(backupTimer);
+          Alert.alert('Failed to load rewarded ad:', error);
           if (isMounted) setIsLoadingAd(false);
         });
 
         rewarded.load();
       } catch (error) {
+        Alert.alert('Failed to prepare rewarded ad:', error);
         if (isMounted) setIsLoadingAd(false);
       }
     };
@@ -140,7 +145,7 @@ export default function ProblemAndSolution() {
       unsubscribeLoaded?.();
       unsubscribeError?.();
     };
-  }, [mode]);  
+  }, []);  
 
 
   const getSectionPreviewSource = (section) => {
@@ -895,7 +900,7 @@ export default function ProblemAndSolution() {
       return false;
     });
     return () => backHandler.remove();
-  }, [mode]);
+  }, []);
 
 
 
@@ -1406,7 +1411,7 @@ export default function ProblemAndSolution() {
               <ImageBackground style={styles.iconAM} resizeMode='contain' source={currentPSItem ? require('../assets/problems/editproblemtitle.png') : require('../assets/problems/addproblemtitle.png')} /> 
             </View>
             
-            <TouchableOpacity onPress={() => { if (isPicking || isPickingRef.current) return; setMode(prevMode); resetForm(); }} style={styles.discardBtn}>
+            <TouchableOpacity onPress={() => { if (isPicking || isPickingRef.current) return; setSelectedIds([]); setMode(prevMode); resetForm(); }} style={styles.discardBtn}>
               <ImageBackground style={{ alignSelf:'center', height: 57, width: "100%", opacity: 1}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
               <Text style={styles.discardText}>CANCEL</Text>
             </TouchableOpacity>
@@ -1565,7 +1570,7 @@ export default function ProblemAndSolution() {
               <View style={styles.card}>
                 {item && item.category && (
                   <TouchableOpacity
-                    style={{ width: "72%", height: 47 }}
+                    style={{ width: "69%", height: 59 }}
                     onPress={() => {
                       setHPsItems(getPsItems(item.category, psItems));
                       setPsItemCategory(item.category);
@@ -1627,7 +1632,7 @@ const styles = StyleSheet.create({
   searchBtn: { width: 39, height: 37, backgroundColor: '#e7f5ed4f', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
   clearBtn: { width: 32, height: 32, backgroundColor: '#31303080', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
   dashboardIconsControlsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 1, minHeight: 50, width: '100%', gap: 15, backgroundColor: 'rgba(255, 255, 255, 0.06)' },
-  plusIcon: { width: 45, height: 45, marginRight: 7, marginLeft: 10 },
+  plusIcon: { width: 57, height: 50, marginRight: 7, marginLeft: 10 },
   plusIconAM: { width: 45, height: 44, marginRight: 19 },
   importIcon: { width: 45, height: 45 },
   infoIcon: { width: 45, height: 45 },

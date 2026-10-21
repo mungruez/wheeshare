@@ -1071,7 +1071,7 @@ export default function Chapters() {
       return false;
     });
     return () => backHandler.remove();
-  }, [mode]);
+  }, []);
 
 
   const ChapterCard = ({ item }) => (
