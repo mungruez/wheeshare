@@ -49,6 +49,7 @@ export default function WheeCrosswords() {
 
   const isOffline = useNetInfo().isConnected === false;
   const isLoadingRef = useRef(false);
+  const navigation = useNavigation();
 
 
   const showInstructions = () => {
@@ -935,6 +936,11 @@ export default function WheeCrosswords() {
         setCrosswordCategory("");
         setPrevCategory("");
         setSelectedIds([]);
+        return true;
+      }
+
+      if (navigation.canGoBack()) {
+        navigation.goBack();
         return true;
       }
 

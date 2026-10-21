@@ -1068,6 +1068,11 @@ export default function Chapters() {
         return true;
       }
 
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+        return true;
+      }
+
       return false;
     });
     return () => backHandler.remove();

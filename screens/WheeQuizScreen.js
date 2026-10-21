@@ -1,7 +1,6 @@
-import { StyleSheet, Text, View, Image, Pressable, ImageBackground, FlatList, ScrollView, TextInput } from "react-native";
+import { StyleSheet, Text, View, Image, Pressable, ImageBackground, FlatList, TextInput, StatusBar } from "react-native";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from '@expo/vector-icons'; 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -469,20 +468,19 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
           <Text>Questions Answered</Text>
           <Text>({points}/{answers.length})</Text>
         </View>
-
-        <View style={{ flex: 1, backgroundColor: "white", borderRadius: 7, marginTop: 10, overflow: "hidden" }}>
+  
+        <View style={{ backgroundColor: "white", borderRadius: 7, marginTop: 10, marginBottom: 20, paddingBottom: 76, minHeight: "100%" }}>
           <Text style={{ color: "#E30B5C", fontSize: 15, fontWeight: "700", textAlign: "center", marginTop: 7, textDecorationLine: "underline" }}>Score Card</Text>
 
-          <FlatList
+          <View style={{ flex: 1 }}>
+            <FlatList
             data={answers || []}
             keyExtractor={(item, index) => item.question?.toString() || index.toString()}
-            contentContainerStyle={{ paddingBottom: 16 }}
+            contentContainerStyle={{ paddingBottom: 120 }}
             showsVerticalScrollIndicator={false}
             style={{ flex: 1 }}
             renderItem={({ item }) => {
-              const displayOptions = Array.isArray(item.curra)
-                ? item.curra.map((opt, optIdx) => ({ opt, optIdx })).filter(({ opt }) => opt?.trim())
-                : [];
+              const displayOptions = Array.isArray(item.curra) ? item.curra.map((opt, optIdx) => ({ opt, optIdx })).filter(({ opt }) => opt?.trim()) : [];
               const isLongText = item.inferredType === "long" || !Array.isArray(item.curra) || displayOptions.length === 1;
               const isMultipleAns = item.inferredType === "multiple" || displayOptions.length > 4;
 
@@ -538,6 +536,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
               );
             }}
           />
+          </View>
 
           <View style={{ paddingHorizontal: 16, paddingVertical: 14, borderTopWidth: 1, borderTopColor: "#e2e8f0", backgroundColor: "#fff" }}>
             <Pressable style={{ backgroundColor: "#159215", padding: 12, borderRadius: 9, alignSelf: "center", width: 133, justifyContent: "center" }}

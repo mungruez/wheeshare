@@ -27,6 +27,7 @@ export default function WheeQuizzes() {
   const [squizzes, setSquizzes] = useState([]);
   const isOffline = useNetInfo().isConnected === false;
   const isLoadingRef = useRef(false);
+  const navigation = useNavigation();
 
   const [mode, setMode] = useState("main"); 
   const [prevMode, setPrevMode] = useState("main");
@@ -651,6 +652,11 @@ export default function WheeQuizzes() {
         setQuizCategory('');
         setPrevCategory('');
         setMode('main');
+        return true;
+      }
+
+      if (navigation.canGoBack()) {
+        navigation.goBack();
         return true;
       }
       return false;

@@ -20,7 +20,7 @@ const REWARDED_A_ID = TestIds.REWARDED;
 const CARD_WIDTH = width * 0.76;
 
 
-export default function ProblemAndSolution() {
+export default function WheeProblemsAndSolutions() {
   const [currentPSItem, setCurrentPSItem] = useState(null);
   const [prevMode, setPrevMode] = useState("main");
   const [mode, setMode] = useState("main");
@@ -120,19 +120,19 @@ export default function ProblemAndSolution() {
           rewarded.show()
             .then(() => AdTimer.saveTimestamp())
             .catch((error) => {
-              Alert.alert('Failed to show rewarded ad:', error);
+              Alert.alert('Failed to show rewarded ad:', "Add eventListener Error .");
             });
         });
 
         unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
           clearTimeout(backupTimer);
-          Alert.alert('Failed to load rewarded ad:', error);
+          Alert.alert('Failed to load rewarded ad:', "Add eventListener Error .");
           if (isMounted) setIsLoadingAd(false);
         });
 
         rewarded.load();
       } catch (error) {
-        Alert.alert('Failed to prepare rewarded ad:', error);
+        Alert.alert('Failed to prepare rewarded ad:', "Add Request Error .");
         if (isMounted) setIsLoadingAd(false);
       }
     };
@@ -894,6 +894,11 @@ export default function ProblemAndSolution() {
         setSelectedIds([]);
         setPsItemCategory('');
         setMode('main');
+        return true;
+      }
+
+      if (navigation.canGoBack()) {
+        navigation.goBack();
         return true;
       }
       
