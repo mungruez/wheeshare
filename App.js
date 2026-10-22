@@ -1,18 +1,18 @@
-import { StatusBar } from 'expo-status-bar';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import WheeProblemsAndSolutions from './screens/WheeProblemsAndSolutions';
+import { NavigationContainer } from '@react-navigation/native';
+import mobileAds from 'react-native-google-mobile-ads';
+import WheeCrosswords from './screens/WheeCrosswords';
+import WheeChapters from './screens/WheeChapters';
+import WheeQuizzes from './screens/WheeQuizzes';
 import HomeScreen from './screens/HomeScreen';
 import Resources from './screens/Resources';
-import WheeProblemsAndSolutions from './screens/WheeProblemsAndSolutions';
-import WheeChapters from './screens/WheeChapters';
-import WheeCrosswords from './screens/WheeCrosswords';
-import WheeQuizzes from './screens/WheeQuizzes';
+import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
-import mobileAds from 'react-native-google-mobile-ads';
-
 
 
 const Stack = createNativeStackNavigator();
+
 
 export default function App() {
   useEffect(() => {

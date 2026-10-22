@@ -76,7 +76,7 @@ export default function HomeScreen() {
             disabled={isLoadingAd}>
               { isLoadingAd ? ( <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : ( <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
-                  <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>CHAPTERS</Text>
+                  <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Chapters</Text>
                 </ImageBackground>
               ) }
           </TouchableOpacity>
@@ -87,7 +87,7 @@ export default function HomeScreen() {
             disabled={isLoadingAd}>
               { isLoadingAd ? ( <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : ( <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
-                  <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>CROSSWORDS</Text>
+                  <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Crosswords</Text>
                 </ImageBackground>
               ) }
           </TouchableOpacity>
@@ -98,7 +98,7 @@ export default function HomeScreen() {
             disabled={isLoadingAd}>
               { isLoadingAd ? ( <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : ( <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
-                  <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>QUIZZES</Text>
+                  <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Quizzes</Text>
                 </ImageBackground>
               ) }
           </TouchableOpacity>
@@ -109,7 +109,7 @@ export default function HomeScreen() {
             disabled={isLoadingAd}>
               { isLoadingAd ? ( <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : ( <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
-                  <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>PROBLEMS</Text>
+                  <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Problems</Text>
                 </ImageBackground>
               ) }
           </TouchableOpacity>
@@ -119,7 +119,7 @@ export default function HomeScreen() {
             onPress={()=> navigation.navigate('About')}
             disabled={isLoadingAd}>
               <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
-                <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>ABOUT</Text>
+                <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>About</Text>
               </ImageBackground>
           </TouchableOpacity> 
         </ScrollView>

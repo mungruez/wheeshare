@@ -56,8 +56,8 @@ export default function WheeProblemsAndSolutions() {
 
   const showInstructions = () => {
     Alert.alert(
-      "My Dojo Problems & Solutions List",
-      "Instructions: Save, Edit, View, Share, Delete and Import Problems and Solutions using iDojo. You may add any number of items your phone memory allows. Click the binoculars icon to search items by terms. (1) Use the plus(+) icon to Add Items. Each item splits into a Problem Chapter and a Solution Chapter. A category and title are required. (2) Click category buttons to view items. Press and hold items to activate batch operations. Thank you for using our App.",
+      "Problems & Solutions",
+      "Instructions: Save, edit, view, share, delete, and import problems and solutions in WheeShare. You can add as many items as your device storage allows. Use the binoculars icon to search by keyword.\n\n1. Tap the + button to add an item. Each entry creates both a problem section and a solution section, and both a category and a title are required.\n2. Select a category button to filter your items. Press and hold an item to enable batch actions.\n3. Use the actions in the batch bar to share or delete selected items.\nThank you for using WheeShare.",
       [{ text: "OK", onPress: () => setMode("main"), style: "cancel" }],
       { cancelable: false }
     );
@@ -647,43 +647,43 @@ export default function WheeProblemsAndSolutions() {
     if (isPickingRef.current || isPicking) return;
 
     if (!psItemTitle.trim()) {
-      Alert.alert('Required', 'Please enter a Title');
+      Alert.alert('Required', 'Please enter a title.');
       return;
     }
 
     if (!psItemCategory.trim()) {
-      Alert.alert('Required', 'Please enter a Category');
+      Alert.alert('Required', 'Please enter a category.');
       return;
     }
 
     if (problemSections.length === 0) {
-      Alert.alert('Required', 'Add at least one Problem section.');
+      Alert.alert('Required', 'Add at least one problem section.');
       return;
     }
 
     if (solutionSections.length === 0) {
-      Alert.alert('Required', 'Add at least one Solution section.');
+      Alert.alert('Required', 'Add at least one solution section.');
       return;
     }
 
     for (const section of problemSections) {
       if (!section.title.trim()) {
-        Alert.alert('Required', `Problem section needs a Title`);
+        Alert.alert('Required', 'Each problem section needs a title.');
         return;
       }
       if (!section.mediaUri && !section.mediaUrl?.trim()) {
-        Alert.alert('Required', `Problem section "${section.title}" needs Media`);
+        Alert.alert('Required', `Problem section "${section.title}" requires media.`);
         return;
       }
     }
 
     for (const section of solutionSections) {
       if (!section.title.trim()) {
-        Alert.alert('Required', `Solution section needs a Title`);
+        Alert.alert('Required', 'Each solution section needs a title.');
         return;
       }
       if (!section.mediaUri && !section.mediaUrl?.trim()) {
-        Alert.alert('Required', `Solution section "${section.title}" needs Media`);
+        Alert.alert('Required', `Solution section "${section.title}" requires media.`);
         return;
       }
     }

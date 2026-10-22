@@ -203,22 +203,22 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
             <View style={{ width: '100%', padding: 10, backgroundColor: 'rgba(211, 211, 211, 0.1)', borderRadius: 6, marginTop: 15, borderWidth: 2, borderColor: "#9a9aa1" }}>
               <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5 }}>
                 <Text style={{ color: "#d1fafa", marginRight: 6 }}>•</Text>
-                <Text style={styles.ruleText}>For each correct answer you get 10 points</Text>
+                <Text style={styles.ruleText}>Each correct answer earns 10 points.</Text>
               </View>
 
               <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5 }}>
                 <Text style={{ color: "#d1fafa", marginRight: 6 }}>•</Text>
-                <Text style={styles.ruleText}>There is no negative marking for wrong answers</Text>
+                <Text style={styles.ruleText}>Incorrect answers do not carry a penalty.</Text>
               </View>
 
               <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5 }}>
                 <Text style={{ color: "#d1fafa", marginRight: 6 }}>•</Text>
-                <Text style={styles.ruleText}>Each question has a time limit</Text>
+                <Text style={styles.ruleText}>Each question has a time limit.</Text>
               </View>
 
               <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5 }}>
                 <Text style={{ color: "#d1fafa", marginRight: 6 }}>•</Text>
-                <Text style={styles.ruleText}>You should answer all the questions compulsarily</Text>
+                <Text style={styles.ruleText}>Please answer every question.</Text>
               </View>
             </View>
           </View>

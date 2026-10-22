@@ -106,35 +106,35 @@ export default function Resources() {
             </TouchableOpacity>
 
             <Text style={styles.title}>
-              Thank you for downloading WheeShare the best File Sharing App. Your support helps us continue building a connected, knowledge-sharing community and improving the experience for learners, creators, and collaborators alike. We are grateful to everyone who has contributed time, effort, and insight to bring this platform to life. The free version of wheeShare contains ads the paid version has no ads, improved crosswords and quizzes and a free Hidden Password Manager.
+              Thank you for downloading WheeShare. Your support helps us continue building a connected, knowledge-sharing community and improving the experience for learners, creators, and collaborators alike. We are grateful to everyone who has contributed time, effort, and insight to bring this platform to life. The free version includes ads, while the premium version removes them and includes enhanced crossword and quiz tools, along with a secure hidden password manager.
             </Text>
 
             <Text style={styles.title}>
-              WheeShare does not collect personal data from your device. The app is designed for efficient battery usage, low memory consumption, and smooth performance. Future upgrades will remain free, and we are committed to making the experience both accessible and reliable.
+              WheeShare does not collect personal data from your device. The app is designed for efficient battery usage, low memory consumption, and smooth performance. We plan to keep future updates accessible and reliable, with continued improvements at no extra cost.
             </Text>
 
             <Text style={styles.chapters}>Chapters</Text>
             <Text style={styles.title}>
-              Create, share, edit, view, delete, and import your own chapters in the WheeShare app. Each chapter can include videos, audio files, images, and PDFs in any order, giving you flexibility to organise lessons, courses, albums, events, and other digital content. You may also share individual assets or complete chapters with other WheeShare users, while external sharing is limited to single media files and instructions are provided for supported formats.
+              Create, share, edit, view, delete, and import your own chapters in WheeShare. Each chapter can include videos, audio files, images, and PDFs in any order, giving you flexibility to organise lessons, courses, albums, events, and other digital content. You can also share individual assets or entire chapters with other WheeShare users, while external sharing is limited to single media files and supported formats.
             </Text>
 
             <Text style={styles.problems}>Problems and Solutions</Text>
             <Text style={styles.title}>
-              Add, share, edit, view, delete, and import your own problems and solutions. You can share problem images, videos, or PDFs while viewing a record, enabling collaborative learning and streamlined knowledge exchange. Problems and solutions can be imported and shared securely within the WheeShare ecosystem, with clear guidance provided for supported file types and sharing methods.
+              Add, share, edit, view, delete, and import your own problems and solutions. You can share problem images, videos, or PDFs while reviewing a record, enabling collaborative learning and streamlined knowledge exchange. Problems and solutions can be imported and shared securely within the WheeShare ecosystem, with clear guidance for supported file types and sharing methods.
             </Text>
 
             <Text style={styles.crosswords}>Crosswords</Text>
             <Text style={styles.title}>
-              Build and manage your own crosswords with ease. Each crossword contains a set of four words, and the app supports secure sharing and importing of crossword content within WheeShare. This feature offers a practical and engaging way to reinforce vocabulary, comprehension, and learning through interactive play.
+              Build and manage your own crosswords with ease. Each crossword contains a set of words, and the app supports secure sharing and importing of crossword content within WheeShare. This feature offers an engaging and practical way to strengthen vocabulary, comprehension, and learning.
             </Text>
 
             <Text style={styles.quizzes}>Quizzes</Text>
             <Text style={styles.title}>
-              Create and manage quizzes with multiple question formats in any order. You can add, edit, view, delete, and import quiz content, and share it with other users through the WheeShare platform. Quizzes are designed to support effective learning, assessment, and engagement across a variety of subjects and content types.
+              Create and manage quizzes in multiple formats and any order. You can add, edit, view, delete, and import quiz content, and share it with other users through the WheeShare platform. Quizzes are designed to support effective learning, assessment, and engagement across a wide range of subjects and content types.
             </Text>
 
             <Text style={styles.title}>
-              For best results, use the volume control in the top-right corner to manage audio, and note that videos can be played in slow motion for clearer review. Wi-Fi is primarily used for content sharing, while the premium version removes advertisements for a cleaner experience. It is recommended to clear the app cache in your device settings when needed. Please avoid clearing app data, as this may remove saved passwords, chapters, quizzes, crosswords, and problems.
+              For the best experience, use the volume control in the top-right corner to manage audio. Videos can be played in slow motion for clearer review. Wi-Fi is primarily used for content sharing, while the premium version removes advertisements for a cleaner experience. If needed, clear the app cache from your device settings. Please avoid clearing app data, as this may remove saved passwords, chapters, quizzes, crosswords, and problems.
             </Text>
 
             <TouchableOpacity onPress={handlePress} style={styles.linkButton} accessibilityRole="link">
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   quizzes: {textDecorationLine: 'underline',textDecorationColor: '#dd4848',color: '#ce0a0a',fontSize: 19,fontStyle: 'italic',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
   chapters: {textDecorationLine: 'underline',textDecorationColor: '#ecd866',fontStyle: 'italic',color: '#bba31c',fontSize: 19,fontWeight: '700',marginLeft: 20, marginTop: 4, letterSpacing: 0.2},
   crosswords: {textDecorationLine: 'underline',textDecorationColor: '#4ee97a',fontStyle: 'italic',color: '#0e8d32',fontSize: 19,fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
-  problems: {textDecorationLine: 'underline',textDecorationColor: '#9e5ad6', fontStyle: 'italic', fontSize: 19,color: '#570b96',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
+  problems: {textDecorationLine: 'underline',textDecorationColor: '#9e5ad6', fontStyle: 'italic', fontSize: 19,color: '#7f28c7',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
   linkButton: {paddingVertical: 12,paddingHorizontal: 18,alignItems: 'center',justifyContent: 'center',alignSelf: 'center',marginTop: 8,marginBottom: 14,borderRadius: 14,backgroundColor: 'rgba(142, 203, 255, 0.10)',borderWidth: 1,borderColor: 'rgba(142, 203, 255, 0.38)'},
   linkText: {color: '#9ecef8',fontSize: 15,textDecorationLine: 'underline',fontStyle: 'italic',fontWeight: '700'},
 });

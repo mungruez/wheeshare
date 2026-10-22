@@ -53,7 +53,7 @@ export default function WheeQuizzes() {
   const showInstructions = () => {
     Alert.alert(
       "WheeShare Quizzes",
-      "Instructions: Save, Edit, View, Share, Delete and Import Quiz using WheeShare. You may add any number of Quiz your phone memory allows. Click the binoculars icon to search Quiz by the search term entered. After a search another search can be done by using backspace to remove the search term instead of the silver reload icon.\n(1) Use the green, plus(+) icon in the top menu bar to Add Quiz. Every Quiz must contain four Questions that form a valid quiz, and a Title and a Category. Each of the four words can be ten characters long at most.\n The default allcategories, will be used when a Quiz Category is not entered.\n(2) Click on one of the gold and white buttons on the Quiz Screen to see all Quiz with the same Category. The first Category button in the list is All Categories in gold.\n(3) On the list screen press and hold a Quiz card to see the Batch Bar appear, after select all Quiz to Share or Delete and click on the Share or Delete button in the Batch Bar to share or delete Quiz. Use the green Edit button at the bottom of each Quiz card in the list to edit a Quiz, and to view any Quiz just click on its Quiz card. Quizzes can only be shared and imported with the WheeShare App.\n(4) Scroll horizontally and vertically on the All categories list screen to view All your Quizzes. On the Add Quiz Screen fill out the form and click the Save button to save a Quiz. Thank you for using our App.",
+      "Instructions: Save, edit, view, share, delete, and import quizzes in WheeShare. You can add as many quizzes as your device storage allows. Use the binoculars icon to search by title or keyword. After a search, press backspace to refine the query instead of using the reload icon.\n\n1. Use the green + button in the top menu to add a quiz. Each quiz should include a title, category, and valid set of questions.\n2. Tap a category button to view quizzes in that group. The first option, All Categories, displays every quiz available.\n3. On the list screen, press and hold a quiz card to reveal batch actions. Select quizzes, then choose Share or Delete to manage them. Use the green edit button to update a quiz, or tap the card to open it.\n4. Scroll the category list to browse your quizzes. On the add-quiz screen, complete the form and tap Save to keep your changes. Thank you for using WheeShare.",
       [ { text: "OK",
         onPress: () => setMode("main"),
         style: "cancel" 
@@ -404,24 +404,24 @@ export default function WheeQuizzes() {
     if (isLoadingRef.current || loading) return;
 
     if (!quizTitle.trim()) {
-      Alert.alert('Required', 'Please enter a Quiz Title');
+      Alert.alert('Required', 'Please enter a quiz title.');
       return;
     }
 
     if (!quizCategory.trim()) {
-      Alert.alert('Required', 'Please enter a Quiz Category');
+      Alert.alert('Required', 'Please enter a quiz category.');
       return;
     }
 
     if (!Array.isArray(questionsList) || questionsList.length < 10) {
-      Alert.alert('Required', 'Every Quiz must contain at least 10 Questions');
+      Alert.alert('Required', 'Each quiz must contain at least 10 questions.');
       return;
     }
 
         for (let i = 0; i < questionsList.length; i++) {
       const qitem = questionsList[i];
       if (!Array.isArray(qitem.options) || qitem.options.length === 0) {
-        Alert.alert('Required', `Question #${i + 1} must contain answer options`);
+        Alert.alert('Required', `Question #${i + 1} must include answer options.`);
         return;
       }
       
@@ -444,7 +444,7 @@ export default function WheeQuizzes() {
         const optionText = trimmedOptions[j];
         if (!optionText && !isLongTextLayout) {
           if (isMultipleAnswers) continue;
-          Alert.alert('Required', `Question #${i + 1}, Option #${j + 1} cannot be empty`);
+          Alert.alert('Required', `Question #${i + 1}, option #${j + 1} cannot be empty.`);
           return;
         }
       }

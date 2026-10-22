@@ -20,7 +20,7 @@ const REWARDED_A_ID = TestIds.REWARDED;
 const CARD_WIDTH = width * 0.76;
 
 
-export default function Chapters() {
+export default function WheeChapters() {
   const [mode, setMode] = useState("main");
   const [prevMode, setPrevMode] = useState("main");
   const [chapters, setChapters] = useState([]);
@@ -53,8 +53,8 @@ export default function Chapters() {
 
   const showInstructions = () => {
     Alert.alert(
-      "My Dojo Moves List",
-      "Intructions: Save, Edit, View, Share, Delete and Import Chapters using iDojo. You may add any number of Chapters your phone memory allows. Click the binoculars icon to search Chapters by the search term entered. After a search another search can be done by using backspace to remove the search term instead of the silver reload icon.\n(1) Use the gold, plus(+) icon in the top menu bar to Add Chapters. Every Chapter must contain at least one Section. You can add a Video, Audio, PDF or Image to a Section. A category, title is required for all Chapters and media is required for all Sections of a Chapter. Media in each Section can contain online links or a file uploaded from the phone, not both.\n(2) Click on one of the white and gold buttons on the Chapters Screen to see the List Screen with all Chapters in the same Category.\n(3) On the list screen press and hold a move card to see the batch bar appear, after select all Chapters to share or delete and click on the share or delete button in the batch bar to share or delete Chapters. Use the Edit button at the bottom of each Chapter card in the list to edit a Chapter, and to view any Chapter just click on its Chapter card. When viewing a video Section of a Chapter, click the red arrow to the right to the title to share the individual video. When viewing a Chapters press the square to see full-screen mode appear, then click the red, green or blue share arrow to share a Section. Chapters can be shared and imported with the iDojo App and the WheeShare App, only single videos, images and PDFs can be shared externally.\n(4) The first Category button has All Categories written in gold. Scroll horizontally and vertically on the All categories List Screen to view all Chapters. On the Add Chapters screen fill out the form and click the save button to save Chapters. When adding Sections on the Add Chapter screen click one of the four buttons above the gold save button, to add a Section. The -section icon is provided for removing Sections and next to it is the Change To icons that can be used to change a section type to pdf,image,video or audio. Thank you for using our App.",
+      "WheeShare Chapters",
+      "Instructions: Save, edit, view, share, delete, and import chapters in WheeShare. You can add as many chapters as your device storage allows. Use the binoculars icon to search by title or keyword. After a search, press backspace to refine your query instead of using the reload icon.\n\n1. Tap the gold + button to add a chapter. Every chapter must contain at least one section, and each section can include an image, video, audio file, or PDF. A category and title are required, and each section requires media. Media can be a link or a file stored on your device, but not both.\n2. Select a category button to view chapters in that group.\n3. On the list screen, press and hold a chapter card to reveal batch actions. Select chapters, then choose Share or Delete to manage them. Use the edit button on each card to update a chapter, or tap the card to view it. When viewing a video section, tap the red arrow next to the title to share it. In full-screen mode, use the red, green, or blue share arrow to share an individual section.\n4. The first category button is All Categories. Scroll the list to browse all chapters. On the add-chapter screen, complete the form and tap Save to store the chapter. When adding sections, choose one of the four buttons above the save button to insert a section. Use the section remove icon and the change-type controls to manage sections. Thank you for using WheeShare.",
       [ { text: "OK",
         onPress: () => setMode("main"),
           style: "cancel" 
@@ -1583,7 +1583,7 @@ export default function Chapters() {
            ) }
           /> ) : (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={styles.infoText}>Click on the gold + Chapter icon to add Chapters or use the red folder, import icon to import Chapters. You can share Chapters after adding or importing.</Text>
+            <Text style={styles.infoText}>Tap the gold + chapter button to add a chapter, or use the import icon to bring existing chapters into the app. You can share chapters once they have been added or imported.</Text>
           </View>
         ) }
       </SafeAreaView>

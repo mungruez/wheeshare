@@ -55,7 +55,7 @@ export default function WheeCrosswords() {
   const showInstructions = () => {
     Alert.alert(
       "WheeShare Crosswords",
-      "Instructions: Save, Edit, View, Share, Delete and Import Crosswords using WheeShare. You may add any number of Crosswords your phone memory allows. Click the binoculars icon to search Crosswords by the search term entered. After a search another search can be done by using backspace to remove the search term instead of the silver reload icon.\n(1) Use the green, plus(+) icon in the top menu bar to Add Crossword. Every Crossword must contain four Questions that form a valid crossword, and a Title and a Category. Each of the four words can be ten characters long at most.\n The default allcategories, will be used when a Crossword Category is not entered.\n(2) Click on one of the gold and white buttons on the Crossword Screen to see all Crossword with the same Category. The first Category button in the list is All Categories in gold.\n(3) On the list screen press and hold a Crossword card to see the Batch Bar appear, after select all Crossword to Share or Delete and click on the Share or Delete button in the Batch Bar to share or delete Crossword. Use the green Edit button at the bottom of each Crossword card in the list to edit a Crossword, and to view any Crossword just click on its Crossword card. Crosswords can only be shared and imported with the WheeShare App.\n(4) Scroll horizontally and vertically on the All categories list screen to view All your Crosswords. On the Add Crossword Screen fill out the form and click the Save button to save a Crossword. Thank you for using our App.",
+      "Instructions: Save, edit, view, share, delete, and import crosswords in WheeShare. You can add as many crosswords as your device storage allows. Use the binoculars icon to search by title or keyword. After a search, press backspace to refine your query instead of using the reload icon.\n\n1. Tap the green + button to add a crossword. Every crossword should contain four valid entries, along with a title and category.\n2. Select a category button to view crosswords in that group. The first option, All Categories, displays every crossword available.\n3. On the list screen, press and hold a crossword card to reveal batch actions. Select items, then choose Share or Delete to manage them. Use the green edit button to update a crossword, or tap the card to open it.\n4. Scroll the category list to browse your crosswords. On the add-crossword screen, complete the form and tap Save to keep your changes. Thank you for using WheeShare.",
       [ { text: "OK",
         onPress: () => setMode("main"),
         style: "cancel" 
@@ -592,22 +592,22 @@ export default function WheeCrosswords() {
     if (isLoadingRef.current || loading) return;
 
     if (!crosswordTitle.trim()) {
-      Alert.alert("Missing Title Field", "A Crossword Title is required. Please fill in the Title field."); 
+      Alert.alert("Missing Title", "A crossword title is required. Please enter a title."); 
       return;
     }
 
     if (!crosswordCategory.trim()) {
-      Alert.alert("Missing Category Field", "A Crossword Category is required. Please fill in the Category field."); 
+      Alert.alert("Missing Category", "A crossword category is required. Please enter a category."); 
       return;
     }
 
     for (const question of questions) {
       if (!question.answer.trim()) {
-        Alert.alert('Answer Required', 'All 4 Crosswords Questions require an Answer');
+        Alert.alert('Answer Required', 'Each crossword question requires an answer.');
         return;
       }
       if (!question.hint.trim()) {
-        Alert.alert('Hint Required', `Question "${crosswordTitle}" requires a Hint or an Answer`);
+        Alert.alert('Hint Required', `Question "${crosswordTitle}" requires a hint or answer.`);
         return;
       }
     }
@@ -1327,7 +1327,7 @@ export default function WheeCrosswords() {
                ) }
               /> ) : (
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={styles.infoText}>Click on the green + icon to add Crosswords or use the import icon to import them. You can share Crosswords after adding or importing.</Text>
+                <Text style={styles.infoText}>Tap the green + icon to add a crossword, or use the import icon to bring existing ones into the app. You can share crosswords once they have been added or imported.</Text>
               </View>
             ) }
       </SafeAreaView>
