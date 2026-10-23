@@ -46,7 +46,6 @@ export default function WheeQuizzes() {
   const [multipleanswers, setMultipleAnswers] = useState(false);
   const [longanswer, setLongAnswer] = useState(false);
   const [isLoadingAd, setIsLoadingAd] = useState(false);
-
   const [questionsList, setQuestionsList] = useState([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
   
 
@@ -88,12 +87,10 @@ export default function WheeQuizzes() {
     const loadRewardedAd = async () => {
       try {
         const isEligible = await AdTimer.shouldShowAd();
-
         if (!isEligible || !isMounted) return;
         setIsLoadingAd(true);
         
         const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
-        
         backupTimer = setTimeout(() => {
           if (isMounted) setIsLoadingAd(false);
         }, 2500);
@@ -175,7 +172,6 @@ export default function WheeQuizzes() {
 
       validList?.forEach(m => {
         const currentStyle = m.category || "Enter Category";
-  
         let matches = false;
         const nestedMatch = m.quiz?.some(s => 
           s.question?.toLowerCase().includes(q) ||
@@ -211,6 +207,7 @@ export default function WheeQuizzes() {
   const parseHQuizzes = (quizzesList) => {
     let hQuizzes = [];
     let categoriesSeen = [];
+
     for (let mNum = 0; mNum < quizzesList.length; mNum++) {
       const quizItem = quizzesList[mNum];
       const currentCategory = quizItem.category || "Enter Quiz Category";
@@ -236,7 +233,6 @@ export default function WheeQuizzes() {
     if (cat === "allcategories") return parseHQuizzes(sQuizzes);
     return sQuizzes;
   };
-
 
 
   const loadQuizzes = async () => {
@@ -297,7 +293,6 @@ export default function WheeQuizzes() {
   };
 
 
-
   const saveQuizzesToStorage = async (quizzesData) => {
     try {
       const fileUri = `${FileSystem.documentDirectory}wheequizzes.json`;
@@ -313,8 +308,7 @@ export default function WheeQuizzes() {
       throw e;
     }
   };
-
-  
+ 
 
   const handleSaveQuiz = async (newData) => {
     try {
@@ -344,7 +338,6 @@ export default function WheeQuizzes() {
       setLoading(false);
     }
   };
-
 
   
   const deleteQuizzes = async (idsFromArg = []) => {
@@ -398,7 +391,7 @@ export default function WheeQuizzes() {
     );
   };
 
-
+  
   
   const saveQuiz = async () => {
     if (isLoadingRef.current || loading) return;
@@ -418,7 +411,7 @@ export default function WheeQuizzes() {
       return;
     }
 
-        for (let i = 0; i < questionsList.length; i++) {
+    for (let i = 0; i < questionsList.length; i++) {
       const qitem = questionsList[i];
       if (!Array.isArray(qitem.options) || qitem.options.length === 0) {
         Alert.alert('Required', `Question #${i + 1} must include answer options.`);
@@ -504,12 +497,14 @@ export default function WheeQuizzes() {
     }
   };
 
+
   
   const shareQuizzes = async (quizIds) => {
     if (isOffline) {
       Alert.alert("No Internet", "An internet connection is required to share components.");
       return;
     }
+
     if (!quizIds?.length) return;
     
     let shareDir = null;
@@ -582,6 +577,7 @@ export default function WheeQuizzes() {
         { id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
       ]);
       setMode("add");
+
     } else {
       setCurrentQuiz(quizItem);
       setQuizId(quizItem.id);
@@ -607,12 +603,13 @@ export default function WheeQuizzes() {
 
 
   const resetForm = () => {
-    setCurrentQuiz(null);
-    setQuizId(Date.now().toString());
-    setQuizTitle("");
-    setQuizDesc("");
     if (prevCategory === "allcategories") setQuizCategory("allcategories");
     setQuestionsList([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
+    setQuizId(Date.now().toString());
+    setCurrentQuiz(null);
+    setSelectedIds([]);
+    setQuizTitle("");
+    setQuizDesc("");
   };
 
 
@@ -662,8 +659,7 @@ export default function WheeQuizzes() {
       return false;
     });
     return () => backHandler.remove();
-  }, []);
-  
+  }, []);  
 
 
   const handleImportQuizzes = async () => {
@@ -689,16 +685,13 @@ export default function WheeQuizzes() {
       const importId = Date.now().toString();
       extractDir = `${FileSystem.documentDirectory}imported_quizzes_${importId}/`;
       tempZipPath = `${FileSystem.cacheDirectory}import_quiz_temp_${importId}.zip`;
-      
       await FileSystem.copyAsync({ from: asset.uri, to: tempZipPath });
       await FileSystem.makeDirectoryAsync(extractDir, { intermediates: true });
-      
       const nakedZip = Platform.OS === 'android' ? tempZipPath.replace('file://', '') : tempZipPath;
       const nakedDest = Platform.OS === 'android' ? extractDir.replace('file://', '').replace(/\/$/, '') : extractDir;
-      
       await unzip(nakedZip, nakedDest);
-      
       let manifest = { count: 0 };
+
       try {
         const manifestContent = await FileSystem.readAsStringAsync(`${extractDir}manifest.json`);
         manifest = JSON.parse(manifestContent);
@@ -1055,7 +1048,7 @@ export default function WheeQuizzes() {
               <ImageBackground style={styles.iconAM} resizeMode='contain' source={currentQuiz ? require('../assets/quizzes/editquiztitle.png') : require('../assets/quizzes/addquiztitle.png')} /> 
             </View>
             
-            <TouchableOpacity onPress={() => { resetForm(); setSelectedIds([]); setMode(prevMode); }} style={styles.discardBtn}>
+            <TouchableOpacity onPress={() => { resetForm(); setMode(prevMode); }} style={styles.discardBtn}>
               <ImageBackground style={{ height: 57, width: 57, opacity: 1, marginTop: 7}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
               <Text style={styles.discardText}>CANCEL</Text>
             </TouchableOpacity>

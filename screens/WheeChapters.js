@@ -21,17 +21,15 @@ const CARD_WIDTH = width * 0.76;
 
 
 export default function WheeChapters() {
-  const [mode, setMode] = useState("main");
-  const [prevMode, setPrevMode] = useState("main");
-  const [chapters, setChapters] = useState([]);
   const [currentChapter, setCurrentChapter] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [prevMode, setPrevMode] = useState("main");
+  const [schapters, setSchapters] = useState([]); 
+  const [hchapters, setHchapters] = useState([]);
+  const [chapters, setChapters] = useState([]);
+  const [mode, setMode] = useState("main");
   const navigation = useNavigation();
 
-  const [schapters, setSchapters] = useState([]); 
-  const [hchapters, setHchapters] = useState([]); 
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [selectedSingles, setSelectedSingles] = useState([]);
-  
   const [vcDropdownVisible, setVcDropdownVisible] = useState(true);
   const [activeSectionId, setActiveSectionId] = useState(null);
   const [chapterCategory, setChapterCategory] = useState("");
@@ -47,9 +45,8 @@ export default function WheeChapters() {
   const [sections, setSections] = useState([]);
   
   const isOffline = useNetInfo().isConnected === false;
-  const isLoadingRef = useRef(false);
   const isPickingRef = React.useRef(false);
-
+  const isLoadingRef = useRef(false);
 
   const showInstructions = () => {
     Alert.alert(
@@ -541,14 +538,14 @@ export default function WheeChapters() {
       const importId = Date.now().toString();
       extractDir = `${FileSystem.documentDirectory}imported_chapters_${importId}/`;
       tempZipPath = `${FileSystem.cacheDirectory}import_chapter_temp_${importId}.zip`;
-      
+
       await FileSystem.copyAsync({ from: asset.uri, to: tempZipPath });
       await FileSystem.makeDirectoryAsync(extractDir, { intermediates: true });
-      
+
       const nakedZip = Platform.OS === 'android' ? tempZipPath.replace('file://', '') : tempZipPath;
       const nakedDest = Platform.OS === 'android' ? extractDir.replace('file://', '').replace(/\/$/, '') : extractDir;
-      
       await unzip(nakedZip, nakedDest);
+
       const fixPath = (oldPath) => {
         if (!oldPath || typeof oldPath !== 'string' || oldPath.startsWith('http')) return oldPath;
         const fileName = oldPath.split('/').pop();
@@ -716,6 +713,7 @@ export default function WheeChapters() {
     setSections([]);
     setChapterDesc('');
     setChapterTitle('');
+    setSelectedIds([]);
     setCurrentChapter(null);
     setChapterId(Date.now().toString());
     if(prevCategory === "allcategories") setChapterCategory("allcategories");
@@ -803,9 +801,7 @@ export default function WheeChapters() {
   const getMediaFileExtension = (uri, type) => {
     if (typeof uri === 'string') {
       const nameFromUri = uri.split('/').pop()?.split('?')[0] || '';
-      const extFromName = nameFromUri.includes('.')
-        ? `.${nameFromUri.split('.').pop().toLowerCase()}`
-        : '';
+      const extFromName = nameFromUri.includes('.') ? `.${nameFromUri.split('.').pop().toLowerCase()}` : '';
 
       const supportedExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.mp4', '.mov', '.avi', '.m4a', '.mp3', '.wav', '.pdf', '.aac', '.ogg'];
       if (supportedExts.includes(extFromName)) {
@@ -1036,6 +1032,7 @@ export default function WheeChapters() {
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+
       if (mode === "view") {
         if(openpdfViewer) {
           setOpenpdfViewer(false);
@@ -1084,16 +1081,14 @@ export default function WheeChapters() {
       onLongPress={() => toggleSelect(item.id)}
       onPress={() => selectedIds.length > 0 ? toggleSelect(item.id) : viewChapter(item)}
       style={[styles.itemContainer, selectedIds.includes(item.id) && styles.selectedItem]}>
+        
         <View style={styles.card}>
-  
           <View style={styles.titleBanner}>
             <Text numberOfLines={1} ellipsizeMode="clip" style={styles.titleText}>{item.title}</Text>
           </View>
   
-          <Image style={styles.thumbImage}
-            resizeMode='contain'
-            source={ (() => { return getChapterThumbnail(item); })() } />
-  
+          <Image style={styles.thumbImage} resizeMode='contain' source={ (() => { return getChapterThumbnail(item); })() } />
+          
           <View style = {styles.pillRow}>
             <Text style = {styles.typePill}>Chapter</Text>
             <TouchableOpacity onPress={() => populateForEdit(item, item.category)} style={styles.editIcon}>

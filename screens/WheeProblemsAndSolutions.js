@@ -299,11 +299,12 @@ export default function WheeProblemsAndSolutions() {
 
   const resetForm = () => {
     setCurrentPSItem(null);
-    setPsItemId(Date.now().toString());
     setPsItemTitle('');
     setPsItemDesc('');
+    setSelectedIds([]);
     setProblemSections([]);
     setSolutionSections([]);
+    setPsItemId(Date.now().toString());
     if (prevCategory === "allcategories") setPsItemCategory("allcategories");
   };
 
@@ -442,6 +443,7 @@ export default function WheeProblemsAndSolutions() {
     }
   };
 
+
   
   const loadPsItems = async () => {
     try {
@@ -531,8 +533,10 @@ export default function WheeProblemsAndSolutions() {
     try {
       const fileUri = `${FileSystem.documentDirectory}problem_solution.json`;
       const trackingUri = `${FileSystem.documentDirectory}.ps_user_initialized`;
+
       await FileSystem.writeAsStringAsync(trackingUri, "true");
       await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(itemsData));
+      
       setPsItems(itemsData);
       parseCategories(itemsData, null);
       
@@ -573,6 +577,7 @@ export default function WheeProblemsAndSolutions() {
       setLoading(false);
     }
   };
+
 
 
   const deletePsItems = async (idsFromArg = []) => {
@@ -641,6 +646,7 @@ export default function WheeProblemsAndSolutions() {
       ]
     );
   };
+
 
     
   const savePSItem = async () => {
@@ -874,6 +880,7 @@ export default function WheeProblemsAndSolutions() {
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+
       if (openpdfViewer !== null) {
         setOpenpdfViewer(null);
         return true;
@@ -883,6 +890,7 @@ export default function WheeProblemsAndSolutions() {
         setVcDropdownVisible(true);
         return true;
       }
+
       if (mode === 'add') {
         if (isPickingRef.current || isPicking) return true;
         if (isLoadingRef.current) return true;
@@ -890,6 +898,7 @@ export default function WheeProblemsAndSolutions() {
         resetForm();
         return true;
       }
+
       if (mode === 'list') {
         setSelectedIds([]);
         setPsItemCategory('');
@@ -1416,7 +1425,7 @@ export default function WheeProblemsAndSolutions() {
               <ImageBackground style={styles.iconAM} resizeMode='contain' source={currentPSItem ? require('../assets/problems/editproblemtitle.png') : require('../assets/problems/addproblemtitle.png')} /> 
             </View>
             
-            <TouchableOpacity onPress={() => { if (isPicking || isPickingRef.current) return; setSelectedIds([]); setMode(prevMode); resetForm(); }} style={styles.discardBtn}>
+            <TouchableOpacity onPress={() => { if (isPicking || isPickingRef.current) return; setMode(prevMode); resetForm(); }} style={styles.discardBtn}>
               <ImageBackground style={{ alignSelf:'center', height: 57, width: "100%", opacity: 1}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
               <Text style={styles.discardText}>CANCEL</Text>
             </TouchableOpacity>

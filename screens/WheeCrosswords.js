@@ -557,9 +557,10 @@ export default function WheeCrosswords() {
 
 
   const resetForm = () => {
+    setQuestions([{answer: "", hint: "", startx: "", starty: "", orientation: "", position: 1}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: 2}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: 3}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: 4}]);
     if(prevCategory === "allcategories") setCrosswordCategory("allcategories");
     setCurrentCrossword(null);
-    setQuestions([{answer: "", hint: "", startx: "", starty: "", orientation: "", position: 1}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: 2}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: 3}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: 4}]);
+    setSelectedIds([]);
   };
 
 
@@ -789,11 +790,10 @@ export default function WheeCrosswords() {
       
       await FileSystem.copyAsync({ from: asset.uri, to: tempZipPath });
       await FileSystem.makeDirectoryAsync(extractDir, { intermediates: true });
-      
       const nakedZip = Platform.OS === 'android' ? tempZipPath.replace('file://', '') : tempZipPath;
       const nakedDest = Platform.OS === 'android' ? extractDir.replace('file://', '').replace(/\/$/, '') : extractDir;
-      
       await unzip(nakedZip, nakedDest);
+
       const fixPath = (oldPath) => {
         if (!oldPath || typeof oldPath !== 'string' || oldPath.startsWith('http')) return oldPath;
         const fileName = oldPath.split('/').pop();
@@ -809,9 +809,7 @@ export default function WheeCrosswords() {
       }
       
       const rawCrosswords = [];
-      const crosswordDirs = manifest.count > 0 
-        ? Array.from({length: manifest.count}, (_, i) => `crossword_${i}/`) 
-        : [''];
+      const crosswordDirs = manifest.count > 0 ? Array.from({length: manifest.count}, (_, i) => `crossword_${i}/`) : [''];
       
       for (const dir of crosswordDirs) {
         const crosswordPath = `${extractDir}${dir}crossword.json`;
@@ -891,10 +889,8 @@ export default function WheeCrosswords() {
     let str = "";
     if(txt) {
       let end = txt.length;
-          
-      if(end > 19) {
-        end = 19;
-          
+      if(end > 57) {
+        end = 57;
         for(let index=0; index < end-4; index++) {
           str+=txt[index];
         }
@@ -961,7 +957,6 @@ export default function WheeCrosswords() {
 
   const CrosswordCard = ({ item }) => {
     const isSelected = selectedIds.includes(item.id);
-
     return (
       <TouchableOpacity
         style={[styles.listCard, isSelected && styles.selectedListCard]}
@@ -1019,7 +1014,7 @@ export default function WheeCrosswords() {
               <ImageBackground style={ styles.iconAM } resizeMode='contain' imageStyle={{ opacity: 1 }} source={currentCrossword ? require('../assets/crosswords/editcrosswordtitle.png') : require('../assets/crosswords/addcrosswordtitle.png') } /> 
             </View>
   
-            <TouchableOpacity onPress={() => { setSelectedIds([]); resetForm(); setMode(prevMode || "main"); }} style={styles.discardBtn}>
+            <TouchableOpacity onPress={() => { resetForm(); setMode(prevMode || "main"); }} style={styles.discardBtn}>
               <ImageBackground style={{ alignSelf: 'center', height: 51, width: "100%", opacity: 1}} imageStyle={{ opacity: 1 }} resizeMode='contain' source={require('../assets/discardicon.png')}/>
               <Text style={styles.discardText}>CANCEL</Text>
             </TouchableOpacity>
@@ -1179,7 +1174,6 @@ export default function WheeCrosswords() {
                       </ScrollView>
                     </View>
                   )}
-
                 </View>
               </ScrollView>
             </SafeAreaView>
@@ -1370,10 +1364,10 @@ const styles = StyleSheet.create({
   goldDivider: {width: '57%', height: 43, alignSelf: 'center', marginVertical: 15, shadowColor: '#edf7d6', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 10, opacity: 1},
   listCard: { width: CARD_WIDTH, backgroundColor: 'rgba(241, 255, 250, 0.84)', marginHorizontal: 7, marginVertical: 7, borderRadius: 12, borderWidth: 2, borderColor: '#259963', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 4, overflow: 'hidden' },
   selectedListCard: { borderColor: '#dc2626', backgroundColor: '#d8ffcf' },
-  listRow: { flexDirection: 'row', height: 133 },
+  listRow: { flexDirection: 'column', height: 133 },
   infoBox: { flex: 1, padding: 7, alignSelf: 'flex-start' },
-  crosswordTitle: { color: '#07670f', fontSize: 12, fontWeight: 'bold', marginBottom: 4 },
-  questionText: { color: '#2d9912', fontSize: 11, fontWeight: 'bold', marginBottom: 5 },
+  crosswordTitle: { color: '#0c5012', fontSize: 12, fontWeight: 'bold', marginBottom: 4 },
+  questionText: { color: '#248f0a', fontSize: 11, fontWeight: 'bold', marginBottom: 5 },
   typeBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginBottom: 3 },
   crosswordCardFooter: { flexDirection: 'row', justifyContent: 'center', paddingBottom: 9 },
   editBtnCard: { backgroundColor: '#12863f', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
