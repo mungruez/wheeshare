@@ -476,7 +476,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
            <FlatList
             data={answers || []}
             keyExtractor={(item, index) => item.question?.toString() || index.toString()}
-            contentContainerStyle={{ paddingBottom: 40 }}
+            contentContainerStyle={{ paddingBottom: 38 }}
             showsVerticalScrollIndicator={false}
             style={{ flex: 1 }}
             renderItem={({ item }) => {
