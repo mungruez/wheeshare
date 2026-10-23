@@ -26,6 +26,7 @@ export default function WheeQuizzes() {
   
   const [squizzes, setSquizzes] = useState([]);
   const isOffline = useNetInfo().isConnected === false;
+  const lastBackPress = useRef<number>(0);
   const isLoadingRef = useRef(false);
   const navigation = useNavigation();
 
@@ -631,6 +632,14 @@ export default function WheeQuizzes() {
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+
+      const now = Date.now();
+      if(now - lastBackPress.current < 760) {
+        return true;
+      }
+
+      lastBackPress.current = now;
+
       if (mode === 'view') {
         setCurrentQuiz(null);
         setMode('list');

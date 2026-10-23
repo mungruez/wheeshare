@@ -46,6 +46,7 @@ export default function WheeChapters() {
   
   const isOffline = useNetInfo().isConnected === false;
   const isPickingRef = React.useRef(false);
+  const lastBackPress = useRef<number>(0);
   const isLoadingRef = useRef(false);
 
   const showInstructions = () => {
@@ -1032,6 +1033,13 @@ export default function WheeChapters() {
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+
+      const now = Date.now();
+      if(now - lastBackPress.current < 760) {
+        return true;
+      }
+
+      lastBackPress.current = now;
 
       if (mode === "view") {
         if(openpdfViewer) {

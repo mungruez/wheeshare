@@ -24,6 +24,8 @@ export default function WheeProblemsAndSolutions() {
   const [currentPSItem, setCurrentPSItem] = useState(null);
   const [prevMode, setPrevMode] = useState("main");
   const [mode, setMode] = useState("main");
+
+  const lastBackPress = useRef<number>(0);
   const navigation = useNavigation();
   const isPickingRef = useRef(false);
   const isLoadingRef = useRef(false);
@@ -49,7 +51,6 @@ export default function WheeProblemsAndSolutions() {
   const [solutionSections, setSolutionSections] = useState([]);
   const [activeSectionId, setActiveSectionId] = useState(null);
   const [problemSections, setProblemSections] = useState([]);
-  const [isLoadingAd, setIsLoadingAd] = useState(false);
   const isOffline = useNetInfo().isConnected === false;
   const [isPicking, setIsPicking] = useState(false);
 
@@ -94,58 +95,54 @@ export default function WheeProblemsAndSolutions() {
   };
 
 
-  useEffect(() => {
-    let isMounted = true;
-    let backupTimer;
-    let unsubscribeLoaded;
-    let unsubscribeError;
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+      let unsubscribeLoaded;
+      let unsubscribeError;
 
-    const loadRewardedAd = async () => {
-      try {
-        const isEligible = await AdTimer.shouldShowAd();
+      const loadRewardedAd = async () => {
+        try {
+          const isEligible = await AdTimer.shouldShowAd();
 
-        if (!isEligible || !isMounted) return;
-        setIsLoadingAd(true);
-        
-        const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
-        
-        backupTimer = setTimeout(() => {
-          if (isMounted) setIsLoadingAd(false);
-        }, 2500);
+          if (!isEligible || !isActive) return;
 
-        unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-          clearTimeout(backupTimer);
-          if (!isMounted) return;
-          setIsLoadingAd(false);
-          rewarded.show()
-            .then(() => AdTimer.saveTimestamp())
-            .catch((error) => {
-              Alert.alert('Failed to show rewarded ad:', "Add eventListener Error .");
-            });
-        });
+          const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
 
-        unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
-          clearTimeout(backupTimer);
-          Alert.alert('Failed to load rewarded ad:', "Add eventListener Error .");
-          if (isMounted) setIsLoadingAd(false);
-        });
+          unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+            if (!isActive) return;
+            rewarded.show()
+              .then(() => AdTimer.saveTimestamp())
+              .catch((error) => {
+                if (isActive) {
+                  Alert.alert('Failed to show rewarded ad', error?.message || String(error));
+                }
+              });
+          });
 
-        rewarded.load();
-      } catch (error) {
-        Alert.alert('Failed to prepare rewarded ad:', "Add Request Error .");
-        if (isMounted) setIsLoadingAd(false);
-      }
-    };
+          unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
+            if (isActive) {
+              Alert.alert('Failed to load rewarded ad', error?.message || String(error));
+            }
+          });
 
-    loadRewardedAd();
+          rewarded.load();
+        } catch (error) {
+          if (isActive) {
+            Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
+          }
+        }
+      };
 
-    return () => {
-      isMounted = false;
-      clearTimeout(backupTimer);
-      unsubscribeLoaded?.();
-      unsubscribeError?.();
-    };
-  }, []);  
+      loadRewardedAd();
+
+      return () => {
+        isActive = false;
+        unsubscribeLoaded?.();
+        unsubscribeError?.();
+      };
+    }, [])
+  );
 
 
   const getSectionPreviewSource = (section) => {
@@ -881,6 +878,13 @@ export default function WheeProblemsAndSolutions() {
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
 
+      const now = Date.now();
+      if(now - lastBackPress.current < 760) {
+        return true;
+      }
+
+      lastBackPress.current = now;
+
       if (openpdfViewer !== null) {
         setOpenpdfViewer(null);
         return true;
@@ -911,7 +915,7 @@ export default function WheeProblemsAndSolutions() {
         return true;
       }
       
-      return false;
+      return true;
     });
     return () => backHandler.remove();
   }, []);
