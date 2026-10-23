@@ -949,7 +949,7 @@ export default function WheeCrosswords() {
         return true;
       }
 
-      return false;
+      return true;
     });
 
     return () => backHandler.remove();

@@ -1078,7 +1078,7 @@ export default function WheeChapters() {
         return true;
       }
 
-      return false;
+      return true;
     });
     return () => backHandler.remove();
   }, []);

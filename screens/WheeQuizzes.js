@@ -665,8 +665,10 @@ export default function WheeQuizzes() {
         navigation.goBack();
         return true;
       }
-      return false;
+
+      return true;
     });
+    
     return () => backHandler.remove();
   }, []);  
 
