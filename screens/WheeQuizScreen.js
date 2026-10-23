@@ -469,14 +469,14 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
           <Text>({points}/{answers.length})</Text>
         </View>
   
-        <View style={{ backgroundColor: "white", borderRadius: 7, marginTop: 10, marginBottom: 20, paddingBottom: 76, minHeight: "100%" }}>
+        <View style={{ backgroundColor: "white", borderRadius: 7, marginTop: 10, marginBottom: 7, paddingBottom: 2, maxHeight: "87%" }}>
           <Text style={{ color: "#E30B5C", fontSize: 15, fontWeight: "700", textAlign: "center", marginTop: 7, textDecorationLine: "underline" }}>Score Card</Text>
 
-          <View style={{ flex: 1 }}>
-            <FlatList
+          <View style={{ flex: 1, maxHeight: "76%" }}>
+           <FlatList
             data={answers || []}
             keyExtractor={(item, index) => item.question?.toString() || index.toString()}
-            contentContainerStyle={{ paddingBottom: 120 }}
+            contentContainerStyle={{ paddingBottom: 40 }}
             showsVerticalScrollIndicator={false}
             style={{ flex: 1 }}
             renderItem={({ item }) => {
@@ -534,14 +534,17 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
                   )}
                 </View>
               );
-            }}
-          />
+            }}/>
           </View>
 
-          <View style={{ paddingHorizontal: 16, paddingVertical: 14, borderTopWidth: 1, borderTopColor: "#e2e8f0", backgroundColor: "#fff" }}>
-            <Pressable style={{ backgroundColor: "#159215", padding: 12, borderRadius: 9, alignSelf: "center", width: 133, justifyContent: "center" }}
+          <View style={{ paddingHorizontal: 7, paddingVertical: 1, borderTopWidth: 1, borderTopColor: "#d6dbe2", backgroundColor: "#e1e1f8" }}>
+            <Pressable style={{ backgroundColor: "#089908", padding: 7, borderRadius: 9, alignSelf: "center", width: 133, justifyContent: "center" }}
               onPress={() => { setQmode("start"); }}>
               <Text style={{ color: "white", textAlign: "center", fontWeight: "700", fontSize: 13 }}>Restart Quiz</Text>
+            </Pressable>
+            <Pressable style={{ backgroundColor: "#5e1919", padding: 7, borderRadius: 9, alignSelf: "center", width: 133, justifyContent: "center", marginTop: 6 }}
+              onPress={() => { if (onBackToDashboard) {onBackToDashboard();  navigation.goBack();}}}>
+              <Text style={{ color: "white", textAlign: "center", fontWeight: "700", fontSize: 13 }}>Back</Text>
             </Pressable>
           </View>
         </View>
