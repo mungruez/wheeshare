@@ -41,11 +41,14 @@
     },
     "plugins": [
       [
-        "react-native-google-mobile-ads",
+        "expo-build-properties",
         {
-          "androidAppId": "ca-app-pub-5022889398292450~5423408529"
+          "android": {
+            "multiDexEnabled": true
+          }
         }
       ],
+      "react-native-google-mobile-ads", 
       "expo-video",
       "expo-audio",
       "expo-asset",
@@ -62,7 +65,6 @@
     },
     "owner": "mungruez"
   },
-  
   "react-native-google-mobile-ads": {
     "android_app_id": "ca-app-pub-5022889398292450~5423408529"
   }
