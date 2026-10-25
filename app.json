@@ -1,79 +1,73 @@
 {
-  "expo": {
-    "name": "WheeShare",
-    "slug": "wheeshare",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/wheesharelauncher.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/icon.png",
-      "resizeMode": "contain",
+  "name": "WheeShare",
+  "slug": "wheeshare",
+  "version": "1.0.0",
+  "orientation": "portrait",
+  "icon": "./assets/wheesharelauncher.png",
+  "userInterfaceStyle": "light",
+  "newArchEnabled": true,
+  "splash": {
+    "image": "./assets/icon.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#F0EFEA"
+  },
+  "assetBundlePatterns": [
+    "**/*"
+  ],
+  "ios": {
+    "supportsTablet": true,
+    "infoPlist": {
+      "UIBackgroundModes": [
+        "audio"
+      ]
+    }
+  },
+  "android": {
+    "softwareKeyboardLayoutMode": "pan",
+    "package": "dojosoft.zaakirmungrue.wheeshare",
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/wheesharelauncher.png",
       "backgroundColor": "#F0EFEA"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true,
-      "infoPlist": {
-        "UIBackgroundModes": [
-          "audio"
-        ]
-      }
-    },
-    "android": {
-      "softwareKeyboardLayoutMode": "pan",
-      "package": "dojosoft.zaakirmungrue.wheeshare",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/wheesharelauncher.png",
-        "backgroundColor": "#F0EFEA"
-      },
-      "permissions": [
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS",
-        "android.permission.READ_MEDIA_IMAGES",
-        "android.permission.READ_MEDIA_VIDEO",
-        "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
-      ]
-    },
-    "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "multiDexEnabled": true,
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35,
-            "buildToolsVersion": "35.0.0"
-          }
-        }
-      ],
-      "expo-video",
-      "expo-audio",
-      "expo-asset",
-      "expo-image-picker",
-      "expo-sharing",
-      "expo-status-bar",
-      "@config-plugins/react-native-blob-util",
-      "@config-plugins/react-native-pdf",
-      "react-native-google-mobile-ads"
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "364bec3e-dd73-4059-98b0-b395f4384fc4"
-      },
-      "react-native-google-mobile-ads": {
-        "android_app_id": "ca-app-pub-5022889398292450~5423408529",
-        "ios_app_id": "ca-app-pub-3940256099942544~1458002511"
-      }
-    },
-    "owner": "mungruez"
+    "permissions": [
+      "android.permission.RECORD_AUDIO",
+      "android.permission.MODIFY_AUDIO_SETTINGS",
+      "android.permission.READ_MEDIA_IMAGES",
+      "android.permission.READ_MEDIA_VIDEO",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+    ]
   },
-  "react-native-google-mobile-ads": {
-    "android_app_id": "ca-app-pub-5022889398292450~5423408529",
-    "ios_app_id": "ca-app-pub-3940256099942544~1458002511"
-  }
-}   
+  "plugins": [
+    [
+      "expo-build-properties",
+      {
+        "android": {
+          "multiDexEnabled": true,
+          "compileSdkVersion": 35,
+          "targetSdkVersion": 35,
+          "buildToolsVersion": "35.0.0"
+        }
+      }
+    ],
+    "expo-video",
+    "expo-audio",
+    "expo-asset",
+    "expo-image-picker",
+    "expo-sharing",
+    "expo-status-bar",
+    "@config-plugins/react-native-blob-util",
+    "@config-plugins/react-native-pdf",
+    "react-native-google-mobile-ads"
+  ],
+  "extra": {
+    "eas": {
+      "projectId": "364bec3e-dd73-4059-98b0-b395f4384fc4"
+    },
+    "react-native-google-mobile-ads": {
+      "androidAppId": "ca-app-pub-5022889398292450~5423408529",
+      "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+    }
+  },
+  "owner": "mungruez"
+}
