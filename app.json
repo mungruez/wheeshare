@@ -44,15 +44,11 @@
         "expo-build-properties",
         {
           "android": {
-            "multiDexEnabled": true
+            "multiDexEnabled": true,
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0"
           }
-        }
-      ],
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-5022889398292450~5423408529",
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511" 
         }
       ],
       "expo-video",
@@ -62,13 +58,22 @@
       "expo-sharing",
       "expo-status-bar",
       "@config-plugins/react-native-blob-util",
-      "@config-plugins/react-native-pdf"
+      "@config-plugins/react-native-pdf",
+      "react-native-google-mobile-ads"
     ],
     "extra": {
       "eas": {
         "projectId": "364bec3e-dd73-4059-98b0-b395f4384fc4"
+      },
+      "react-native-google-mobile-ads": {
+        "android_app_id": "ca-app-pub-5022889398292450~5423408529",
+        "ios_app_id": "ca-app-pub-3940256099942544~1458002511"
       }
     },
     "owner": "mungruez"
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-5022889398292450~5423408529",
+    "ios_app_id": "ca-app-pub-3940256099942544~1458002511"
   }
-}
+}   
