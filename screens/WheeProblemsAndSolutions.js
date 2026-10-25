@@ -35,6 +35,7 @@ export default function WheeProblemsAndSolutions() {
   const [psItems, setPsItems] = useState([]);
 
   const [loading, setLoading] = useState(false);
+  const [loadedAd, setLoadedAd] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [openpdfViewer, setOpenpdfViewer] = useState(null);
@@ -98,31 +99,25 @@ export default function WheeProblemsAndSolutions() {
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
-      let unsubscribeLoaded;
-      let unsubscribeError;
+      let rewarded = null;
+      let unsubscribeLoaded = null;
+      let unsubscribeError = null;
 
-      const loadRewardedAd = async () => {
+      const prepareRewardedAd = async () => {
         try {
           const isEligible = await AdTimer.shouldShowAd();
-
           if (!isEligible || !isActive) return;
 
-          const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+          rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
 
           unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
             if (!isActive) return;
-            rewarded.show()
-              .then(() => AdTimer.saveTimestamp())
-              .catch((error) => {
-                if (isActive) {
-                  Alert.alert('Failed to show rewarded ad', error?.message || String(error));
-                }
-              });
+            setLoadedAd(rewarded);
           });
 
           unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
             if (isActive) {
-              Alert.alert('Failed to load rewarded ad', error?.message || String(error));
+              console.error('Ad failed to load: ', error);
             }
           });
 
@@ -134,15 +129,47 @@ export default function WheeProblemsAndSolutions() {
         }
       };
 
-      loadRewardedAd();
+      prepareRewardedAd();
 
       return () => {
         isActive = false;
-        unsubscribeLoaded?.();
-        unsubscribeError?.();
+        if (unsubscribeLoaded) unsubscribeLoaded();
+        if (unsubscribeError) unsubscribeError();
+        setLoadedAd(null); // Clear reference on blur
       };
     }, [])
   );
+
+
+  useEffect(() => {
+    if (!loadedAd) return;
+
+    let isMounted = true;
+
+    const displayAd = async () => {
+      try {
+        await loadedAd.show();
+        if (isMounted) {
+          await AdTimer.saveTimestamp();
+        }
+      } catch (error) {
+        if (isMounted) {
+          Alert.alert('Failed to show rewarded ad', error?.message || String(error));
+        }
+      }
+    };
+
+    
+    const timeoutId = setTimeout(() => {
+      displayAd();
+    }, 250);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
+  }, [loadedAd]);
+
 
 
   const getSectionPreviewSource = (section) => {

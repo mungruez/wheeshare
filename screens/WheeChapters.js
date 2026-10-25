@@ -34,7 +34,6 @@ export default function WheeChapters() {
   const [activeSectionId, setActiveSectionId] = useState(null);
   const [chapterCategory, setChapterCategory] = useState("");
   const [openpdfViewer, setOpenpdfViewer] = useState(null);
-  const [isLoadingAd, setIsLoadingAd] = useState(false);
   const [prevCategory, setPrevCategory] = useState("");
   const [chapterTitle, setChapterTitle] = useState("");
   const [chapterDesc, setChapterDesc] = useState("");
@@ -42,6 +41,7 @@ export default function WheeChapters() {
   const [isPicking, setIsPicking] = useState(false);
   const [chapterId, setChapterId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadedAd, setLoadedAd] = useState(null);
   const [sections, setSections] = useState([]);
   
   const isOffline = useNetInfo().isConnected === false;
@@ -78,53 +78,77 @@ export default function WheeChapters() {
   };
 
 
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+      let rewarded = null;
+      let unsubscribeLoaded = null;
+      let unsubscribeError = null;
+
+      const prepareRewardedAd = async () => {
+        try {
+          const isEligible = await AdTimer.shouldShowAd();
+          if (!isEligible || !isActive) return;
+
+          rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+
+          unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+            if (!isActive) return;
+            setLoadedAd(rewarded);
+          });
+
+          unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
+            if (isActive) {
+              console.error('Ad failed to load: ', error);
+            }
+          });
+
+          rewarded.load();
+        } catch (error) {
+          if (isActive) {
+            Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
+          }
+        }
+      };
+
+      prepareRewardedAd();
+
+      return () => {
+        isActive = false;
+        if (unsubscribeLoaded) unsubscribeLoaded();
+        if (unsubscribeError) unsubscribeError();
+        setLoadedAd(null); 
+      };
+    }, [])
+  );
+
+
   useEffect(() => {
+    if (!loadedAd) return;
     let isMounted = true;
-    let backupTimer;
-    let unsubscribeLoaded;
-    let unsubscribeError;
 
-    const loadRewardedAd = async () => {
+    const displayAd = async () => {
       try {
-        const isEligible = await AdTimer.shouldShowAd();
-
-        if (!isEligible || !isMounted) return;
-        setIsLoadingAd(true);
-        
-        const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
-        
-        backupTimer = setTimeout(() => {
-          if (isMounted) setIsLoadingAd(false);
-        }, 2500);
-
-        unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-          clearTimeout(backupTimer);
-          if (!isMounted) return;
-          setIsLoadingAd(false);
-          rewarded.show();
-          AdTimer.saveTimestamp();
-        });
-
-        unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
-          clearTimeout(backupTimer);
-          if (isMounted) setIsLoadingAd(false);
-        });
-
-        rewarded.load();
+        await loadedAd.show();
+        if (isMounted) {
+          await AdTimer.saveTimestamp();
+        }
       } catch (error) {
-        if (isMounted) setIsLoadingAd(false);
+        if (isMounted) {
+          Alert.alert('Failed to show rewarded ad', error?.message || String(error));
+        }
       }
     };
 
-    loadRewardedAd();
+    const timeoutId = setTimeout(() => {
+      displayAd();
+    }, 250);
 
     return () => {
       isMounted = false;
-      clearTimeout(backupTimer);
-      unsubscribeLoaded?.();
-      unsubscribeError?.();
+      clearTimeout(timeoutId);
     };
-  }, [mode]);
+  }, [loadedAd]);
 
 
   const parseCategories = (list, query) => {
