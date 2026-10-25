@@ -1,6 +1,6 @@
 import * as FileSystem from 'expo-file-system/legacy';
 
-const FILE_PATH = `${FileSystem.documentDirectory}last_ad_time.txt`;
+const FILE_PATH = FileSystem.documentDirectory.endsWith('/') ? `${FileSystem.documentDirectory}last_ad_time.txt` : `${FileSystem.documentDirectory}/last_ad_time.txt`;
 const COOLDOWN_TIME_MS = 5 * 60 * 1000; 
 
 export const AdTimer = {
@@ -32,7 +32,7 @@ export const AdTimer = {
       const currentTime = Date.now().toString();
       await FileSystem.writeAsStringAsync(FILE_PATH, currentTime);
     } catch (error) {
-      
+
     }
   }
 };

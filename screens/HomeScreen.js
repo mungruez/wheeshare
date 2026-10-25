@@ -3,7 +3,6 @@ import { RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from
 import React, { useLayoutEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import * as FileSystem from 'expo-file-system/legacy';
 import { AdTimer } from './AdTimer';
   
 const BANNER_A_ID = TestIds.BANNER; 
@@ -17,31 +16,51 @@ export default function HomeScreen() {
     navigation.setOptions({ headerShown: false,});
   }, []);
 
-  const handleNavigate = async (scrname) => {
+ const handleNavigate = async (scrname) => {
     try {
       const isEligible = await AdTimer.shouldShowAd();
 
       if (isEligible) {
         setIsLoadingAd(true);
         const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+        
+        let unsubscribeLoaded = null;
+        let unsubscribeError = null;
+        let backupTimer = null;
 
-        const backupTimer = setTimeout(() => {
+        const cleanUp = () => {
+          if (backupTimer) clearTimeout(backupTimer);
+          if (unsubscribeLoaded) unsubscribeLoaded();
+          if (unsubscribeError) unsubscribeError();
+        };
+
+        backupTimer = setTimeout(() => {
+          cleanUp();
           setIsLoadingAd(false);
           navigation.navigate(scrname);
         }, 2500);
 
-        rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-          clearTimeout(backupTimer);
+        unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+          cleanUp();
           setIsLoadingAd(false);
+          
           try {
-            rewarded.show();
-            AdTimer.saveTimestamp(); 
+            rewarded.show()
+              .then(() => {
+                AdTimer.saveTimestamp();
+              })
+              .catch(() => {
+              
+              });
           } catch (showError) {}
-          navigation.navigate(scrname);
+
+          requestAnimationFrame(() => {
+            navigation.navigate(scrname);
+          });
         });
 
-        rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
-          clearTimeout(backupTimer);
+        unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
+          cleanUp();
           setIsLoadingAd(false);
           navigation.navigate(scrname); 
         });
