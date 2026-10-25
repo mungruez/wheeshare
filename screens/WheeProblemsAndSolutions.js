@@ -1084,7 +1084,7 @@ export default function WheeProblemsAndSolutions() {
   
   const MyHeader = () => (
     <View style={styles.problemsDivider}>
-      <ImageBackground style={{width: "100%", height: "100%"}} resizeMode="cover" source={require('../assets/problems/problemsdivider.png')}/>
+      <ImageBackground style={{width: "100%", height: "100%"}} resizeMode="contain" source={require('../assets/problems/problemsdivider.png')}/>
     </View>
   );
 
@@ -1527,7 +1527,7 @@ export default function WheeProblemsAndSolutions() {
               </View>
 
               <TouchableOpacity style={styles.saveBtnBlock} onPress={savePSItem}>
-                <ImageBackground style={{ height: 48, width: "95%", justifyContent: 'center', alignItems: 'center' }} resizeMode='contain' source={require('../assets/problems/saveproblemandsolutionbtn.png')}>
+                <ImageBackground style={{ height: 83, width: "100%", justifyContent: 'center', alignItems: 'center' }} resizeMode='contain' source={require('../assets/problems/saveproblemandsolutionbtn.png')}>
                 </ImageBackground>
               </TouchableOpacity>
             </ScrollView>
@@ -1603,7 +1603,7 @@ export default function WheeProblemsAndSolutions() {
                       { item.id === 'ps-all' ? 
                         ( <Image
                           resizeMode="contain"
-                          style={{ height: "57%", width: "63%", alignSelf:"center"}}
+                          style={{ height: "52%", width: "59%", alignSelf:"center"}}
                           source={require('../assets/allstyles.png')}
                         /> ) : (
                           <Text
@@ -1655,11 +1655,11 @@ const styles = StyleSheet.create({
   importIcon: { width: 45, height: 45 },
   infoIcon: { width: 45, height: 45 },
   silverDivider: { width: '99%', height: 10, alignSelf: 'center', marginVertical: 5 },
-  problemsDivider: { width: '67%', height: 34, alignSelf: 'center', marginVertical: 5 },
+  problemsDivider: { width: '59%', height: 34, alignSelf: 'center', marginVertical: 5 },
   smallGap: { height: 12 },
   card: { width: '100%', alignItems: 'center', marginVertical: 6 },
+  cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#fefeff', paddingHorizontal: 5,  opacity: 1, textAlign: "center", textShadowColor: '#a8889e', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7},
   centerNotificationFlexPanel: { flex: 1, paddingHorizontal: 30, justifyContent: 'center', alignItems: 'center' },
-  cardTextMenuTitle: { width: "100%", fontSize: 15, fontWeight: '800', color: '#5a4f07', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
   infoTextDashboardFallback: { color: '#b155fc', textAlign: 'center', fontSize: 13, lineHeight: 18 },
   categoryHeaderText: { color: '#9e37f3', fontSize: 12, flex: 1, textTransform: 'uppercase', fontWeight: "500" },
   flatlistContainer: { flex: 1, width: '100%' },
@@ -1726,7 +1726,7 @@ const styles = StyleSheet.create({
   orText: { color: '#c89eeb', fontWeight: 'bold', fontSize: 16, marginTop: 19, marginBottom: -7, marginLeft: 38 },
   toggleModeBtn: { alignSelf: 'center', marginTop: 45, marginBottom: 19, padding: 5, backgroundColor: 'rgba(186, 55, 212, 0.12)', borderRadius: 6, borderWidth: 1, borderColor: 'rgba(149, 55, 212, 0.5)', flexDirection: "row" },
   toggleModeText: { color: '#c89eeb', fontSize: 14, fontWeight: '600', marginLeft: 4 },
-  saveBtnBlock: { width: 152, height: 57, borderRadius: 10, alignSelf:'center', marginTop: 25, marginBottom: 20 },
+  saveBtnBlock: { width: 190, height: 114, borderRadius: 10, alignSelf:'center', marginTop: 25, marginBottom: 19 },
   saveBtnTextInternal: { color: '#c89eeb', fontWeight: 'bold', fontSize: 14, letterSpacing: 1 },
   loadingOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '93%', backgroundColor: 'rgba(19, 19, 19, 0.76)', alignItems: 'center', justifyContent: 'center', zIndex: 19, elevation: 50 },
   loadingText: { color: '#9e37f3', fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7 },

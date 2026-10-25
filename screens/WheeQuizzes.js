@@ -1202,7 +1202,7 @@ export default function WheeQuizzes() {
                       { item.id === 'q-all' ? 
                         ( <Image
                           resizeMode="contain"
-                          style={{ height: "57%", width: "63%", alignSelf:"center"}}
+                          style={{ height: "52%", width: "59%", alignSelf:"center"}}
                           source={require('../assets/allstyles.png')}
                         /> ) : (
                           <Text
@@ -1259,7 +1259,7 @@ const styles = StyleSheet.create({
   quizzesDivider: { width: '67%', height: 30, alignSelf: 'center', marginVertical: 5 },
   smallGap: { height: 12 },
   card: { width: '100%', alignItems: 'center', marginVertical: 6 },
-  cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#fefeff', paddingHorizontal: 5,  opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7},
+  cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#fefeff', paddingHorizontal: 5,  opacity: 1, textAlign: "center", textShadowColor: '#a8a681', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7},
   categoryMenuSelectionRowItem: { width: '80%', height: 55, justifyContent: 'center', alignItems: 'center' },
   cardTextMenuTitle: { color: '#313030', fontWeight: 'bold', fontSize: 15, textAlign: 'center', width: '90%' },
   centerNotificationFlexPanel: { flex: 1, paddingHorizontal: 30, justifyContent: 'center', alignItems: 'center' },
