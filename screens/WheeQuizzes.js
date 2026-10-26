@@ -129,6 +129,7 @@ export default function WheeQuizzes() {
     }, [])
   );
 
+
   useEffect(() => {
     if (!loadedAd || !rewarded) return;
     let isMounted = true;
@@ -148,7 +149,7 @@ export default function WheeQuizzes() {
 
     const timeoutId = setTimeout(() => {
       displayAd();
-    }, 760);
+    }, 570);
 
     return () => {
       isMounted = false;
