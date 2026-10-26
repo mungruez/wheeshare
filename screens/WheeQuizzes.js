@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator, Pressable } from 'react-native';
-import { RewardedAd, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import { RewardedAd, TestIds, RewardedAdEventType, InterstitialAd, AdEventType } from 'react-native-google-mobile-ads';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,6 +16,9 @@ import { AdTimer } from './AdTimer';
 const { height, width } = Dimensions.get('window');
 const REWARDED_A_ID = TestIds.REWARDED;
 const CARD_WIDTH = width * 0.76;
+const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID, {
+  requestNonPersonalizedAdsOnly: true,
+});
 
 
 export default function WheeQuizzes() {
@@ -82,25 +85,27 @@ export default function WheeQuizzes() {
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
-      let rewarded = null;
       let unsubscribeLoaded = null;
       let unsubscribeError = null;
+      let unsubscribeReward = null; 
 
       const prepareRewardedAd = async () => {
         try {
           const isEligible = await AdTimer.shouldShowAd();
           if (!isEligible || !isActive) return;
 
-          rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+          unsubscribeReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+            Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
+          });
 
           unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
             if (!isActive) return;
-            setLoadedAd(rewarded);
+            setLoadedAd(true);
           });
 
           unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
             if (isActive) {
-              console.error('Ad failed to load: ', error);
+              Alert.alert('Failed to load rewarded ad', error?.message || String(error));
             }
           });
 
@@ -118,19 +123,19 @@ export default function WheeQuizzes() {
         isActive = false;
         if (unsubscribeLoaded) unsubscribeLoaded();
         if (unsubscribeError) unsubscribeError();
-        setLoadedAd(null); 
+        if (unsubscribeReward) unsubscribeReward(); 
+        setLoadedAd(false); 
       };
     }, [])
   );
 
-
   useEffect(() => {
-    if (!loadedAd) return;
+    if (!loadedAd || !rewarded) return;
     let isMounted = true;
 
     const displayAd = async () => {
       try {
-        await loadedAd.show();
+        await rewarded.show();
         if (isMounted) {
           await AdTimer.saveTimestamp();
         }
@@ -143,14 +148,14 @@ export default function WheeQuizzes() {
 
     const timeoutId = setTimeout(() => {
       displayAd();
-    }, 250);
+    }, 760);
 
     return () => {
       isMounted = false;
       clearTimeout(timeoutId);
     };
   }, [loadedAd]);
-  
+
   
   const handleMultipleChoiceClick = () => {
     if(!multiplechoice) setMultipleChoice(true);

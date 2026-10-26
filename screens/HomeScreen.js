@@ -1,71 +1,91 @@
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator } from 'react-native';
-import { RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
-import React, { useLayoutEffect, useState } from 'react';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator, Alert } from 'react-native';
+import { InterstitialAd, AdEventType, RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import React, { useLayoutEffect, useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { AdTimer } from './AdTimer';
+
   
 const BANNER_A_ID = TestIds.BANNER; 
+const INTERSTITIAL_A_ID = TestIds.INTERSTITIAL;
 const REWARDED_A_ID = TestIds.REWARDED;
+
+const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID, {
+  requestNonPersonalizedAdsOnly: true,
+});
+
 
 export default function HomeScreen() {
   const [isLoadingAd, setIsLoadingAd] = useState(false);
+  const [isAdLoaded, setIsAdLoaded] = useState(false);
+  const [isLoadingTransition, setIsLoadingTransition] = useState(false);
   const navigation = useNavigation();
 
+  
   useLayoutEffect(()=> {
     navigation.setOptions({ headerShown: false,});
   }, []);
 
- const handleNavigate = async (scrname) => {
+
+  const handleNavigateInterstitial = async (scrname) => {
     try {
       const isEligible = await AdTimer.shouldShowAd();
 
       if (isEligible) {
         setIsLoadingAd(true);
-        const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+
+        const interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_A_ID, {
+          requestNonPersonalizedAdsOnly: true
+        });
         
         let unsubscribeLoaded = null;
         let unsubscribeError = null;
+        let unsubscribeClosed = null; 
         let backupTimer = null;
 
         const cleanUp = () => {
           if (backupTimer) clearTimeout(backupTimer);
           if (unsubscribeLoaded) unsubscribeLoaded();
           if (unsubscribeError) unsubscribeError();
+          if (unsubscribeClosed) unsubscribeClosed();
         };
 
         backupTimer = setTimeout(() => {
           cleanUp();
           setIsLoadingAd(false);
           navigation.navigate(scrname);
-        }, 2500);
+        }, 3000);
 
-        unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-          cleanUp();
+      
+        unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
           setIsLoadingAd(false);
-          
           try {
-            rewarded.show()
+            interstitial.show()
               .then(() => {
                 AdTimer.saveTimestamp();
               })
               .catch(() => {
-              
+                cleanUp();
+                navigation.navigate(scrname);
               });
-          } catch (showError) {}
-
-          requestAnimationFrame(() => {
+          } catch (showError) {
+            cleanUp();
             navigation.navigate(scrname);
-          });
+          }
         });
 
-        unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
+        unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+          cleanUp();
+          navigation.navigate(scrname);
+        });
+
+        unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, () => {
           cleanUp();
           setIsLoadingAd(false);
           navigation.navigate(scrname); 
         });
 
-        rewarded.load();
+        interstitial.load();
       } else {
         navigation.navigate(scrname);
       }
@@ -74,6 +94,60 @@ export default function HomeScreen() {
       navigation.navigate(scrname);
     }
   };
+
+
+  useEffect(() => {
+    const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+      setIsAdLoaded(true);
+      setIsLoadingTransition(false);
+    });
+
+    const unsubscribeReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+      Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
+    });
+
+    const unsubscribeClosed = rewarded.addAdEventListener(RewardedAdEventType.CLOSED, () => {
+      setIsAdLoaded(false);
+      rewarded.load(); 
+    });
+
+    const unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
+      Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
+      setIsLoadingTransition(false);
+    });
+
+    rewarded.load();
+
+    return () => {
+      unsubscribeLoaded();
+      unsubscribeReward();
+      unsubscribeClosed();
+      unsubscribeError();
+    };
+  }, []);
+
+
+  const handleNavigate = async (scrname) => {
+    try {
+      const isEligible = await AdTimer.shouldShowAd();
+
+      if (isEligible && isAdLoaded) {
+        setIsLoadingTransition(true);
+        
+        await rewarded.show();
+        await AdTimer.saveTimestamp();
+        
+        setIsLoadingTransition(false);
+        navigation.navigate(scrname);
+      } else {
+        navigation.navigate(scrname);
+      }
+    } catch (error) {
+      setIsLoadingTransition(false);
+      navigation.navigate(scrname);
+    }
+  };
+
 
   return (
     <ImageBackground style={ styles.imgBackground } imageStyle={{ opacity: 1.0 }} resizeMode='cover' source={require('../assets/homescreen.png')}>
@@ -135,7 +209,7 @@ export default function HomeScreen() {
             
           <TouchableOpacity
             style={styles.buttonimage}
-            onPress={()=> navigation.navigate('About')}
+            onPress={()=> handleNavigateInterstitial('About')}
             disabled={isLoadingAd}>
               <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
                 <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>About</Text>

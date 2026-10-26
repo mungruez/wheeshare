@@ -84,6 +84,7 @@ export default function WheeChapters() {
       let rewarded = null;
       let unsubscribeLoaded = null;
       let unsubscribeError = null;
+      let unsubscribeReward = null; 
 
       const prepareRewardedAd = async () => {
         try {
@@ -92,6 +93,10 @@ export default function WheeChapters() {
 
           rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
 
+          unsubscribeReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+            Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
+          });
+
           unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
             if (!isActive) return;
             setLoadedAd(rewarded);
@@ -99,7 +104,7 @@ export default function WheeChapters() {
 
           unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
             if (isActive) {
-              console.error('Ad failed to load: ', error);
+              Alert.alert('Failed to load rewarded ad', error?.message || String(error));
             }
           });
 
@@ -117,12 +122,13 @@ export default function WheeChapters() {
         isActive = false;
         if (unsubscribeLoaded) unsubscribeLoaded();
         if (unsubscribeError) unsubscribeError();
+        if (unsubscribeReward) unsubscribeReward(); 
         setLoadedAd(null); 
       };
     }, [])
   );
 
-
+  
   useEffect(() => {
     if (!loadedAd) return;
     let isMounted = true;
@@ -142,7 +148,7 @@ export default function WheeChapters() {
 
     const timeoutId = setTimeout(() => {
       displayAd();
-    }, 250);
+    }, 777);
 
     return () => {
       isMounted = false;

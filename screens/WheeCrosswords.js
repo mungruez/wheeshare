@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator } from 'react-native';
-import { RewardedAd, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import { RewardedAd, TestIds, RewardedAdEventType, InterstitialAd, AdEventType } from 'react-native-google-mobile-ads';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -22,6 +22,7 @@ const COLUMN_COUNT = 12;
 const CALCULATED_CELL_SIZE = (SCREEN_WIDTH - (GRID_PADDING * 2)) / COLUMN_COUNT;
 const CELL_SIZE = Math.max(CALCULATED_CELL_SIZE, 21);
 const REWARDED_A_ID = TestIds.REWARDED;
+const INTERSTITIAL_A_ID = TestIds.INTERSTITIAL;
 
 
 export default function WheeCrosswords() {
@@ -67,77 +68,74 @@ export default function WheeCrosswords() {
 
 
   useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-      let rewarded = null;
-      let unsubscribeLoaded = null;
-      let unsubscribeError = null;
+  useCallback(() => {
+    let isActive = true;
+    let interstitial = null;
+    let unsubscribeLoaded = null;
+    let unsubscribeError = null;
 
-      const prepareRewardedAd = async () => {
-        try {
-          const isEligible = await AdTimer.shouldShowAd();
-          if (!isEligible || !isActive) return;
-
-          rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
-
-          unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-            if (!isActive) return;
-            setLoadedAd(rewarded);
-          });
-
-          unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
-            if (isActive) {
-              console.error('Ad failed to load: ', error);
-            }
-          });
-
-          rewarded.load();
-        } catch (error) {
-          if (isActive) {
-            Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
-          }
-        }
-      };
-
-      prepareRewardedAd();
-
-      return () => {
-        isActive = false;
-        if (unsubscribeLoaded) unsubscribeLoaded();
-        if (unsubscribeError) unsubscribeError();
-        setLoadedAd(null);
-      };
-    }, [])
-  );
-
-
-  useEffect(() => {
-    if (!loadedAd) return;
-
-    let isMounted = true;
-
-    const displayAd = async () => {
+    const prepareInterstitialAd = async () => {
       try {
-        await loadedAd.show();
-        if (isMounted) {
-          await AdTimer.saveTimestamp();
-        }
+        const isEligible = await AdTimer.shouldShowAd();
+        if (!isEligible || !isActive) return;
+        interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_A_ID);
+
+        unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+          if (!isActive) return;
+          setLoadedAd(interstitial);
+        });
+
+        unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
+          if (isActive) {
+            Alert.alert('Failed to load interstitial ad', error?.message || String(error));
+          }
+        });
+
+        interstitial.load();
       } catch (error) {
-        if (isMounted) {
-          Alert.alert('Failed to show rewarded ad', error?.message || String(error));
+        if (isActive) {
+          Alert.alert('Failed to prepare interstitial ad', error?.message || String(error));
         }
       }
-    };  
-    
-    const timeoutId = setTimeout(() => {
-      displayAd();
-    }, 250);
+    };
+
+    prepareInterstitialAd();
 
     return () => {
-      isMounted = false;
-      clearTimeout(timeoutId);
+      isActive = false;
+      if (unsubscribeLoaded) unsubscribeLoaded();
+      if (unsubscribeError) unsubscribeError();
+      setLoadedAd(null); 
     };
-  }, [loadedAd]);
+  }, [])
+);
+
+useEffect(() => {
+  if (!loadedAd) return;
+  let isMounted = true;
+
+  const displayAd = async () => {
+    try {
+      await loadedAd.show();
+      if (isMounted) {
+        await AdTimer.saveTimestamp();
+      }
+    } catch (error) {
+      if (isMounted) {
+        Alert.alert('Failed to show interstitial ad', error?.message || String(error));
+      }
+    }
+  };
+
+  const timeoutId = setTimeout(() => {
+    displayAd();
+  }, 250);
+
+  return () => {
+    isMounted = false;
+    clearTimeout(timeoutId);
+  };
+}, [loadedAd]);
 
 
   const canPlaceWord = (word, gridT, startX, startY, orientation, requireCrossing) => {
