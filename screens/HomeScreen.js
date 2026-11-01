@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator, Alert } from 'react-native';
 import { InterstitialAd, AdEventType, RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
-import React, { useLayoutEffect, useState, useEffect } from 'react';
+import React, { useLayoutEffect, useState, useEffect, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { AdTimer } from './AdTimer';
@@ -10,17 +10,14 @@ const BANNER_A_ID = TestIds.BANNER;
 const INTERSTITIAL_A_ID = TestIds.INTERSTITIAL;
 const REWARDED_A_ID = TestIds.REWARDED;
 
-const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID, {
-  requestNonPersonalizedAdsOnly: true,
-});
-
 
 export default function HomeScreen() {
   const [isLoadingAd, setIsLoadingAd] = useState(false);
   const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [isLoadingTransition, setIsLoadingTransition] = useState(false);
   const navigation = useNavigation();
-
+  const rewardedAdRef = useRef(null);
+  
   
   useLayoutEffect(()=> {
     navigation.setOptions({ headerShown: false,});
@@ -96,33 +93,51 @@ export default function HomeScreen() {
   };
 
 
+
+  const loadNewRewardedAd = () => {
+    try {
+      const instance = RewardedAd.createForAdRequest(REWARDED_A_ID, {
+        requestNonPersonalizedAdsOnly: true,
+      });
+
+      const unsubscribeLoaded = instance.addAdEventListener(RewardedAdEventType.LOADED, () => {
+        setIsAdLoaded(true);
+        setIsLoadingTransition(false);
+      });
+
+      const unsubscribeReward = instance.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+        Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
+      });
+
+      const unsubscribeClosed = instance.addAdEventListener(AdEventType.CLOSED, () => {
+        setIsAdLoaded(false);
+        unsubscribeLoaded();
+        unsubscribeReward();
+        unsubscribeClosed();
+        unsubscribeError();
+        loadNewRewardedAd(); 
+      });
+
+      const unsubscribeError = instance.addAdEventListener(AdEventType.ERROR, (error) => {
+        Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
+        setIsLoadingTransition(false);
+      });
+
+      instance.load();
+      rewardedAdRef.current = instance;
+
+    } catch (error) {
+      if (isActive) {
+        Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
+      }
+    }
+  };
+
+
   useEffect(() => {
-    const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-      setIsAdLoaded(true);
-      setIsLoadingTransition(false);
-    });
-
-    const unsubscribeReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-      Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
-    });
-
-    const unsubscribeClosed = rewarded.addAdEventListener(RewardedAdEventType.CLOSED, () => {
-      setIsAdLoaded(false);
-      rewarded.load(); 
-    });
-
-    const unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
-      Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
-      setIsLoadingTransition(false);
-    });
-
-    rewarded.load();
-
+    loadNewRewardedAd();
     return () => {
-      unsubscribeLoaded();
-      unsubscribeReward();
-      unsubscribeClosed();
-      unsubscribeError();
+      
     };
   }, []);
 
@@ -130,11 +145,9 @@ export default function HomeScreen() {
   const handleNavigate = async (scrname) => {
     try {
       const isEligible = await AdTimer.shouldShowAd();
-
-      if (isEligible && isAdLoaded) {
+      if (isEligible && isAdLoaded && rewardedAdRef.current) {
         setIsLoadingTransition(true);
-        
-        await rewarded.show();
+        await rewardedAdRef.current.show();
         await AdTimer.saveTimestamp();
         
         setIsLoadingTransition(false);

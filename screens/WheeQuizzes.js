@@ -16,9 +16,6 @@ import { AdTimer } from './AdTimer';
 const { height, width } = Dimensions.get('window');
 const REWARDED_A_ID = TestIds.REWARDED;
 const CARD_WIDTH = width * 0.76;
-const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID, {
-  requestNonPersonalizedAdsOnly: true,
-});
 
 
 export default function WheeQuizzes() {
@@ -32,6 +29,7 @@ export default function WheeQuizzes() {
   const lastBackPress = useRef<number>(0);
   const isLoadingRef = useRef(false);
   const navigation = useNavigation();
+  const rewardedAdRef = useRef(null);
 
   const [mode, setMode] = useState("main"); 
   const [prevMode, setPrevMode] = useState("main");
@@ -91,6 +89,10 @@ export default function WheeQuizzes() {
 
       const prepareRewardedAd = async () => {
         try {
+          const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID, {
+            requestNonPersonalizedAdsOnly: true,
+          });
+              
           const isEligible = await AdTimer.shouldShowAd();
           if (!isEligible || !isActive) return;
 
@@ -103,13 +105,14 @@ export default function WheeQuizzes() {
             setLoadedAd(true);
           });
 
-          unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
+          unsubscribeError = rewarded.addAdEventListener(AdEventType.ERROR, (error) => {
             if (isActive) {
               Alert.alert('Failed to load rewarded ad', error?.message || String(error));
             }
           });
 
           rewarded.load();
+          rewardedAdRef.current = instance;
         } catch (error) {
           if (isActive) {
             Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
@@ -136,7 +139,7 @@ export default function WheeQuizzes() {
 
     const displayAd = async () => {
       try {
-        await rewarded.show();
+        await rewardedAdRef.current.show();
         if (isMounted) {
           await AdTimer.saveTimestamp();
         }
