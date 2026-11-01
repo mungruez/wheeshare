@@ -47,7 +47,10 @@ export default function WheeChapters() {
   const isOffline = useNetInfo().isConnected === false;
   const isPickingRef = React.useRef(false);
   const lastBackPress = useRef<number>(0);
+  const rewardedAdRef = useRef(null);
+  const isAdReadyRef = useRef(false);
   const isLoadingRef = useRef(false);
+
 
   const showInstructions = () => {
     Alert.alert(
@@ -78,83 +81,68 @@ export default function WheeChapters() {
   };
 
 
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-      let rewarded = null;
-      let unsubscribeLoaded = null;
-      let unsubscribeError = null;
-      let unsubscribeReward = null; 
+  const loadNewRewardedAd = () => {
+    if (isAdReadyRef.current) return;
 
-      const prepareRewardedAd = async () => {
-        try {
-          const isEligible = await AdTimer.shouldShowAd();
-          if (!isEligible || !isActive) return;
+    try {
+      const instance = RewardedAd.createForAdRequest(REWARDED_A_ID, {
+        requestNonPersonalizedAdsOnly: true,
+      });
 
-          rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
+      const unsubscribeLoaded = instance.addAdEventListener(RewardedAdEventType.LOADED, () => {
+        isAdReadyRef.current = true;
+      });
 
-          unsubscribeReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-            Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
-          });
+      const unsubscribeReward = instance.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
+        Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
+      });
+      
+      const unsubscribeClosed = instance.addAdEventListener(AdEventType.CLOSED, () => {
+        isAdReadyRef.current = false;
+        rewardedAdRef.current = null;
+        unsubscribeLoaded();
+        unsubscribeReward();
+        unsubscribeClosed();
+        unsubscribeError();
+        loadNewRewardedAd(); 
+      });
 
-          unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-            if (!isActive) return;
-            setLoadedAd(rewarded);
-          });
+      const unsubscribeError = instance.addAdEventListener(AdEventType.ERROR, (error) => {
+        Alert.alert("Ad Error", error.message || "Could not load rewarded ad.");
+        isAdReadyRef.current = false;
+        rewardedAdRef.current = null;
+      });
 
-          unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
-            if (isActive) {
-              Alert.alert('Failed to load rewarded ad', error?.message || String(error));
-            }
-          });
+      instance.load();
+      rewardedAdRef.current = instance;
 
-          rewarded.load();
-        } catch (error) {
-          if (isActive) {
-            Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
-          }
-        }
-      };
+    } catch (e) {
+      Alert.alert("Save Error", e.message || "Could not load ad.");
+    }
+  };
 
-      prepareRewardedAd();
 
-      return () => {
-        isActive = false;
-        if (unsubscribeLoaded) unsubscribeLoaded();
-        if (unsubscribeError) unsubscribeError();
-        if (unsubscribeReward) unsubscribeReward(); 
-        setLoadedAd(null); 
-      };
-    }, [])
-  );
+  useEffect(() => {
+    loadNewRewardedAd();
+    
+    return () => {
+    };
+  }, []);
 
   
-  useEffect(() => {
-    if (!loadedAd) return;
-    let isMounted = true;
-
-    const displayAd = async () => {
-      try {
-        await loadedAd.show();
-        if (isMounted) {
-          await AdTimer.saveTimestamp();
-        }
-      } catch (error) {
-        if (isMounted) {
-          Alert.alert('Failed to show rewarded ad', error?.message || String(error));
-        }
+  const handleAds = async () => {
+    try {
+      setLoadedAd(true);
+      const isEligible = await AdTimer.shouldShowAd();
+      if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {
+        await rewardedAdRef.current.show();
+        await AdTimer.saveTimestamp();
+        setLoadedAd(false);
       }
-    };
-
-    const timeoutId = setTimeout(() => {
-      displayAd();
-    }, 777);
-
-    return () => {
-      isMounted = false;
-      clearTimeout(timeoutId);
-    };
-  }, [loadedAd]);
+    } catch (error) {
+      setLoadedAd(false);
+    }
+  };
 
 
   const parseCategories = (list, query) => {
@@ -707,6 +695,7 @@ export default function WheeChapters() {
 
 
   const populateForEdit = (chapter, mvcat ) => {
+    handleAds();
     if(chapter === null) {
       setSelectedIds([]);
       setChapterTitle("");
@@ -1574,7 +1563,7 @@ export default function WheeChapters() {
           </View>
 
           <View style={{flexDirection:'row', alignItems:'center', justifyContent: 'center', marginBottom: 1, minHeight: 73, width:"100%"}}>
-            <TouchableOpacity onPress={() => { setCurrentChapter(null); setChapterTitle(""); setPrevCategory(""); setChapterCategory(""); setChapterDesc(""); setSelectedIds([]); setSections([]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
+            <TouchableOpacity onPress={() => { handleAds(); setCurrentChapter(null); setChapterTitle(""); setPrevCategory(""); setChapterCategory(""); setChapterDesc(""); setSelectedIds([]); setSections([]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
               <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/addchapterbtn.png')}/>         
             </TouchableOpacity> 
             <TouchableOpacity onPress={handleImportChapters} style={styles.importIcon}>
@@ -1602,7 +1591,7 @@ export default function WheeChapters() {
               { item && item.category && 
                 ( <TouchableOpacity
                   style={{width: "67%", flex: 1, height: 67, alignItems: "center", justifyContent: "center", opacity: 1, alignSelf:"center" }}
-                  onPress={() => { setPrevCategory(item.category); setHchapters(getChapters(item.category, chapters)); setChapterCategory(item.category); setPrevMode("main"); setMode("list"); }}>
+                  onPress={() => { handleAds(); setPrevCategory(item.category); setHchapters(getChapters(item.category, chapters)); setChapterCategory(item.category); setPrevMode("main"); setMode("list"); }}>
                   {item.id === 'c-all' ? 
                     ( <ImageBackground style={{ width: "100%", height: "100%", alignSelf: "center", justifyContent: "center", alignItems: "center" }} resizeMode='contain' source={require('../assets/allcategoriesbtn.png')} />
                     ) : (

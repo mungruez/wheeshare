@@ -79,87 +79,6 @@ export default function WheeQuizzes() {
     }
   };
 
-
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-      let unsubscribeLoaded = null;
-      let unsubscribeError = null;
-      let unsubscribeReward = null; 
-
-      const prepareRewardedAd = async () => {
-        try {
-          const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID, {
-            requestNonPersonalizedAdsOnly: true,
-          });
-              
-          const isEligible = await AdTimer.shouldShowAd();
-          if (!isEligible || !isActive) return;
-
-          unsubscribeReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-            Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
-          });
-
-          unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-            if (!isActive) return;
-            setLoadedAd(true);
-          });
-
-          unsubscribeError = rewarded.addAdEventListener(AdEventType.ERROR, (error) => {
-            if (isActive) {
-              Alert.alert('Failed to load rewarded ad', error?.message || String(error));
-            }
-          });
-
-          rewarded.load();
-          rewardedAdRef.current = instance;
-        } catch (error) {
-          if (isActive) {
-            Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
-          }
-        }
-      };
-
-      prepareRewardedAd();
-
-      return () => {
-        isActive = false;
-        if (unsubscribeLoaded) unsubscribeLoaded();
-        if (unsubscribeError) unsubscribeError();
-        if (unsubscribeReward) unsubscribeReward(); 
-        setLoadedAd(false); 
-      };
-    }, [])
-  );
-
-
-  useEffect(() => {
-    if (!loadedAd || !rewarded) return;
-    let isMounted = true;
-
-    const displayAd = async () => {
-      try {
-        await rewardedAdRef.current.show();
-        if (isMounted) {
-          await AdTimer.saveTimestamp();
-        }
-      } catch (error) {
-        if (isMounted) {
-          Alert.alert('Failed to show rewarded ad', error?.message || String(error));
-        }
-      }
-    };
-
-    const timeoutId = setTimeout(() => {
-      displayAd();
-    }, 570);
-
-    return () => {
-      isMounted = false;
-      clearTimeout(timeoutId);
-    };
-  }, [loadedAd]);
-
   
   const handleMultipleChoiceClick = () => {
     if(!multiplechoice) setMultipleChoice(true);
@@ -595,6 +514,7 @@ export default function WheeQuizzes() {
 
 
   const populateForEdit = (quizItem, mvcat) => {
+    handleAds();
     if (quizItem === null) {
       setSelectedIds([]);
       setQuizTitle("");
@@ -661,8 +581,73 @@ export default function WheeQuizzes() {
     useCallback(() => {
       if ( mode !== "view" ) clearAppCache();
       if (mode === "main" || mode === "list") loadQuizzes();
+
+      let isActive = true;
+      let unsubscribeLoaded = null;
+      let unsubscribeError = null;
+      let unsubscribeReward = null;
+      let unsubscribeClosed = null;
+
+      const prepareRewardedAd = async () => {
+        try {
+          const isEligible = await AdTimer.shouldShowAd();
+          if (!isEligible || !isActive) return;
+
+          const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID, {
+            requestNonPersonalizedAdsOnly: true,
+          });
+
+          unsubscribeReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+            Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
+          });
+
+          unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+            if (!isActive) return;
+            setIsAdLoaded(true);
+          });
+
+          unsubscribeClosed = rewarded.addAdEventListener(AdEventType.CLOSED, () => {
+            setIsAdLoaded(false);
+            if (isActive) {
+              prepareRewardedAd(); 
+            }
+          });
+
+          unsubscribeError = rewarded.addAdEventListener(AdEventType.ERROR, (error) => {
+            Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
+          });
+
+          rewarded.load();
+          rewardedAdRef.current = rewarded; 
+        } catch (error) {
+          Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
+        }
+      };
+      prepareRewardedAd();
+
+      return () => {
+        isActive = false;
+        if (unsubscribeLoaded) unsubscribeLoaded();
+        if (unsubscribeError) unsubscribeError();
+        if (unsubscribeReward) unsubscribeReward();
+        if (unsubscribeClosed) unsubscribeClosed();
+        setIsAdLoaded(false);
+      };
     }, [])
   );
+
+  
+  const handleAds = async () => {
+    try {
+      const isEligible = await AdTimer.shouldShowAd();
+      if (isEligible && isAdLoaded && rewardedAdRef.current) {
+        await rewardedAdRef.current.show();
+        await AdTimer.saveTimestamp();
+      }
+    } catch (error) {
+      Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
+    }
+  };
 
 
   useEffect(() => {
@@ -1229,7 +1214,7 @@ export default function WheeQuizzes() {
                 {item && item.category && (
                   <TouchableOpacity
                     style={{ width: "67%", height: 57 }}
-                    onPress={() => { setHquizzes(getQuizzes(item.category, quizzes)); setQuizCategory(item.category); setPrevCategory(item.category); setMode("list"); }}>
+                    onPress={() => { handleAds(); setHquizzes(getQuizzes(item.category, quizzes)); setQuizCategory(item.category); setPrevCategory(item.category); setMode("list"); }}>
                     <ImageBackground
                       style={{ flex: 1, justifyContent:'center', alignItems:'center' }}
                       resizeMode='stretch'

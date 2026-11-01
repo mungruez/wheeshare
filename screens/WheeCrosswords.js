@@ -49,6 +49,7 @@ export default function WheeCrosswords() {
   const [loading, setLoading] = useState(false);
 
   const isOffline = useNetInfo().isConnected === false;
+  const interstitialAdRef = useRef(null);
   const lastBackPress = useRef<number>(0);
   const isLoadingRef = useRef(false);
   const navigation = useNavigation();
@@ -67,76 +68,40 @@ export default function WheeCrosswords() {
   };
 
 
-  useFocusEffect(
-  useCallback(() => {
-    let isActive = true;
-    let interstitial = null;
-    let unsubscribeLoaded = null;
-    let unsubscribeError = null;
-
-    const prepareInterstitialAd = async () => {
+  const handleInterstitial = () => {
+    return new Promise(async (resolve) => {
       try {
-        const isEligible = await AdTimer.shouldShowAd();
-        if (!isEligible || !isActive) return;
-        interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_A_ID);
+        if (loadedAd && interstitialAdRef.current) {
+          const unsubscribeClosed = interstitialAdRef.current.addAdEventListener(AdEventType.CLOSED, () => {
+            unsubscribeClosed();
+            unsubscribeError();
+            resolve();
+          });
 
-        unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
-          if (!isActive) return;
-          setLoadedAd(interstitial);
-        });
+          const unsubscribeError = interstitialAdRef.current.addAdEventListener(AdEventType.ERROR, () => {
+            unsubscribeClosed();
+            unsubscribeError();
+            resolve(); 
+          });
 
-        unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
-          if (isActive) {
-            Alert.alert('Failed to load interstitial ad', error?.message || String(error));
-          }
-        });
+          await interstitialAdRef.current.show();
 
-        interstitial.load();
-      } catch (error) {
-        if (isActive) {
-          Alert.alert('Failed to prepare interstitial ad', error?.message || String(error));
+        } else {
+          resolve(); 
         }
+      } catch (globalError) {
+        resolve();
       }
-    };
-
-    prepareInterstitialAd();
-
-    return () => {
-      isActive = false;
-      if (unsubscribeLoaded) unsubscribeLoaded();
-      if (unsubscribeError) unsubscribeError();
-      setLoadedAd(null); 
-    };
-  }, [])
-);
-
-useEffect(() => {
-  if (!loadedAd) return;
-  let isMounted = true;
-
-  const displayAd = async () => {
-    try {
-      await loadedAd.show();
-      if (isMounted) {
-        await AdTimer.saveTimestamp();
-      }
-    } catch (error) {
-      if (isMounted) {
-        Alert.alert('Failed to show interstitial ad', error?.message || String(error));
-      }
-    }
+    });
   };
 
-  const timeoutId = setTimeout(() => {
-    displayAd();
-  }, 250);
 
-  return () => {
-    isMounted = false;
-    clearTimeout(timeoutId);
-  };
-}, [loadedAd]);
-
+  const handleAdsInter = () => {
+    setLoadedAd(true);
+    handleInterstitial();
+    setLoadedAd(false);
+  }
+  
 
   const canPlaceWord = (word, gridT, startX, startY, orientation, requireCrossing) => {
     let crossingCount = 0;
@@ -551,6 +516,7 @@ useEffect(() => {
 
 
   const populateForEdit = (cwrd, cwrdcat ) => {
+    handleAdsInter();
     if(cwrd === null) {
       setSelectedIds([]);
       setCrosswordTitle("");
