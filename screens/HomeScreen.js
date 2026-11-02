@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator, Alert } from 'react-native';
-import { InterstitialAd, AdEventType, RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
-import React, { useLayoutEffect, useState, useEffect, useRef } from 'react';
+import { useRewardedAd, InterstitialAd, AdEventType, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import React, { useLayoutEffect, useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { AdTimer } from './AdTimer';
@@ -13,10 +13,13 @@ const REWARDED_A_ID = TestIds.REWARDED;
 
 export default function HomeScreen() {
   const [isLoadingAd, setIsLoadingAd] = useState(false);
-  const [isAdLoaded, setIsAdLoaded] = useState(false);
-  const [isLoadingTransition, setIsLoadingTransition] = useState(false);
   const navigation = useNavigation();
-  const rewardedAdRef = useRef(null);
+
+  const { isLoaded, isEarnedReward, isClosed, error, show, load } = useRewardedAd({
+    adUnitId: REWARDED_A_ID,
+    requestNonPersonalizedAdsOnly: true,
+    autoLoad: true,
+  });
   
   
   useLayoutEffect(()=> {
@@ -92,71 +95,42 @@ export default function HomeScreen() {
     }
   };
 
-
-
-  const loadNewRewardedAd = () => {
-    try {
-      const instance = RewardedAd.createForAdRequest(REWARDED_A_ID, {
-        requestNonPersonalizedAdsOnly: true,
-      });
-
-      const unsubscribeLoaded = instance.addAdEventListener(RewardedAdEventType.LOADED, () => {
-        setIsAdLoaded(true);
-        setIsLoadingTransition(false);
-      });
-
-      const unsubscribeReward = instance.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-        Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
-      });
-
-      const unsubscribeClosed = instance.addAdEventListener(AdEventType.CLOSED, () => {
-        setIsAdLoaded(false);
-        unsubscribeLoaded();
-        unsubscribeReward();
-        unsubscribeClosed();
-        unsubscribeError();
-        loadNewRewardedAd(); 
-      });
-
-      const unsubscribeError = instance.addAdEventListener(AdEventType.ERROR, (error) => {
-        Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
-        setIsLoadingTransition(false);
-      });
-
-      instance.load();
-      rewardedAdRef.current = instance;
-
-    } catch (error) {
-      if (isActive) {
-        Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
-      }
+  
+  useEffect(() => {
+    if (isEarnedReward) {
+      Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
     }
-  };
-
+  }, [isEarnedReward]);
 
   useEffect(() => {
-    loadNewRewardedAd();
-    return () => {
-      
-    };
-  }, []);
+    if (isClosed) {
+      load(); 
+    }
+  }, [isClosed, load]);
+
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
+    }
+  }, [error]);
 
 
   const handleNavigate = async (scrname) => {
     try {
+      setIsLoadingAd(true);
       const isEligible = await AdTimer.shouldShowAd();
-      if (isEligible && isAdLoaded && rewardedAdRef.current) {
-        setIsLoadingTransition(true);
-        await rewardedAdRef.current.show();
+
+      if (isEligible && isLoaded) {
+        await show();
         await AdTimer.saveTimestamp();
-        
-        setIsLoadingTransition(false);
+        setIsLoadingAd(false);
         navigation.navigate(scrname);
       } else {
+        setIsLoadingAd(false);
         navigation.navigate(scrname);
       }
-    } catch (error) {
-      setIsLoadingTransition(false);
+    } catch (err) {
+      setIsLoadingAd(false);
       navigation.navigate(scrname);
     }
   };
