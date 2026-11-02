@@ -123,24 +123,27 @@ export default function WheeChapters() {
 
 
   useEffect(() => {
-    loadNewRewardedAd();
+    if (mode !== "view" && !isAdReadyRef.current) loadNewRewardedAd();
     
     return () => {
     };
-  }, []);
+  }, [mode]);
 
   
   const handleAds = async () => {
     try {
       setLoadedAd(true);
+      setLoading(true);
       const isEligible = await AdTimer.shouldShowAd();
       if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {
         await rewardedAdRef.current.show();
         await AdTimer.saveTimestamp();
         setLoadedAd(false);
+        setLoading(false);
       }
     } catch (error) {
       setLoadedAd(false);
+      setLoading(false);
     }
   };
 

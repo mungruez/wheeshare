@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator, Alert } from 'react-native';
-import { useRewardedAd, InterstitialAd, AdEventType, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
-import React, { useLayoutEffect, useState, useEffect } from 'react';
+import { InterstitialAd, AdEventType, BannerAd, BannerAdSize, TestIds, RewardedAd, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import React, { useLayoutEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { AdTimer } from './AdTimer';
@@ -14,12 +14,6 @@ const REWARDED_A_ID = TestIds.REWARDED;
 export default function HomeScreen() {
   const [isLoadingAd, setIsLoadingAd] = useState(false);
   const navigation = useNavigation();
-
-  const { isLoaded, isEarnedReward, isClosed, error, show, load } = useRewardedAd({
-    adUnitId: REWARDED_A_ID,
-    requestNonPersonalizedAdsOnly: true,
-    autoLoad: true,
-  });
   
   
   useLayoutEffect(()=> {
@@ -95,45 +89,78 @@ export default function HomeScreen() {
     }
   };
 
-  
-  useEffect(() => {
-    if (isEarnedReward) {
-      Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
-    }
-  }, [isEarnedReward]);
-
-  useEffect(() => {
-    if (isClosed) {
-      load(); 
-    }
-  }, [isClosed, load]);
-
-  useEffect(() => {
-    if (error) {
-      Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
-    }
-  }, [error]);
-
 
   const handleNavigate = async (scrname) => {
     try {
-      setIsLoadingAd(true);
       const isEligible = await AdTimer.shouldShowAd();
-
-      if (isEligible && isLoaded) {
-        await show();
-        await AdTimer.saveTimestamp();
-        setIsLoadingAd(false);
+      if (!isEligible) {
         navigation.navigate(scrname);
-      } else {
-        setIsLoadingAd(false);
-        navigation.navigate(scrname);
+        return;
       }
-    } catch (err) {
+
+      setIsLoadingAd(true);
+      const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID, {
+        requestNonPersonalizedAdsOnly: true
+      });
+      
+      let unsubscribeLoaded = null;
+      let unsubscribeError = null;
+      let unsubscribeClosed = null; 
+      let unsubscribeReward = null;
+      let backupTimer = null;
+
+      const cleanUp = () => {
+        if (backupTimer) clearTimeout(backupTimer);
+        if (unsubscribeLoaded) unsubscribeLoaded();
+        if (unsubscribeError) unsubscribeError();
+        if (unsubscribeClosed) unsubscribeClosed();
+        if (unsubscribeReward) unsubscribeReward();
+      };
+
+      backupTimer = setTimeout(() => {
+        cleanUp();
+        setIsLoadingAd(false);
+        navigation.navigate(scrname);
+      }, 3000);
+
+      unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+        setIsLoadingAd(false);
+        try {
+          rewarded.show()
+            .catch(() => {
+              cleanUp();
+              navigation.navigate(scrname);
+            });
+        } catch (showError) {
+          cleanUp();
+          navigation.navigate(scrname);
+        }
+      });
+
+      unsubscribeReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
+        AdTimer.saveTimestamp();
+        Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
+      });
+
+      unsubscribeClosed = rewarded.addAdEventListener(AdEventType.CLOSED, () => {
+        cleanUp();
+        navigation.navigate(scrname);
+      });
+
+      unsubscribeError = rewarded.addAdEventListener(AdEventType.ERROR, () => {
+        cleanUp();
+        setIsLoadingAd(false);
+        navigation.navigate(scrname); 
+      });
+
+      rewarded.load();
+
+    } catch (globalError) {
       setIsLoadingAd(false);
       navigation.navigate(scrname);
     }
   };
+
 
 
   return (

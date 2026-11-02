@@ -68,10 +68,10 @@ export default function WheeCrosswords() {
   };
 
 
-  const handleInterstitial = () => {
+  const handleAdsInter = () => {
     return new Promise(async (resolve) => {
       try {
-        if (loadedAd && interstitialAdRef.current) {
+        if (interstitialAdRef.current) {
           const unsubscribeClosed = interstitialAdRef.current.addAdEventListener(AdEventType.CLOSED, () => {
             unsubscribeClosed();
             unsubscribeError();
@@ -94,13 +94,6 @@ export default function WheeCrosswords() {
       }
     });
   };
-
-
-  const handleAdsInter = () => {
-    setLoadedAd(true);
-    handleInterstitial();
-    setLoadedAd(false);
-  }
   
 
   const canPlaceWord = (word, gridT, startX, startY, orientation, requireCrossing) => {
