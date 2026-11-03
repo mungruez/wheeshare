@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View, Image, Pressable, ImageBackground, FlatList, TextInput, StatusBar } from "react-native";
+import { StyleSheet, Text, View, Image, Pressable, ImageBackground, FlatList, TextInput, StatusBar, ActivityIndicator } from "react-native";
+import { InterstitialAd, AdEventType } from 'react-native-google-mobile-ads';
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from "@react-navigation/native";
@@ -21,8 +22,10 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   const [counter, setCounter] = useState(15);
   const [timerLimit, setTimerLimit] = useState(15);
   const [timerInput, setTimerInput] = useState("15");
+  const [isLoadingAd, setIsLoadingAd] = useState(false);
   const navigation = useNavigation();
   
+  const INTERSTITIAL_A_ID = TestIds.INTERSTITIAL;
   const totalQuestionsCount = qnum > 0 ? qnum : 1;
   const MIN_TIMER_SECONDS = 5;
   const MAX_TIMER_SECONDS = 180 * 60;
@@ -69,6 +72,63 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
+
+
+  const handleAdsInter = async () => {
+    try {
+      setIsLoadingAd(true);
+
+      const interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_A_ID, {
+        requestNonPersonalizedAdsOnly: true
+      });
+        
+      let unsubscribeLoaded = null;
+      let unsubscribeError = null;
+      let unsubscribeClosed = null; 
+      let backupTimer = null;
+
+      const cleanUp = () => {
+        if (backupTimer) clearTimeout(backupTimer);
+        if (unsubscribeLoaded) unsubscribeLoaded();
+        if (unsubscribeError) unsubscribeError();
+        if (unsubscribeClosed) unsubscribeClosed();
+      };
+
+      backupTimer = setTimeout(() => {
+        cleanUp();
+        setIsLoadingAd(false);
+      }, 3000);
+
+      
+        unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+          setIsLoadingAd(false);
+          try {
+            interstitial.show()
+              .then(() => {
+              })
+              .catch(() => {
+                cleanUp();
+              });
+          } catch (showError) {
+            cleanUp();
+          }
+        });
+
+        unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+          cleanUp();
+        });
+
+        unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, () => {
+          cleanUp();
+          setIsLoadingAd(false);
+        });
+
+        interstitial.load();
+      
+    } catch (globalError) {
+      setIsLoadingAd(false);
+    }
+  };
 
   
   const initializeQuizArray = (selectedNum, selectedTimer = timerLimit) => {
@@ -275,9 +335,10 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
             </View>
           </View>
 
-          <Pressable onPress={() => initializeQuizArray(getQnum(), sanitizeTimerSeconds(timerInput))} style={styles.startQuizBtn}>
-            <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Start Quiz</Text>
-          </Pressable>
+          { isLoadingAd ? ( <ActivityIndicator size="small" color="#FFFFFF" /> )
+            : ( <Pressable disabled={isLoadingAd} onPress={() => { handleAdsInter(); initializeQuizArray(getQnum(), sanitizeTimerSeconds(timerInput)); }} style={styles.startQuizBtn}>
+              <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Start Quiz</Text>
+            </Pressable> ) }
         </SafeAreaView>
       </ImageBackground>
     );
