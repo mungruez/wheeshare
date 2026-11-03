@@ -162,6 +162,16 @@ export default function HomeScreen() {
   };
 
 
+  if (isLoadingAd) return ( 
+    <View style={styles.loadingOverlay}>
+      <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
+        <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24, opacity: 1, borderRadius: 12 } } resizeMode='contain' source={require('../assets/icon.png')} />
+        <ActivityIndicator size="large" color="#b4b119" style={{ transform: [{ scale: 1.9 }], marginBottom: 17 }} />
+        <Text style={styles.loadingText}>Please Wait...</Text>
+      </View>
+    </View>
+  );
+
 
   return (
     <ImageBackground style={ styles.imgBackground } imageStyle={{ opacity: 1.0 }} resizeMode='cover' source={require('../assets/homescreen.png')}>
@@ -234,6 +244,7 @@ export default function HomeScreen() {
     </ImageBackground>
   )
 }
+
 
 const styles = StyleSheet.create({
     searchcontainer: {flexDirection: 'row',marginTop: 57, alignItems:'center', justifyContent:'center', alignSelf: 'center',width:'100%',marginBottom: 76,padding: 5},

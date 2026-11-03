@@ -47,7 +47,7 @@ export default function WheeQuizzes() {
   const [truefalse, setTrueFalse] = useState(false); 
   const [multipleanswers, setMultipleAnswers] = useState(false);
   const [longanswer, setLongAnswer] = useState(false);
-  const [loadedAd, setLoadedAd] = useState(false);
+  const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [questionsList, setQuestionsList] = useState([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
   
 
@@ -513,70 +513,7 @@ export default function WheeQuizzes() {
   };
 
 
-  const populateForEdit = (quizItem, mvcat) => {
-    handleAds();
-    if (quizItem === null) {
-      setSelectedIds([]);
-      setQuizTitle("");
-      setQuizDesc("");
-      setCurrentQuiz(null);
-      setQuizId(Date.now().toString());
-
-      if (mvcat === "allcategories") {
-        setPrevCategory("allcategories");
-        setQuizCategory("");
-      } else {
-        setQuizCategory(mvcat);
-      }
-      
-      setQuestionsList([
-        { id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
-      ]);
-      setMode("add");
-
-    } else {
-      setCurrentQuiz(quizItem);
-      setQuizId(quizItem.id);
-      setQuizTitle(quizItem.title);
-      setQuizCategory(mvcat);
-      setQuizDesc(quizItem.description || "");
-      setQuestionsList(quizItem.quiz || []);
-      setPrevMode("list");
-      setMode("add");
-    }
-  };
-
-
-  const toggleSelect = (id) => {
-    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-  };
-
-
-  const removeQuestionItem = (qIdx) => {
-    if (questionsList.length <= 1) return;
-    setQuestionsList(questionsList.filter((_, index) => index !== qIdx));
-  };
-
-
-  const resetForm = () => {
-    if (prevCategory === "allcategories") setQuizCategory("allcategories");
-    setQuestionsList([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
-    setQuizId(Date.now().toString());
-    setCurrentQuiz(null);
-    setSelectedIds([]);
-    setQuizTitle("");
-    setQuizDesc("");
-  };
-
-
-  const addQuestionItem = () => { 
-    if(multiplechoice) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]); 
-    else if (truefalse) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["True", "False"], correctAnswerIndex: 0, explanation: "" }]);
-    else if (multipleanswers) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", "", "", "", ""], correctAnswerIndex: [], explanation: "" }]);
-    else setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: [""], correctAnswerIndex: 0, explanation: "" }]);
-  };
-
-
+  
   useFocusEffect(
     useCallback(() => {
       if ( mode !== "view" ) clearAppCache();
@@ -647,6 +584,71 @@ export default function WheeQuizzes() {
     } catch (error) {
       Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
     }
+  }
+
+
+  const populateForEdit = (quizItem, mvcat) => {
+    handleAds();
+
+    if (quizItem === null) {
+      setSelectedIds([]);
+      setQuizTitle("");
+      setQuizDesc("");
+      setCurrentQuiz(null);
+      setQuizId(Date.now().toString());
+
+      if (mvcat === "allcategories") {
+        setPrevCategory("allcategories");
+        setQuizCategory("");
+      } else {
+        setQuizCategory(mvcat);
+      }
+      
+      setQuestionsList([
+        { id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }
+      ]);
+      setMode("add");
+
+    } else {
+      setCurrentQuiz(quizItem);
+      setQuizId(quizItem.id);
+      setQuizTitle(quizItem.title);
+      setQuizCategory(mvcat);
+      setQuizDesc(quizItem.description || "");
+      setQuestionsList(quizItem.quiz || []);
+      setPrevMode("list");
+      setMode("add");
+    }
+  };
+
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+
+  const removeQuestionItem = (qIdx) => {
+    if (questionsList.length <= 1) return;
+    setQuestionsList(questionsList.filter((_, index) => index !== qIdx));
+  };
+
+
+  const resetForm = () => {
+    if (prevCategory === "allcategories") setQuizCategory("allcategories");
+    setQuestionsList([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
+    setQuizId(Date.now().toString());
+    setCurrentQuiz(null);
+    setSelectedIds([]);
+    setQuizTitle("");
+    setQuizDesc("");
+  };
+
+
+  const addQuestionItem = () => { 
+    if(multiplechoice) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]); 
+    else if (truefalse) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["True", "False"], correctAnswerIndex: 0, explanation: "" }]);
+    else if (multipleanswers) setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: ["", "", "", "", "", "", ""], correctAnswerIndex: [], explanation: "" }]);
+    else setQuestionsList([...questionsList, { id: Date.now().toString() + Math.random().toString(36).substring(2, 5), question: "", options: [""], correctAnswerIndex: 0, explanation: "" }]);
   };
 
 
