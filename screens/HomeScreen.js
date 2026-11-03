@@ -162,17 +162,6 @@ export default function HomeScreen() {
   };
 
 
-  if (isLoadingAd) return ( 
-    <View style={styles.loadingOverlay}>
-      <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
-        <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24, opacity: 1, borderRadius: 12 } } resizeMode='contain' source={require('../assets/icon.png')} />
-        <ActivityIndicator size="large" color="#b4b119" style={{ transform: [{ scale: 1.9 }], marginBottom: 17 }} />
-        <Text style={styles.loadingText}>Please Wait...</Text>
-      </View>
-    </View>
-  );
-
-
   return (
     <ImageBackground style={ styles.imgBackground } imageStyle={{ opacity: 1.0 }} resizeMode='cover' source={require('../assets/homescreen.png')}>
       <StatusBar barStyle="light-content"/>
@@ -189,7 +178,7 @@ export default function HomeScreen() {
         <ScrollView style={{ flexDirection:"column", marginTop: 19}}>
           <TouchableOpacity
             style={[styles.buttonimage, isLoadingAd && styles.disabledButton]}
-            onPress={()=> handleNavigateInterstitial('Chapters')}
+            onPress={()=> navigation.navigate('Chapters')}
             disabled={isLoadingAd}>
               <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
                 <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Chapters</Text>
@@ -198,7 +187,7 @@ export default function HomeScreen() {
 
           <TouchableOpacity
             style={[styles.buttonimage, isLoadingAd && styles.disabledButton]}
-            onPress={()=> handleNavigateInterstitial('Crosswords')}
+            onPress={()=> navigation.navigate('Crosswords')}
             disabled={isLoadingAd}>
               <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
                 <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Crosswords</Text>
@@ -207,7 +196,7 @@ export default function HomeScreen() {
 
           <TouchableOpacity
             style={[styles.buttonimage, isLoadingAd && styles.disabledButton]}
-            onPress={()=> handleNavigateInterstitial('Quizzes')}
+            onPress={()=> navigation.navigate('Quizzes')}
             disabled={isLoadingAd}>
               <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
                 <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Quizzes</Text>
@@ -216,7 +205,7 @@ export default function HomeScreen() {
             
           <TouchableOpacity
             style={[styles.buttonimage, isLoadingAd && styles.disabledButton]}
-            onPress={()=> handleNavigateInterstitial('Problems')}
+            onPress={()=> navigation.navigate('Problems')}
             disabled={isLoadingAd}>
               <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
                 <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Problems</Text>
@@ -258,5 +247,7 @@ const styles = StyleSheet.create({
     buttonimage: { width: "67%", flex: 1, height: 67, alignItems: "center", justifyContent: "center", opacity: 1, alignSelf:"center" },
     cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#5a4f07', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#f3efbd', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
     container: { flex: 1, justifyContent: 'center', alignItems: 'center',backgroundColor: '#F5F5F5'},
-    buttonText: {color: '#FFFFFF',fontSize: 16,fontWeight: '600'}
+    buttonText: {color: '#FFFFFF',fontSize: 16,fontWeight: '600'},
+    loadingOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '93%', backgroundColor: 'rgba(19, 19, 19, 0.76)', alignItems: 'center', justifyContent: 'center', zIndex: 19, elevation: 50 },
+    loadingText: { color: '#f3efbd', fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7 }
 });
