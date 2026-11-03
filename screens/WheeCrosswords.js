@@ -9,6 +9,7 @@ import { zip, unzip } from 'react-native-zip-archive';
 import * as DocumentPicker from 'expo-document-picker';
 import CrosswordGrid from "./CrosswordGrid";
 import * as Sharing from 'expo-sharing';
+import AutoRewardAd from './AutoRewardAd';
 import { AdTimer } from './AdTimer';
 
 
@@ -40,7 +41,7 @@ export default function WheeCrosswords() {
   const [crosswordGridT, setCrosswordGridT] = useState([[]]);
   const [isGridVisible, setIsGridVisible] = useState(false);
   const [gridWordCount, setGridWordCount] = useState(0);
-  const [loadedAd, setLoadedAd] = useState(false);
+  const [isAdActive, setIsAdActive] = useState(false);
   const [hcrosswords, setHcrosswords] = useState([]);
   const [scrosswords, setScrosswords] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -68,31 +69,26 @@ export default function WheeCrosswords() {
   };
 
 
-  const handleAdsInter = () => {
-    return new Promise(async (resolve) => {
-      try {
-        if (interstitialAdRef.current) {
-          const unsubscribeClosed = interstitialAdRef.current.addAdEventListener(AdEventType.CLOSED, () => {
-            unsubscribeClosed();
-            unsubscribeError();
-            resolve();
-          });
+  const handleAdResult = useCallback((result) => {
+    setIsAdActive(false);
 
-          const unsubscribeError = interstitialAdRef.current.addAdEventListener(AdEventType.ERROR, () => {
-            unsubscribeClosed();
-            unsubscribeError();
-            resolve(); 
-          });
+    if (result.success) {
+      AdTimer.saveTimestamp();
+      Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
+    } else if (result.error) {
+      Alert.alert("Unavailable", "Ad could not be loaded right now.");
+    }
+  }, []);
 
-          await interstitialAdRef.current.show();
 
-        } else {
-          resolve(); 
-        }
-      } catch (globalError) {
-        resolve();
-      }
-    });
+  const handleAdsInter = async () => {
+    if (isOffline) return;
+
+    const isEligible = await AdTimer.shouldShowAd();
+    if (!isEligible) return;
+    if (isAdActive) return;
+
+    setIsAdActive(true);
   };
   
 
@@ -975,6 +971,13 @@ export default function WheeCrosswords() {
   };
 
 
+  if(isAdActive) {
+    return (
+      <AutoRewardAd onAdFinished={handleAdResult} />
+    )
+  }
+
+
   if(mode === "view") {
     return (
       <View style={{flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -1191,7 +1194,7 @@ export default function WheeCrosswords() {
                     <ImageBackground style={{ height: "100%", width: "100%", }} resizeMode='contain' source={ require('../assets/crosswords/greenbackbtn.png') }/>
                   </TouchableOpacity>
           
-                  <TouchableOpacity onPress={() => { setPrevMode("main"); populateForEdit(null, crosswordCategory); }} style={ styles.plusIcon }>
+                  <TouchableOpacity onPress={() => { handleAdsInter(); setPrevMode("main"); populateForEdit(null, crosswordCategory); }} style={ styles.plusIcon }>
                     <ImageBackground style={{ height: "100%", width: "100%", }} resizeMode='contain' source={ require('../assets/crosswords/addcrosswordbtn.png') }/>         
                   </TouchableOpacity>
                 </View>
@@ -1267,7 +1270,7 @@ export default function WheeCrosswords() {
               </View>
     
               <View style={{flexDirection:'row', alignItems:'center', justifyContent: 'center', marginBottom: 1, minHeight: 73, width:"100%"}}>
-                <TouchableOpacity onPress={() => { setCurrentCrossword(null); setCrosswordId(null); setCrosswordTitle(""); setCrosswordCategory(""); setSelectedIds([]); setQuestions([{answer: "", hint: "", startx: "", starty: "", orientation: "", position: "1"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "2"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "3"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "4"}]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
+                <TouchableOpacity onPress={() => { handleAdsInter(); setCurrentCrossword(null); setCrosswordId(null); setCrosswordTitle(""); setCrosswordCategory(""); setSelectedIds([]); setQuestions([{answer: "", hint: "", startx: "", starty: "", orientation: "", position: "1"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "2"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "3"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "4"}]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
                   <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/crosswords/addcrosswordbtn.png')}/>         
                 </TouchableOpacity> 
                 <TouchableOpacity onPress={handleImportCrosswords} style={styles.importIcon}>
@@ -1295,7 +1298,7 @@ export default function WheeCrosswords() {
                   { item && item.category && 
                     ( <TouchableOpacity
                     style={{ width: "67%", height: 57 }}
-                    onPress={() => { setHcrosswords(getCrosswords(item.category, crosswords)); setCrosswordCategory(item.category); setPrevCategory(item.category); setMode("list"); setPrevMode("main"); }}>
+                    onPress={() => { handleAdsInter(); setHcrosswords(getCrosswords(item.category, crosswords)); setCrosswordCategory(item.category); setPrevCategory(item.category); setMode("list"); setPrevMode("main"); }}>
                     <ImageBackground style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} resizeMode='stretch' source={require('../assets/crosswords/greenbtnbg.png')}>
                       {item.id === 'c-all' ? 
                         ( <Image
