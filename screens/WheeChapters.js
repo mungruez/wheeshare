@@ -41,7 +41,6 @@ export default function WheeChapters() {
   const [isPicking, setIsPicking] = useState(false);
   const [chapterId, setChapterId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [loadedAd, setLoadedAd] = useState(null);
   const [sections, setSections] = useState([]);
   
   const isOffline = useNetInfo().isConnected === false;
@@ -132,17 +131,14 @@ export default function WheeChapters() {
   
   const handleAds = async () => {
     try {
-      setLoadedAd(true);
       setLoading(true);
       const isEligible = await AdTimer.shouldShowAd();
       if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {
         await rewardedAdRef.current.show();
         await AdTimer.saveTimestamp();
-        setLoadedAd(false);
         setLoading(false);
       }
     } catch (error) {
-      setLoadedAd(false);
       setLoading(false);
     }
   };

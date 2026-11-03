@@ -1,14 +1,27 @@
 import * as FileSystem from 'expo-file-system/legacy';
 
-const FILE_PATH = FileSystem.documentDirectory.endsWith('/') ? `${FileSystem.documentDirectory}last_ad_time.txt` : `${FileSystem.documentDirectory}/last_ad_time.txt`;
-const COOLDOWN_TIME_MS = 5 * 60 * 1000; 
+
+const FILE_PATH = FileSystem.documentDirectory.endsWith('/') 
+  ? `${FileSystem.documentDirectory}last_ad_time.txt` 
+  : `${FileSystem.documentDirectory}/last_ad_time.txt`;
+
+const COOLDOWN_TIME_MS = 5 * 60 * 1000;
+
+
 
 export const AdTimer = {
 
   shouldShowAd: async () => {
+
     try {
-      const fileInfo = await FileSystem.getInfoAsync(FILE_PATH);
-      if (!fileInfo.exists) {
+      
+      if (!FileSystem.documentDirectory) {
+        return true; 
+      }
+
+      const fileInfo = await FileSystem.getInfoAsync(FILE_PATH).catch(() => null);
+      
+      if (!fileInfo || !fileInfo.exists) {
         return true; 
       }
 
@@ -20,6 +33,7 @@ export const AdTimer = {
       }
 
       const currentTime = Date.now();
+
       return (currentTime - lastAdTime) >= COOLDOWN_TIME_MS;
 
     } catch (error) {
@@ -27,12 +41,17 @@ export const AdTimer = {
     }
   },
 
+
   saveTimestamp: async () => {
     try {
+
+      if (!FileSystem.documentDirectory) return;
+
       const currentTime = Date.now().toString();
       await FileSystem.writeAsStringAsync(FILE_PATH, currentTime);
-    } catch (error) {
 
+    } catch (error) {
+      
     }
   }
 };

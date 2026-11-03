@@ -179,46 +179,38 @@ export default function HomeScreen() {
         <ScrollView style={{ flexDirection:"column", marginTop: 19}}>
           <TouchableOpacity
             style={[styles.buttonimage, isLoadingAd && styles.disabledButton]}
-            onPress={()=> handleNavigate('Chapters')}
+            onPress={()=> handleNavigateInterstitial('Chapters')}
             disabled={isLoadingAd}>
-              { isLoadingAd ? ( <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : ( <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
-                  <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Chapters</Text>
-                </ImageBackground>
-              ) }
+              <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
+                <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Chapters</Text>
+              </ImageBackground>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.buttonimage, isLoadingAd && styles.disabledButton]}
-            onPress={()=> handleNavigate('Crosswords')}
+            onPress={()=> handleNavigateInterstitial('Crosswords')}
             disabled={isLoadingAd}>
-              { isLoadingAd ? ( <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : ( <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
-                  <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Crosswords</Text>
-                </ImageBackground>
-              ) }
+              <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
+                <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Crosswords</Text>
+              </ImageBackground>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.buttonimage, isLoadingAd && styles.disabledButton]}
-            onPress={()=> handleNavigate('Quizzes')}
+            onPress={()=> handleNavigateInterstitial('Quizzes')}
             disabled={isLoadingAd}>
-              { isLoadingAd ? ( <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : ( <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
-                  <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Quizzes</Text>
-                </ImageBackground>
-              ) }
+              <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
+                <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Quizzes</Text>
+              </ImageBackground>
           </TouchableOpacity>
             
           <TouchableOpacity
             style={[styles.buttonimage, isLoadingAd && styles.disabledButton]}
-            onPress={()=> handleNavigate('Problems')}
+            onPress={()=> handleNavigateInterstitial('Problems')}
             disabled={isLoadingAd}>
-              { isLoadingAd ? ( <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : ( <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
-                  <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Problems</Text>
-                </ImageBackground>
-              ) }
+              <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
+                <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Problems</Text>
+              </ImageBackground>
           </TouchableOpacity>
             
           <TouchableOpacity
