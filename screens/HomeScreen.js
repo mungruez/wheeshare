@@ -1,16 +1,15 @@
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator, Alert } from 'react-native';
-import { InterstitialAd, AdEventType, BannerAd, BannerAdSize, TestIds, RewardedAd, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import { InterstitialAd, AdEventType, BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
-import React, { useLayoutEffect, useState, useCallback } from 'react';
+import React, { useLayoutEffect, useState, useEffect, useCallback } from 'react';
 import AutoRewardAd from './AutoRewardAd';
 import { AdTimer } from './AdTimer';
 
   
 const BANNER_A_ID = TestIds.BANNER; 
 const INTERSTITIAL_A_ID = TestIds.INTERSTITIAL;
-const REWARDED_A_ID = TestIds.REWARDED;
 
 
 export default function HomeScreen() {
@@ -21,22 +20,18 @@ export default function HomeScreen() {
   const [loadAd, setLoadAd] = useState(false);
   const navigation = useNavigation();
   const isFocused = useIsFocused();
+  
 
-
-  useEffect(() => {
+   useEffect(() => {
     if (!isFocused) {
       setLoadAd(false);
       return;
-    }
-      
-    const task = InteractionManager.runAfterInteractions(() => {
+    } else {
       setLoadAd(true);
-    });
-
-    return () => task.cancel();
+    }
   }, [isFocused]);
-  
-  
+
+
   useLayoutEffect(()=> {
     navigation.setOptions({ headerShown: false,});
   }, []);
@@ -189,7 +184,7 @@ export default function HomeScreen() {
         <ScrollView style={{ flexDirection:"column", marginTop: 19}}>
           <TouchableOpacity
             style={[styles.buttonimage, isLoadingAd && styles.disabledButton]}
-            onPress={()=> navigation.navigate('Chapters')}
+            onPress={()=> handleNavigate('Chapters')}
             disabled={isLoadingAd}>
               <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
                 <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Chapters</Text>
@@ -198,7 +193,7 @@ export default function HomeScreen() {
 
           <TouchableOpacity
             style={[styles.buttonimage, isLoadingAd && styles.disabledButton]}
-            onPress={()=> navigation.navigate('Crosswords')}
+            onPress={()=> handleNavigate('Crosswords')}
             disabled={isLoadingAd}>
               <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
                 <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Crosswords</Text>
@@ -207,7 +202,7 @@ export default function HomeScreen() {
 
           <TouchableOpacity
             style={[styles.buttonimage, isLoadingAd && styles.disabledButton]}
-            onPress={()=> navigation.navigate('Quizzes')}
+            onPress={()=> handleNavigate('Quizzes')}
             disabled={isLoadingAd}>
               <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
                 <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>Quizzes</Text>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator } from 'react-native';
-import { RewardedAd, TestIds, RewardedAdEventType, InterstitialAd, AdEventType } from 'react-native-google-mobile-ads';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -22,8 +21,6 @@ const COLUMN_COUNT = 12;
 
 const CALCULATED_CELL_SIZE = (SCREEN_WIDTH - (GRID_PADDING * 2)) / COLUMN_COUNT;
 const CELL_SIZE = Math.max(CALCULATED_CELL_SIZE, 21);
-const REWARDED_A_ID = TestIds.REWARDED;
-const INTERSTITIAL_A_ID = TestIds.INTERSTITIAL;
 
 
 export default function WheeCrosswords() {
@@ -112,7 +109,7 @@ export default function WheeCrosswords() {
       setPendingTargetCwrd(null);
       setPendingTargetCat(null);
     }
-  }, [pendingTargetCwrd, pendingTargetCat,]);
+  }, [pendingTargetCwrd, pendingTargetCat]);
 
 
   
