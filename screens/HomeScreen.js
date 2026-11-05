@@ -1,8 +1,10 @@
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator, Alert } from 'react-native';
 import { InterstitialAd, AdEventType, BannerAd, BannerAdSize, TestIds, RewardedAd, RewardedAdEventType } from 'react-native-google-mobile-ads';
-import React, { useLayoutEffect, useState } from 'react';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNetInfo } from "@react-native-community/netinfo";
+import React, { useLayoutEffect, useState, useCallback } from 'react';
+import AutoRewardAd from './AutoRewardAd';
 import { AdTimer } from './AdTimer';
 
   
@@ -12,8 +14,27 @@ const REWARDED_A_ID = TestIds.REWARDED;
 
 
 export default function HomeScreen() {
+  const [pendingTargetScreen, setPendingTargetScreen] = useState<string | null>(null);
   const [isLoadingAd, setIsLoadingAd] = useState(false);
+  const isOffline = useNetInfo().isConnected === false;
+  const [isAdActive, setIsAdActive] = useState(false);
+  const [loadAd, setLoadAd] = useState(false);
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+
+
+  useEffect(() => {
+    if (!isFocused) {
+      setLoadAd(false);
+      return;
+    }
+      
+    const task = InteractionManager.runAfterInteractions(() => {
+      setLoadAd(true);
+    });
+
+    return () => task.cancel();
+  }, [isFocused]);
   
   
   useLayoutEffect(()=> {
@@ -24,9 +45,9 @@ export default function HomeScreen() {
   const handleNavigateInterstitial = async (scrname) => {
     try {
       const isEligible = await AdTimer.shouldShowAd();
-
-      if (isEligible) {
-        setIsLoadingAd(true);
+      
+      if (isEligible && !isOffline) {
+        setLoadAd(false);
 
         const interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_A_ID, {
           requestNonPersonalizedAdsOnly: true
@@ -46,7 +67,7 @@ export default function HomeScreen() {
 
         backupTimer = setTimeout(() => {
           cleanUp();
-          setIsLoadingAd(false);
+          setLoadAd(false);
           navigation.navigate(scrname);
         }, 3000);
 
@@ -60,106 +81,96 @@ export default function HomeScreen() {
               })
               .catch(() => {
                 cleanUp();
+                setLoadAd(false);
                 navigation.navigate(scrname);
               });
           } catch (showError) {
             cleanUp();
+            setLoadAd(false);
             navigation.navigate(scrname);
           }
         });
 
         unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
           cleanUp();
+          setLoadAd(false);
           navigation.navigate(scrname);
         });
 
         unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, () => {
           cleanUp();
-          setIsLoadingAd(false);
+          setLoadAd(false);
           navigation.navigate(scrname); 
         });
 
         interstitial.load();
       } else {
+        setLoadAd(false);
         navigation.navigate(scrname);
       }
     } catch (globalError) {
-      setIsLoadingAd(false);
+      setLoadAd(false);
       navigation.navigate(scrname);
     }
   };
 
 
+  const handleAdResult = useCallback((result) => {
+    setIsAdActive(false);
+
+    if (result.success) {
+      AdTimer.saveTimestamp();
+      Alert.alert(
+        'Thank you.', 
+        'You have earned another 10 mins without ads! Enjoy wheeShare.', 
+        [{ 
+          text: 'OK',
+          onPress: () => {
+            if (pendingTargetScreen) {
+              navigation.navigate(pendingTargetScreen);
+              setPendingTargetScreen(null);
+            }
+          } 
+        }]
+      );
+    } else {
+      if (result.error) {
+        Alert.alert("Unavailable", "Ad could not be loaded right now.");
+      }
+      
+      if (pendingTargetScreen) {
+        navigation.navigate(pendingTargetScreen);
+        setPendingTargetScreen(null);
+      }
+    }
+  }, [pendingTargetScreen, navigation]);
+
+
   const handleNavigate = async (scrname) => {
+    if (isAdActive) return;
+    setLoadAd(false);
+
     try {
       const isEligible = await AdTimer.shouldShowAd();
-      if (!isEligible) {
+      if (!isEligible || isOffline) {
         navigation.navigate(scrname);
         return;
       }
 
-      setIsLoadingAd(true);
-      const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID, {
-        requestNonPersonalizedAdsOnly: true
-      });
-      
-      let unsubscribeLoaded = null;
-      let unsubscribeError = null;
-      let unsubscribeClosed = null; 
-      let unsubscribeReward = null;
-      let backupTimer = null;
-
-      const cleanUp = () => {
-        if (backupTimer) clearTimeout(backupTimer);
-        if (unsubscribeLoaded) unsubscribeLoaded();
-        if (unsubscribeError) unsubscribeError();
-        if (unsubscribeClosed) unsubscribeClosed();
-        if (unsubscribeReward) unsubscribeReward();
-      };
-
-      backupTimer = setTimeout(() => {
-        cleanUp();
-        setIsLoadingAd(false);
-        navigation.navigate(scrname);
-      }, 3000);
-
-      unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-        setIsLoadingAd(false);
-        try {
-          rewarded.show()
-            .catch(() => {
-              cleanUp();
-              navigation.navigate(scrname);
-            });
-        } catch (showError) {
-          cleanUp();
-          navigation.navigate(scrname);
-        }
-      });
-
-      unsubscribeReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
-        AdTimer.saveTimestamp();
-        Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
-      });
-
-      unsubscribeClosed = rewarded.addAdEventListener(AdEventType.CLOSED, () => {
-        cleanUp();
-        navigation.navigate(scrname);
-      });
-
-      unsubscribeError = rewarded.addAdEventListener(AdEventType.ERROR, () => {
-        cleanUp();
-        setIsLoadingAd(false);
-        navigation.navigate(scrname); 
-      });
-
-      rewarded.load();
+      setPendingTargetScreen(scrname);
+      setIsAdActive(true);
 
     } catch (globalError) {
-      setIsLoadingAd(false);
       navigation.navigate(scrname);
     }
   };
+
+
+  if(isAdActive) {
+    return (
+      <AutoRewardAd onAdFinished={handleAdResult} />
+    )
+  }
 
 
   return (
@@ -223,11 +234,17 @@ export default function HomeScreen() {
         </ScrollView>
 
         <View style={{ flex:1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center', backgroundColor: "#ffffffff", width: '100%' }}>
-          <BannerAd
-            unitId={BANNER_A_ID}
-            size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
-            requestOptions={{requestNonPersonalizedAdsOnly: true}}
-          />
+          {!isOffline && loadAd && isFocused ? (
+            <BannerAd
+              key="sticky-footer-banner"
+              unitId={BANNER_A_ID}
+              size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
+              requestOptions={{requestNonPersonalizedAdsOnly: true}}
+              onAdFailedToLoad={(error) => {
+                Alert.alert('Failed to prepare Banner Ad', error?.message || String(error))
+              }}
+            />
+          ) : null}
         </View>
       </SafeAreaView>
     </ImageBackground>

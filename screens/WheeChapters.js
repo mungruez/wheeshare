@@ -1562,7 +1562,7 @@ export default function WheeChapters() {
           </View>
 
           <View style={{flexDirection:'row', alignItems:'center', justifyContent: 'center', marginBottom: 1, minHeight: 73, width:"100%"}}>
-            <TouchableOpacity onPress={() => { handleAds(); setCurrentChapter(null); setChapterTitle(""); setPrevCategory(""); setChapterCategory(""); setChapterDesc(""); setSelectedIds([]); setSections([]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
+            <TouchableOpacity onPress={() => { setCurrentChapter(null); setChapterTitle(""); setPrevCategory(""); setChapterCategory(""); setChapterDesc(""); setSelectedIds([]); setSections([]); setPrevMode("main"); setMode("add"); } } style={styles.plusIcon}>
               <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/addchapterbtn.png')}/>         
             </TouchableOpacity> 
             <TouchableOpacity onPress={handleImportChapters} style={styles.importIcon}>
@@ -1590,7 +1590,7 @@ export default function WheeChapters() {
               { item && item.category && 
                 ( <TouchableOpacity
                   style={{width: "67%", flex: 1, height: 67, alignItems: "center", justifyContent: "center", opacity: 1, alignSelf:"center" }}
-                  onPress={() => { handleAds(); setPrevCategory(item.category); setHchapters(getChapters(item.category, chapters)); setChapterCategory(item.category); setPrevMode("main"); setMode("list"); }}>
+                  onPress={() => { setPrevCategory(item.category); setHchapters(getChapters(item.category, chapters)); setChapterCategory(item.category); setPrevMode("main"); setMode("list"); }}>
                   {item.id === 'c-all' ? 
                     ( <ImageBackground style={{ width: "100%", height: "100%", alignSelf: "center", justifyContent: "center", alignItems: "center" }} resizeMode='contain' source={require('../assets/allcategoriesbtn.png')} />
                     ) : (

@@ -1,10 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { RewardedAd, TestIds, RewardedAdEventType, AdEventType } from 'react-native-google-mobile-ads';
 
+
 const rewarded = RewardedAd.createForAdRequest(TestIds.REWARDED);
+
 
 export default function AutoRewardAd({ onAdFinished }) {
   const hasTriggeredCallback = useRef(false);
+
 
   useEffect(() => {
     let earnedReward = false;
@@ -12,11 +15,13 @@ export default function AutoRewardAd({ onAdFinished }) {
     const safeExit = (statusObj) => {
       if (!hasTriggeredCallback.current) {
         hasTriggeredCallback.current = true;
+        
         requestAnimationFrame(() => {
           onAdFinished(statusObj);
         });
       }
     };
+
 
     const unsubscribeLoaded = rewarded.addAdEventListener(
       RewardedAdEventType.LOADED, 
@@ -29,6 +34,7 @@ export default function AutoRewardAd({ onAdFinished }) {
       }
     );
 
+
     const unsubscribeEarned = rewarded.addAdEventListener(
       RewardedAdEventType.EARNED_REWARD, 
       () => { 
@@ -36,12 +42,14 @@ export default function AutoRewardAd({ onAdFinished }) {
       }
     );
 
+
     const unsubscribeClosed = rewarded.addAdEventListener(
       AdEventType.CLOSED, 
       () => { 
         safeExit({ success: earnedReward, error: null }); 
       }
     );
+
 
     const unsubscribeError = rewarded.addAdEventListener(
       AdEventType.ERROR, 
@@ -53,7 +61,7 @@ export default function AutoRewardAd({ onAdFinished }) {
     try {
       rewarded.load();
     } catch (loadError) {
-      safeExit({ success: false, error: "Instance busy" });
+      safeExit({ success: false, error: "RewardAd Instance busy" });
     }
 
     return () => {
