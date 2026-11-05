@@ -36,6 +36,7 @@ export default function WheeChapters() {
   const [openpdfViewer, setOpenpdfViewer] = useState(null);
   const [prevCategory, setPrevCategory] = useState("");
   const [chapterTitle, setChapterTitle] = useState("");
+  const [isAdActive, setIsAdActive] = useState(false);
   const [chapterDesc, setChapterDesc] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isPicking, setIsPicking] = useState(false);
@@ -131,15 +132,19 @@ export default function WheeChapters() {
   
   const handleAds = async () => {
     try {
-      setLoading(true);
+
+      setIsAdActive(true);
       const isEligible = await AdTimer.shouldShowAd();
+
       if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {
         await rewardedAdRef.current.show();
         await AdTimer.saveTimestamp();
-        setLoading(false);
       }
+
+      setIsAdActive(false);
+
     } catch (error) {
-      setLoading(false);
+      setIsAdActive(false);
     }
   };
 
@@ -1133,6 +1138,11 @@ export default function WheeChapters() {
     if (firstId === "c-all") return <Image source={require('../assets/chaptersdivider.png')} style={styles.goldDivider} resizeMode='contain'/>;
     return null;
   };
+
+
+  if(isAdActive) {
+    return null;
+  }
 
 
   if (loading) return ( 
