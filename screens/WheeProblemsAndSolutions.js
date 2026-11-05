@@ -25,7 +25,7 @@ export default function WheeProblemsAndSolutions() {
   const [prevMode, setPrevMode] = useState("main");
   const [mode, setMode] = useState("main");
 
-  const lastBackPress = useRef<number>(0);
+  const lastBackPress = useRef(0);
   const navigation = useNavigation();
   const isPickingRef = useRef(false);
   const isLoadingRef = useRef(false);

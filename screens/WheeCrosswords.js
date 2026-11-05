@@ -49,7 +49,7 @@ export default function WheeCrosswords() {
   const [loading, setLoading] = useState(false);
 
   const isOffline = useNetInfo().isConnected === false;
-  const lastBackPress = useRef<number>(0);
+  const lastBackPress = useRef(0);
   const isLoadingRef = useRef(false);
   const navigation = useNavigation();
 

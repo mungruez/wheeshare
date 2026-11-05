@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, ActivityIndicator, Alert } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ImageBackground, StatusBar, Alert } from 'react-native';
 import { InterstitialAd, AdEventType, BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,7 +13,7 @@ const INTERSTITIAL_A_ID = TestIds.INTERSTITIAL;
 
 
 export default function HomeScreen() {
-  const [pendingTargetScreen, setPendingTargetScreen] = useState<string | null>(null);
+  const [pendingTargetScreen, setPendingTargetScreen] = useState(null);
   const [isLoadingAd, setIsLoadingAd] = useState(false);
   const isOffline = useNetInfo().isConnected === false;
   const [isAdActive, setIsAdActive] = useState(false);
@@ -115,6 +115,7 @@ export default function HomeScreen() {
 
     if (result.success) {
       AdTimer.saveTimestamp();
+
       Alert.alert(
         'Thank you.', 
         'You have earned another 10 mins without ads! Enjoy wheeShare.', 
@@ -228,7 +229,7 @@ export default function HomeScreen() {
           </TouchableOpacity> 
         </ScrollView>
 
-        <View style={{ flex:1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center', backgroundColor: "#ffffffff", width: '100%' }}>
+        <View style={{ flex: 1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center', backgroundColor: "#ffffffff", width: '100%' }}>
           {!isOffline && loadAd && isFocused ? (
             <BannerAd
               key="sticky-footer-banner"

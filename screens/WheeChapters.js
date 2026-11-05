@@ -46,7 +46,7 @@ export default function WheeChapters() {
   
   const isOffline = useNetInfo().isConnected === false;
   const isPickingRef = React.useRef(false);
-  const lastBackPress = useRef<number>(0);
+  const lastBackPress = useRef(0);
   const rewardedAdRef = useRef(null);
   const isAdReadyRef = useRef(false);
   const isLoadingRef = useRef(false);

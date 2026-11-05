@@ -31,10 +31,10 @@ export default function WheeQuizzes() {
   const [squizzes, setSquizzes] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
   const [mode, setMode] = useState("main");
-  const lastBackPress = useRef<number>(0);
   const isLoadingRef = useRef(false);
   const navigation = useNavigation();
   const rewardedAdRef = useRef(null);
+  const lastBackPress = useRef(0);
 
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [longanswer, setLongAnswer] = useState(false);
