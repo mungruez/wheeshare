@@ -5,9 +5,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
 import { MaterialCommunityIcons } from "@expo/vector-icons"; 
+import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import { zip, unzip } from 'react-native-zip-archive';
-import * as DocumentPicker from 'expo-document-picker';
 import WheeQuizScreen from "./WheeQuizScreen";
 import * as Sharing from 'expo-sharing';
 import { AdTimer } from './AdTimer';
@@ -19,35 +19,34 @@ const CARD_WIDTH = width * 0.76;
 
 
 export default function WheeQuizzes() {
-  const [loading, setLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [quizzes, setQuizzes] = useState([]);
-  const [hquizzes, setHquizzes] = useState([]);
-  
-  const [squizzes, setSquizzes] = useState([]);
+  const [multipleanswers, setMultipleAnswers] = useState(false);
+  const [multiplechoice, setMultipleChoice] = useState(true);
   const isOffline = useNetInfo().isConnected === false;
+  const [quizCategory, setQuizCategory] = useState("");
+  const [prevCategory, setPrevCategory] = useState("");
+  const [isAdActive, setIsAdActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [hquizzes, setHquizzes] = useState([]);
+  const [squizzes, setSquizzes] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
+  const [mode, setMode] = useState("main");
   const lastBackPress = useRef<number>(0);
   const isLoadingRef = useRef(false);
   const navigation = useNavigation();
   const rewardedAdRef = useRef(null);
 
-  const [mode, setMode] = useState("main"); 
-  const [prevMode, setPrevMode] = useState("main");
   const [currentQuiz, setCurrentQuiz] = useState(null);
-  
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [quizId, setQuizId] = useState(null);
-  const [quizTitle, setQuizTitle] = useState("");
-  const [quizCategory, setQuizCategory] = useState("");
-  const [prevCategory, setPrevCategory] = useState("");
-  const [quizDesc, setQuizDesc] = useState("");
-  const [searchQuery, setSearchQuery] = useState(""); 
-  
-  const [multiplechoice, setMultipleChoice] = useState(true); 
-  const [truefalse, setTrueFalse] = useState(false); 
-  const [multipleanswers, setMultipleAnswers] = useState(false);
   const [longanswer, setLongAnswer] = useState(false);
   const [isAdLoaded, setIsAdLoaded] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [truefalse, setTrueFalse] = useState(false);  
+  const [prevMode, setPrevMode] = useState("main");
+  const [quizTitle, setQuizTitle] = useState("");
+  const [quizDesc, setQuizDesc] = useState("");
+  const [quizId, setQuizId] = useState(null);
+  
   const [questionsList, setQuestionsList] = useState([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
   
 
@@ -584,10 +583,12 @@ export default function WheeQuizzes() {
     } catch (error) {
       Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
     }
+    setIsAdActive(false);
   }
 
 
   const populateForEdit = (quizItem, mvcat) => {
+    setIsAdActive(true);
     handleAds();
 
     if (quizItem === null) {
@@ -965,6 +966,11 @@ export default function WheeQuizzes() {
       </View>
     </View>
   );
+
+
+  if(isAdActive) {
+    return null;
+  }
   
     
   if (mode === "play_active" && currentQuiz) {
@@ -1216,7 +1222,7 @@ export default function WheeQuizzes() {
                 {item && item.category && (
                   <TouchableOpacity
                     style={{ width: "67%", height: 57 }}
-                    onPress={() => { handleAds(); setHquizzes(getQuizzes(item.category, quizzes)); setQuizCategory(item.category); setPrevCategory(item.category); setMode("list"); }}>
+                    onPress={() => { setIsAdActive(true); handleAds(); setHquizzes(getQuizzes(item.category, quizzes)); setQuizCategory(item.category); setPrevCategory(item.category); setMode("list"); }}>
                     <ImageBackground
                       style={{ flex: 1, justifyContent:'center', alignItems:'center' }}
                       resizeMode='stretch'
