@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View, Image, Pressable, ImageBackground, FlatList, TextInput, StatusBar, ActivityIndicator } from "react-native";
-import { InterstitialAd, AdEventType } from 'react-native-google-mobile-ads';
+import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from '@expo/vector-icons'; 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-export default function WheeQuizScreen({ data, onBackToDashboard}) {
+export default function WheeQuizScreen({ data, onBackToDashboard, isOffline}) {
   const [ten, setTen] = useState(false); 
   const [twenty, setTwenty] = useState(false); 
   const [thirty, setThirty] = useState(false);
@@ -76,28 +76,30 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
 
   const handleAdsInter = async () => {
     try {
-      setIsLoadingAd(true);
+      if (!isOffline) {
+        setLoadAd(false);
 
-      const interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_A_ID, {
-        requestNonPersonalizedAdsOnly: true
-      });
+        const interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_A_ID, {
+          requestNonPersonalizedAdsOnly: true
+        });
         
-      let unsubscribeLoaded = null;
-      let unsubscribeError = null;
-      let unsubscribeClosed = null; 
-      let backupTimer = null;
+        let unsubscribeLoaded = null;
+        let unsubscribeError = null;
+        let unsubscribeClosed = null; 
+        let backupTimer = null;
 
-      const cleanUp = () => {
-        if (backupTimer) clearTimeout(backupTimer);
-        if (unsubscribeLoaded) unsubscribeLoaded();
-        if (unsubscribeError) unsubscribeError();
-        if (unsubscribeClosed) unsubscribeClosed();
-      };
+        const cleanUp = () => {
+          if (backupTimer) clearTimeout(backupTimer);
+          if (unsubscribeLoaded) unsubscribeLoaded();
+          if (unsubscribeError) unsubscribeError();
+          if (unsubscribeClosed) unsubscribeClosed();
+        };
 
-      backupTimer = setTimeout(() => {
-        cleanUp();
-        setIsLoadingAd(false);
-      }, 3000);
+        backupTimer = setTimeout(() => {
+          cleanUp();
+          setLoadAd(false);
+          setQmode("quiz");
+        }, 3000);
 
       
         unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
@@ -105,28 +107,40 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
           try {
             interstitial.show()
               .then(() => {
+                
               })
               .catch(() => {
                 cleanUp();
+                setLoadAd(false);
+                setQmode("quiz");
               });
           } catch (showError) {
             cleanUp();
+            setLoadAd(false);
+            setQmode("quiz");
           }
         });
 
         unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
           cleanUp();
+          setLoadAd(false);
+          setQmode("quiz");
         });
 
         unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, () => {
           cleanUp();
-          setIsLoadingAd(false);
+          setLoadAd(false);
+          setQmode("quiz"); 
         });
 
         interstitial.load();
-      
+      } else {
+        setLoadAd(false);
+        setQmode("quiz");
+      }
     } catch (globalError) {
-      setIsLoadingAd(false);
+      setLoadAd(false);
+      setQmode("quiz");
     }
   };
 
@@ -136,9 +150,11 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
     const safeSelectedNum = Number.isFinite(selectedNum) ? Math.floor(selectedNum) : data.length;
     const finalCount = Math.max(1, Math.min(data.length, safeSelectedNum));
     const safeTimer = sanitizeTimerSeconds(selectedTimer);
+
     setQnum(finalCount);
     setTimerLimit(safeTimer);
     setTimerInput(String(safeTimer));
+
     const randomIndices = [];
     const usedIndexes = new Set();
 
@@ -150,12 +166,13 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
       usedIndexes.add(nextIndex);
       randomIndices.push(nextIndex);
     }
+
     setQarr(randomIndices);
+    setCounter(safeTimer);
     setIndex(0);
     setPoints(0);
     setAnswers([]);
-    setCounter(safeTimer);
-    setQmode("quiz");
+    handleAdsInter();
   };
 
   const currentQuestion = Array.isArray(data) && qarr.length > 0 && index < qarr.length ? data[qarr[index]] : null;
@@ -336,7 +353,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard}) {
           </View>
 
           { isLoadingAd ? ( <ActivityIndicator size="small" color="#FFFFFF" /> )
-            : ( <Pressable disabled={isLoadingAd} onPress={() => { handleAdsInter(); initializeQuizArray(getQnum(), sanitizeTimerSeconds(timerInput)); }} style={styles.startQuizBtn}>
+            : ( <Pressable disabled={isLoadingAd} onPress={() => initializeQuizArray(getQnum(), sanitizeTimerSeconds(timerInput))} style={styles.startQuizBtn}>
               <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Start Quiz</Text>
             </Pressable> ) }
         </SafeAreaView>
