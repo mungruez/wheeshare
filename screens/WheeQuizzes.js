@@ -657,7 +657,7 @@ export default function WheeQuizzes() {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
 
       const now = Date.now();
-      if(now - lastBackPress.current < 760) {
+      if(now - lastBackPress.current < 1140) {
         return true;
       }
 
@@ -684,7 +684,7 @@ export default function WheeQuizzes() {
         return true;
       }
 
-      if (navigation.canGoBack()) {
+      if (mode === "main" && navigation.canGoBack()) {
         navigation.goBack();
         return true;
       }

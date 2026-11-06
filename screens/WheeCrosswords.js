@@ -955,7 +955,7 @@ export default function WheeCrosswords() {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
 
       const now = Date.now();
-      if(now - lastBackPress.current < 760) {
+      if(now - lastBackPress.current < 1425) {
         return true;
       }
 
@@ -984,7 +984,7 @@ export default function WheeCrosswords() {
         return true;
       }
 
-      if (navigation.canGoBack()) {
+      if (mode === "main" && navigation.canGoBack()) {
         navigation.goBack();
         return true;
       }

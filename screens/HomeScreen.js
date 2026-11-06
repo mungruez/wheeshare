@@ -229,19 +229,19 @@ export default function HomeScreen() {
           </TouchableOpacity> 
         </ScrollView>
 
-        <View style={{ flex: 1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center', backgroundColor: "#ffffffff", width: '100%' }}>
-          {!isOffline && loadAd && isFocused ? (
+        {!isOffline && loadAd && isFocused ? (
+          <View style={{ flex: 1, justifyContent: "space-between", marginTop: 20, alignSelf: 'center', width: '100%' }}>
             <BannerAd
               key="sticky-footer-banner"
               unitId={BANNER_A_ID}
               size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
               requestOptions={{requestNonPersonalizedAdsOnly: true}}
               onAdFailedToLoad={(error) => {
-                Alert.alert('Failed to prepare Banner Ad', error?.message || String(error))
+                setLoadAd(false);
               }}
             />
-          ) : null}
-        </View>
+          </View>
+        ) : null}
       </SafeAreaView>
     </ImageBackground>
   )
