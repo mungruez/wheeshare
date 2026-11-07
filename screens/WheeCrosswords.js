@@ -85,7 +85,11 @@ export default function WheeCrosswords() {
                 setPrevMode("main");
               }
             } else {
-              populateForEdit(pendingTargetCwrd, pendingTargetCat);
+              if(pendingTargetCat === "ZljimvznotWheeSharetonzvtmijlZ") {
+                viewCrossword(pendingTargetCwrd);
+              } else {
+                populateForEdit(pendingTargetCwrd, pendingTargetCat);
+              }
             }
           } 
         }]
@@ -103,7 +107,11 @@ export default function WheeCrosswords() {
           setPrevMode("main");
         }
       } else {
-        populateForEdit(pendingTargetCwrd, pendingTargetCat);
+        if(pendingTargetCat === "ZljimvznotWheeSharetonzvtmijlZ") {
+            viewCrossword(pendingTargetCwrd);
+        } else {
+          populateForEdit(pendingTargetCwrd, pendingTargetCat);
+        }
       }
 
       setPendingTargetCwrd(null);
@@ -128,7 +136,11 @@ export default function WheeCrosswords() {
             setPrevMode("main");
           }
         } else {
-          populateForEdit(cwrd, cwrdcat);
+          if(cwrdcat === "ZljimvznotWheeSharetonzvtmijlZ") {
+            viewCrossword(cwrd);
+          } else {
+            populateForEdit(cwrd, cwrdcat);
+          }
         }
         return;
       }
@@ -146,7 +158,11 @@ export default function WheeCrosswords() {
             setPrevMode("main");
           }
         } else {
-          populateForEdit(cwrd, cwrdcat);
+          if(cwrdcat === "ZljimvznotWheeSharetonzvtmijlZ") {
+            viewCrossword(cwrd);
+          } else {
+            populateForEdit(cwrd, cwrdcat);
+          }
         }
     }
   };
@@ -1010,7 +1026,7 @@ export default function WheeCrosswords() {
       <TouchableOpacity
         style={[styles.listCard, isSelected && styles.selectedListCard]}
         onLongPress={() => toggleSelect(item.id)}
-        onPress={() => selectedIds.length > 0 ? toggleSelect(item.id) : viewCrossword(item)}
+        onPress={() => selectedIds.length > 0 ? toggleSelect(item.id) : handleRewardAds(item, "ZljimvznotWheeSharetonzvtmijlZ")}
         activeOpacity={0.8}
       >
         <View style={styles.listRow}>
