@@ -19,36 +19,37 @@ const CARD_WIDTH = width * 0.76;
 
 
 export default function WheeQuizzes() {
+  const [questionsList, setQuestionsList] = useState([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
+  const [pendingTargetQuiz, setPendingTargetQuiz] = useState(null);
+  const [pendingTargetCat, setPendingTargetCat] = useState(null);
   const [multipleanswers, setMultipleAnswers] = useState(false);
   const [multiplechoice, setMultipleChoice] = useState(true);
   const isOffline = useNetInfo().isConnected === false;
   const [quizCategory, setQuizCategory] = useState("");
   const [prevCategory, setPrevCategory] = useState("");
+  const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [longanswer, setLongAnswer] = useState(false);
+  const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [isAdActive, setIsAdActive] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [truefalse, setTrueFalse] = useState(false);  
+  const [prevMode, setPrevMode] = useState("main");
   const [isLoading, setIsLoading] = useState(true);
+  const [quizTitle, setQuizTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [hquizzes, setHquizzes] = useState([]);
   const [squizzes, setSquizzes] = useState([]);
+  const [quizDesc, setQuizDesc] = useState("");
+  const [quizId, setQuizId] = useState(null);
   const [quizzes, setQuizzes] = useState([]);
   const [mode, setMode] = useState("main");
   const isLoadingRef = useRef(false);
   const navigation = useNavigation();
   const rewardedAdRef = useRef(null);
+  const isAdReadyRef = useRef(false);
   const lastBackPress = useRef(0);
 
-  const [currentQuiz, setCurrentQuiz] = useState(null);
-  const [longanswer, setLongAnswer] = useState(false);
-  const [isAdLoaded, setIsAdLoaded] = useState(false);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [truefalse, setTrueFalse] = useState(false);  
-  const [prevMode, setPrevMode] = useState("main");
-  const [quizTitle, setQuizTitle] = useState("");
-  const [quizDesc, setQuizDesc] = useState("");
-  const [quizId, setQuizId] = useState(null);
-  
-  const [questionsList, setQuestionsList] = useState([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
-  
 
   const showInstructions = () => {
     Alert.alert(
@@ -518,6 +519,7 @@ export default function WheeQuizzes() {
       if ( mode !== "view" ) clearAppCache();
       if (mode === "main" || mode === "list") loadQuizzes();
 
+      if(isOffline) return;
       let isActive = true;
       let unsubscribeLoaded = null;
       let unsubscribeError = null;
@@ -534,22 +536,44 @@ export default function WheeQuizzes() {
           });
 
           unsubscribeReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-            Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
+            Alert.alert('Thank you.','You have earned another 10 mins without ads! Enjoy wheeShare.', 
+              [{ 
+                text: 'OK',
+                onPress: () => {
+                  if (mode === "main") {
+                    if(pendingTargetQuiz === null) {
+                      populateForEdit(null, pendingTargetCat);
+                    } else {
+                      setMode("list"); 
+                      setPrevMode("main");
+                    }
+                  } else {
+                    if(qcat === "VniojlzmWheeSharemzljoinV") {
+                      setCurrentQuiz(pendingTargetQuiz);
+                      setMode("play_active");
+                    } else {
+                      populateForEdit(pendingTargetQuiz, pendingTargetCat);
+                    }
+                  }
+                } 
+              }]
+            );
           });
 
           unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
             if (!isActive) return;
-            setIsAdLoaded(true);
+            isAdReadyRef.current = true;
           });
 
           unsubscribeClosed = rewarded.addAdEventListener(AdEventType.CLOSED, () => {
-            setIsAdLoaded(false);
+            isAdReadyRef.current = false;
             if (isActive) {
               prepareRewardedAd(); 
             }
           });
 
           unsubscribeError = rewarded.addAdEventListener(AdEventType.ERROR, (error) => {
+            isAdReadyRef.current = false;
             Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
           });
 
@@ -572,25 +596,64 @@ export default function WheeQuizzes() {
     }, [])
   );
 
-  
-  const handleAds = async () => {
+
+  const handleAds = async (quizItem, qcat) => {
+    if (isAdActive) return;
+
     try {
       const isEligible = await AdTimer.shouldShowAd();
-      if (isEligible && isAdLoaded && rewardedAdRef.current) {
+
+      if (!isEligible || isOffline) {
+        if (mode === "main") {
+          if(quizItem === null) {
+            populateForEdit(quizItem, qcat);
+          } else {
+            setMode("list"); 
+            setPrevMode("main");
+          }
+        } else {
+          if(qcat === "VniojlzmWheeSharemzljoinV") {
+            setCurrentQuiz(quizItem);
+            setMode("play_active");
+          } else {
+            populateForEdit(quizItem, qcat);
+          }
+        }
+        return;
+      }
+
+      setPendingTargetQuiz(quizItem);
+      setPendingTargetCat(qcat);
+      setIsAdActive(true);
+
+      if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {
         await rewardedAdRef.current.show();
         await AdTimer.saveTimestamp();
       }
-    } catch (error) {
-      Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
+
+      setIsAdActive(false);
+
+    } catch (globalError) {
+        if (mode === "main") {
+          if(quizItem === null) {
+            populateForEdit(null, qcat);
+          } else {
+            setMode("list"); 
+            setPrevMode("main");
+          }
+        } else {
+          if(qcat === "VniojlzmWheeSharemzljoinV") {
+            setCurrentQuiz(quizItem);
+            setMode("play_active");
+          } else {
+            populateForEdit(quizItem, qcat);
+          }
+        }
     }
-    setIsAdActive(false);
-  }
+  };
 
 
   const populateForEdit = (quizItem, mvcat) => {
-    setIsAdActive(true);
-    handleAds();
-
     if (quizItem === null) {
       setSelectedIds([]);
       setQuizTitle("");
@@ -794,14 +857,13 @@ export default function WheeQuizzes() {
           if (selectedIds.length > 0) {
             toggleSelect(item.id);
           } else {
-            setCurrentQuiz(item.quiz);
-            setMode("play_active"); 
+            handleAds(item.quiz, "VniojlzmWheeSharemzljoinV");
           }
         }}>
         <Text style={styles.chapterCardTitle} numberOfLines={1}>{item.title}</Text>
         <Text style={styles.chapterCardCount}>{`Contains: ${item.quiz.length} questions`}</Text>
         { isSelected && selectedIds.length === 1 && ( <View style={styles.chapterCardFooter}>
-          <TouchableOpacity style={styles.editBtnCard} onPress={() => populateForEdit(item, item.category)}>
+          <TouchableOpacity style={styles.editBtnCard} onPress={() => handleAds(item, item.category)}>
             <Text style={styles.editBtnText}>EDIT</Text>
           </TouchableOpacity>
         </View> ) }
@@ -1197,7 +1259,7 @@ export default function WheeQuizzes() {
           </View>
 
           <View style={styles.dashboardIconsControlsRow}>
-            <TouchableOpacity onPress={() => { setPrevMode("main"); populateForEdit(null, "allcategories"); }} style={styles.plusIcon}>
+            <TouchableOpacity onPress={() => { handleAds(null, "allcategories"); }} style={styles.plusIcon}>
               <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/quizzes/addquizbtn.png')}/>         
             </TouchableOpacity> 
             <TouchableOpacity onPress={handleImportQuizzes} style={styles.importIcon}>
@@ -1222,7 +1284,7 @@ export default function WheeQuizzes() {
                 {item && item.category && (
                   <TouchableOpacity
                     style={{ width: "67%", height: 57 }}
-                    onPress={() => { setIsAdActive(true); handleAds(); setHquizzes(getQuizzes(item.category, quizzes)); setQuizCategory(item.category); setPrevCategory(item.category); setMode("list"); }}>
+                    onPress={() => { setHquizzes(getQuizzes(item.category, quizzes)); setQuizCategory(item.category); setPrevCategory(item.category); handleAds(item, item.category); }}>
                     <ImageBackground
                       style={{ flex: 1, justifyContent:'center', alignItems:'center' }}
                       resizeMode='stretch'

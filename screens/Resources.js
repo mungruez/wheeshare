@@ -102,7 +102,7 @@ export default function Resources() {
           <View style={styles.contentBox}>
 
             <TouchableOpacity style={styles.eulaButton} onPress={showEulaModal}>
-              <Text style={styles.eulaButtonText}>⚖️ View Terms of Use & EULA (18+)</Text>
+              <Text style={styles.eulaButtonText}>⚖️ View Terms of Use & EULA (16+)</Text>
             </TouchableOpacity>
 
             <Text style={styles.title}>
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   bannerContainer: { alignSelf: 'center', backgroundColor: '#ffffffff', width: '100%' },
   tintOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(7, 15, 24, 0.58)',
   },
   headerWrap: {
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 19,
     paddingVertical: 10,
-    backgroundColor: 'rgba(10, 17, 27, 0.18)',
+    backgroundColor: 'rgba(211, 211, 211, 0.1)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.18,

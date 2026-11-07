@@ -25,10 +25,10 @@ const CELL_SIZE = Math.max(CALCULATED_CELL_SIZE, 21);
 
 export default function WheeCrosswords() {
   const [questions, setQuestions] = useState([{answer: "", hint: "", startx: "", starty: "", orientation: "", position: "1"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "2"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "3"}, {answer: "", hint: "", startx: "", starty: "", orientation: "", position: "4"}]);
-  const [crosswordCategory, setCrosswordCategory] = useState("");
-  const [currentCrossword, setCurrentCrossword] = useState(null);
   const [pendingTargetCwrd, setPendingTargetCwrd] = useState(null);
   const [pendingTargetCat, setPendingTargetCat] = useState(null);
+  const [crosswordCategory, setCrosswordCategory] = useState("");
+  const [currentCrossword, setCurrentCrossword] = useState(null);
   const [crosswordTitle, setCrosswordTitle] = useState("");
   const [crosswordId, setCrosswordId] = useState(null);  
   const [prevCategory, setPrevCategory] = useState("");
