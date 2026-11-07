@@ -125,9 +125,9 @@ export default function WheeCrosswords() {
     if (isAdActive) return;
 
     try {
-      const isEligible = await AdTimer.shouldShowAd();
+      const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
 
-      if (!isEligible || isOffline) {
+      if (!isEligible) {
         if (mode === "main") {
           if(cwrd === null) {
             populateForEdit(cwrd, cwrdcat);
@@ -164,6 +164,7 @@ export default function WheeCrosswords() {
             populateForEdit(cwrd, cwrdcat);
           }
         }
+        setIsAdActive(false);
     }
   };
   

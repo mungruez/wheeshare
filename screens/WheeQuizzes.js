@@ -601,9 +601,9 @@ export default function WheeQuizzes() {
     if (isAdActive) return;
 
     try {
-      const isEligible = await AdTimer.shouldShowAd();
+      const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
 
-      if (!isEligible || isOffline) {
+      if (!isEligible) {
         if (mode === "main") {
           if(quizItem === null) {
             populateForEdit(quizItem, qcat);
@@ -649,6 +649,7 @@ export default function WheeQuizzes() {
             populateForEdit(quizItem, qcat);
           }
         }
+        setIsAdActive(false);
     }
   };
 
@@ -1043,6 +1044,7 @@ export default function WheeQuizzes() {
           setMode("list");
           setCurrentQuiz(null);
         }}
+        isOffline={isOffline}
       />
     );
   }

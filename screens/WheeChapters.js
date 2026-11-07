@@ -21,6 +21,8 @@ const CARD_WIDTH = width * 0.76;
 
 
 export default function WheeChapters() {
+  const [pendingTargetChapt, setPendingTargetChapt] = useState(null);
+  const [pendingTargetCat, setPendingTargetCat] = useState(null);
   const [currentChapter, setCurrentChapter] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [prevMode, setPrevMode] = useState("main");
@@ -46,10 +48,10 @@ export default function WheeChapters() {
   
   const isOffline = useNetInfo().isConnected === false;
   const isPickingRef = React.useRef(false);
-  const lastBackPress = useRef(0);
   const rewardedAdRef = useRef(null);
   const isAdReadyRef = useRef(false);
   const isLoadingRef = useRef(false);
+  const lastBackPress = useRef(0);
 
 
   const showInstructions = () => {
@@ -94,7 +96,27 @@ export default function WheeChapters() {
       });
 
       const unsubscribeReward = instance.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
-        Alert.alert('Thank you.', 'You have earned another 10 mins without ads! Enjoy wheeShare.', [{ text: 'OK' }]);
+        Alert.alert('Thank you.','You have earned another 10 mins without ads! Enjoy wheeShare.', 
+          [{ 
+            text: 'OK',
+            onPress: () => {
+              if (mode === "main") {
+                if(pendingTargetChapt === null) {
+                  populateForEdit(null, pendingTargetCat);
+                } else {
+                  setMode("list"); 
+                  setPrevMode("main");
+                }
+              } else {
+                if(qcat === "VniojlzmWheeSharemzljoinV") {
+                  viewChapter(pendingTargetChapt);
+                } else {
+                  populateForEdit(pendingTargetChapt, pendingTargetCat);
+                }
+              }
+            } 
+          }]
+        );
       });
       
       const unsubscribeClosed = instance.addAdEventListener(AdEventType.CLOSED, () => {
@@ -123,18 +145,40 @@ export default function WheeChapters() {
 
 
   useEffect(() => {
-    if (mode !== "view" && !isAdReadyRef.current) loadNewRewardedAd();
+    if (mode !== "view" && !isOffline && !isAdReadyRef.current) loadNewRewardedAd();
     
     return () => {
     };
   }, [mode]);
 
-  
-  const handleAds = async () => {
-    try {
 
+  const handleAds = async (chaptItem, chaptcat) => {
+    if (isAdActive) return;
+
+    try {
+      const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
+
+      if (!isEligible) {
+        if (mode === "main") {
+          if(chaptItem === null) {
+            populateForEdit(chaptItem, chaptcat);
+          } else {
+            setMode("list"); 
+            setPrevMode("main");
+          }
+        } else {
+          if(chaptcat === "VbniojlzmWheeSharemzljoinbV") {
+            viewChapter(chaptItem);
+          } else {
+            populateForEdit(chaptItem, chaptcat);
+          }
+        }
+        return;
+      }
+
+      setPendingTargetChapt(chaptItem);
+      setPendingTargetCat(chaptcat);
       setIsAdActive(true);
-      const isEligible = await AdTimer.shouldShowAd();
 
       if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {
         await rewardedAdRef.current.show();
@@ -143,8 +187,23 @@ export default function WheeChapters() {
 
       setIsAdActive(false);
 
-    } catch (error) {
-      setIsAdActive(false);
+    } catch (globalError) {
+        if (mode === "main") {
+          if(chaptItem === null) {
+            populateForEdit(null, chaptcat);
+          } else {
+            setMode("list"); 
+            setPrevMode("main");
+          }
+        } else {
+          if(chaptcat === "VniojlzmWheeSharemzljoinV") {
+            viewChapter(chaptItem);
+          } else {
+            populateForEdit(chaptItem, chaptcat);
+          }
+        }
+        
+        setIsAdActive(false);
     }
   };
 
@@ -699,7 +758,6 @@ export default function WheeChapters() {
 
 
   const populateForEdit = (chapter, mvcat ) => {
-    handleAds();
     if(chapter === null) {
       setSelectedIds([]);
       setChapterTitle("");
@@ -1110,7 +1168,7 @@ export default function WheeChapters() {
   const ChapterCard = ({ item }) => (
     <TouchableOpacity 
       onLongPress={() => toggleSelect(item.id)}
-      onPress={() => selectedIds.length > 0 ? toggleSelect(item.id) : viewChapter(item)}
+      onPress={() => selectedIds.length > 0 ? toggleSelect(item.id) : handleAds(item, "VbniojlzmWheeSharemzljoinbV")}
       style={[styles.itemContainer, selectedIds.includes(item.id) && styles.selectedItem]}>
         
         <View style={styles.card}>
@@ -1249,7 +1307,7 @@ export default function WheeChapters() {
                   <ImageBackground style={{ height: "100%", width: "100%", }} resizeMode='contain' source={ require('../assets/backgold.png') }/>
                 </TouchableOpacity>
         
-                <TouchableOpacity onPress={() => populateForEdit(null, chapterCategory)} style={ styles.plusIcon }>
+                <TouchableOpacity onPress={() => handleAds(null, chapterCategory)} style={ styles.plusIcon }>
                   <ImageBackground style={{ height: "100%", width: "100%", }} resizeMode='contain' source={ require('../assets/addchapterbtn.png') }/>         
                 </TouchableOpacity>
               </View>
@@ -1600,7 +1658,7 @@ export default function WheeChapters() {
               { item && item.category && 
                 ( <TouchableOpacity
                   style={{width: "67%", flex: 1, height: 67, alignItems: "center", justifyContent: "center", opacity: 1, alignSelf:"center" }}
-                  onPress={() => { setPrevCategory(item.category); setHchapters(getChapters(item.category, chapters)); setChapterCategory(item.category); setPrevMode("main"); setMode("list"); }}>
+                  onPress={() => { setPrevCategory(item.category); setHchapters(getChapters(item.category, chapters)); setChapterCategory(item.category); handleAds(item, item.category) }}>
                   {item.id === 'c-all' ? 
                     ( <ImageBackground style={{ width: "100%", height: "100%", alignSelf: "center", justifyContent: "center", alignItems: "center" }} resizeMode='contain' source={require('../assets/allcategoriesbtn.png')} />
                     ) : (

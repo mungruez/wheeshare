@@ -147,8 +147,9 @@ export default function HomeScreen() {
     setLoadAd(false);
 
     try {
-      const isEligible = await AdTimer.shouldShowAd();
-      if (!isEligible || isOffline) {
+      const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
+      
+      if (!isEligible) {
         navigation.navigate(scrname);
         return;
       }
