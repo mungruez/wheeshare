@@ -519,7 +519,7 @@ export default function WheeQuizzes() {
       if ( mode !== "view" ) clearAppCache();
       if (mode === "main" || mode === "list") loadQuizzes();
 
-      if(isOffline) return;
+      if(isOffline || isAdReadyRef.current) return;
       let isActive = true;
       let unsubscribeLoaded = null;
       let unsubscribeError = null;
@@ -649,6 +649,7 @@ export default function WheeQuizzes() {
             populateForEdit(quizItem, qcat);
           }
         }
+
         setIsAdActive(false);
     }
   };
