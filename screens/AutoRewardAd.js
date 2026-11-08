@@ -58,8 +58,7 @@ export default function AutoRewardAd({ onAdFinished }) {
     const unsubscribeClosed = rewarded.addAdEventListener(
       AdEventType.CLOSED, 
       () => { 
-        safeExit({ success: earnedReward, error: null }); 
-        cleanupListeners();
+        safeExit({ success: earnedReward, error: null });
       }
     );
 
@@ -67,8 +66,7 @@ export default function AutoRewardAd({ onAdFinished }) {
     const unsubscribeError = rewarded.addAdEventListener(
       AdEventType.ERROR, 
       (error) => { 
-        safeExit({ success: false, error: error.message }); 
-        cleanupListeners();
+        safeExit({ success: false, error: error.message });
       }
     );
 
@@ -78,16 +76,11 @@ export default function AutoRewardAd({ onAdFinished }) {
       safeExit({ success: false, error: "RewardAd Instance busy" });
     }
 
-
-    const cleanupListeners = () => {
-      if (unsubscribeLoaded) unsubscribeLoaded();
-      if (unsubscribeEarned) unsubscribeEarned();
-      if (unsubscribeClosed) unsubscribeClosed();
-      if (unsubscribeError) unsubscribeError();
-    };
-
-
     return () => {
+      unsubscribeLoaded();
+      unsubscribeEarned();
+      unsubscribeClosed();
+      unsubscribeError();
     };
   }, [onAdFinished]);
 
