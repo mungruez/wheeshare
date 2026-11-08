@@ -32,7 +32,14 @@ export default function AutoRewardAd({ onAdFinished }) {
       () => {
         try {
           willTriggerShow.current = true;
-          rewarded.show();
+          
+          requestAnimationFrame(() => {
+            try {
+              rewarded.show();
+            } catch (err) {
+              safeExit({ success: false, error: err.message });
+            }
+          });
         } catch (err) {
           safeExit({ success: false, error: err.message });
         }
@@ -52,6 +59,7 @@ export default function AutoRewardAd({ onAdFinished }) {
       AdEventType.CLOSED, 
       () => { 
         safeExit({ success: earnedReward, error: null }); 
+        cleanupListeners();
       }
     );
 
@@ -60,6 +68,7 @@ export default function AutoRewardAd({ onAdFinished }) {
       AdEventType.ERROR, 
       (error) => { 
         safeExit({ success: false, error: error.message }); 
+        cleanupListeners();
       }
     );
 
@@ -69,23 +78,32 @@ export default function AutoRewardAd({ onAdFinished }) {
       safeExit({ success: false, error: "RewardAd Instance busy" });
     }
 
+
+    const cleanupListeners = () => {
+      if (unsubscribeLoaded) unsubscribeLoaded();
+      if (unsubscribeEarned) unsubscribeEarned();
+      if (unsubscribeClosed) unsubscribeClosed();
+      if (unsubscribeError) unsubscribeError();
+    };
+
+
     return () => {
-      unsubscribeLoaded();
-      unsubscribeEarned();
-      unsubscribeClosed();
-      unsubscribeError();
     };
   }, [onAdFinished]);
 
 
-  return (!hasTriggeredCallback.current  && !willTriggerShow.current ? 
-    ( <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '93%', backgroundColor: 'rgba(19, 19, 19, 0.76)', alignItems: 'center', justifyContent: 'center', zIndex: 19, elevation: 50 }}>
+  if (hasTriggeredCallback.current || willTriggerShow.current ) {
+    return null;
+  }
+
+
+  return (
+    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '93%', backgroundColor: 'rgba(19, 19, 19, 0.76)', alignItems: 'center', justifyContent: 'center', zIndex: 19, elevation: 50 }}>
       <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
         <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24, opacity: 1, borderRadius: 12 } } resizeMode='contain' source={require('../assets/icon.png')} />
         <ActivityIndicator size="large" color="#696308" style={{ transform: [{ scale: 1.9 }], marginBottom: 17 }} />
         <Text style={{ color: "#504b08", fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7 }}>Please Wait...</Text>
       </View>
     </View>
-   )
-   : null);
+  );
 }

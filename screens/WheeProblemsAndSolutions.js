@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator } from 'react-native';
-import { RewardedAd, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import { RewardedAd, TestIds, RewardedAdEventType, AdEventType } from 'react-native-google-mobile-ads';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -21,18 +21,19 @@ const CARD_WIDTH = width * 0.76;
 
 
 export default function WheeProblemsAndSolutions() {
+  const [pendingTargetQuiz, setPendingTargetQuiz] = useState(null);
+  const [pendingTargetCat, setPendingTargetCat] = useState(null);
   const [currentPSItem, setCurrentPSItem] = useState(null);
   const [prevMode, setPrevMode] = useState("main");
+  const [sPsItems, setSPsItems] = useState([]); 
+  const [hPsItems, setHPsItems] = useState([]); 
+  const [psItems, setPsItems] = useState([]);
   const [mode, setMode] = useState("main");
 
   const lastBackPress = useRef(0);
   const navigation = useNavigation();
   const isPickingRef = useRef(false);
   const isLoadingRef = useRef(false);
-
-  const [sPsItems, setSPsItems] = useState([]); 
-  const [hPsItems, setHPsItems] = useState([]); 
-  const [psItems, setPsItems] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [loadedAd, setLoadedAd] = useState(null);
