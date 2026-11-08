@@ -1,16 +1,28 @@
 import { StyleSheet, Text, View, ImageBackground, ScrollView, StatusBar, TouchableOpacity, Alert, Linking } from 'react-native'
-import { RewardedAd, BannerAd, BannerAdSize, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { AdTimer } from './AdTimer';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { useNetInfo } from "@react-native-community/netinfo";
+import { useNavigation, useIsFocused } from '@react-navigation/native';
+import React, { useLayoutEffect, useState, useEffect } from 'react';
 
-const BANNER_A_ID = TestIds.BANNER; 
-const REWARDED_A_ID = TestIds.REWARDED;
+const BANNER_A_ID = TestIds.BANNER;
 
 export default function Resources() {
-  const [isLoadingAd, setIsLoadingAd] = useState(false);
+  const isOffline = useNetInfo().isConnected === false;
+  const [loadAd, setLoadAd] = useState(false);
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+
+
+  useEffect(() => {
+    if (!isFocused) {
+      setLoadAd(false);
+      return;
+    } else {
+      setLoadAd(true);
+    }
+  }, [isFocused]);
+
 
   const handlePress = async () => {
     try {
@@ -28,54 +40,6 @@ export default function Resources() {
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
-
-  
-  useEffect(() => {
-    let isMounted = true;
-    let backupTimer;
-    let unsubscribeLoaded;
-    let unsubscribeError;
-
-    const loadRewardedAd = async () => {
-      try {
-        const isEligible = await AdTimer.shouldShowAd();
-        if (!isEligible || !isMounted) return;
-
-        setIsLoadingAd(true);
-        
-        const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID);
-        backupTimer = setTimeout(() => {
-          if (isMounted) setIsLoadingAd(false);
-        }, 2500);
-
-        unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-          clearTimeout(backupTimer);
-          if (!isMounted) return;
-          setIsLoadingAd(false);
-          rewarded.show();
-          AdTimer.saveTimestamp();
-        });
-
-        unsubscribeError = rewarded.addAdEventListener(RewardedAdEventType.ERROR, () => {
-          clearTimeout(backupTimer);
-          if (isMounted) setIsLoadingAd(false);
-        });
-
-        rewarded.load();
-      } catch (error) {
-        if (isMounted) setIsLoadingAd(false);
-      }
-    };
-
-    loadRewardedAd();
-
-    return () => {
-      isMounted = false;
-      clearTimeout(backupTimer);
-      unsubscribeLoaded?.();
-      unsubscribeError?.();
-    };
-  }, []);
 
 
   const showEulaModal = () => {
@@ -143,13 +107,19 @@ export default function Resources() {
           </View>
         </ScrollView>
 
-        <View style={styles.bannerContainer}>
-          <BannerAd
-            unitId={BANNER_A_ID}
-            size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
-            requestOptions={{requestNonPersonalizedAdsOnly: true}}
-          />
-        </View>
+        {!isOffline && loadAd && isFocused ? (
+          <View style={styles.bannerContainer}>
+            <BannerAd
+              key="res-footer-banner"
+              unitId={BANNER_A_ID}
+              size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
+              requestOptions={{requestNonPersonalizedAdsOnly: true}}
+              onAdFailedToLoad={(error) => {
+                setLoadAd(false);
+              }}
+            />
+          </View>
+        ) : null }
       </SafeAreaView>
     </ImageBackground>
   );
@@ -164,7 +134,7 @@ const styles = StyleSheet.create({
   eulaButtonText: {color: '#00ff00',fontWeight: 'bold',fontSize: 14,textTransform: 'uppercase',letterSpacing: 0.5,},
   scrollContent: {paddingBottom: 24},
   safeArea: { flex: 1 },
-  bannerContainer: { alignSelf: 'center', backgroundColor: '#ffffffff', width: '100%' },
+  bannerContainer: { alignSelf: 'center', width: '100%' },
   tintOverlay: {
     ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(7, 15, 24, 0.58)',
