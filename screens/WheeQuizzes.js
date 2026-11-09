@@ -758,7 +758,7 @@ export default function WheeQuizzes() {
     });
     
     return () => backHandler.remove();
-  }, []);  
+  }, [mode, prevMode]);  
 
 
   const handleImportQuizzes = async () => {
@@ -1410,5 +1410,5 @@ const styles = StyleSheet.create({
   explanationBodyText: { color: '#cbd5e1', fontSize: 12, marginTop: 4 },
   saveBtnFullBlock: { width: 133, height: 114, borderRadius: 15, marginTop: 7, alignSelf:'center', alignItems: 'center', justifyContent:'center', },
   loadingOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '93%', backgroundColor: 'rgba(19, 19, 19, 0.76)', alignItems: 'center', justifyContent: 'center', zIndex: 19, elevation: 50 },
-  loadingText: { color: '#9e37f3', fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7 },
+  loadingText: { color: '#c20f0f', fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7 },
  });

@@ -1,10 +1,13 @@
 import { View, TextInput, StyleSheet, Text, Button, ScrollView, Alert, StatusBar } from 'react-native';
+import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useNavigation } from "@react-navigation/native";
 
 const ROW_COUNT = 12;
 const COLUMN_COUNT = 12;
+const INTERSTITIAL_A_ID = TestIds.INTERSTITIAL;
 const isInBounds = (row, col) => row >= 0 && row < ROW_COUNT && col >= 0 && col < COLUMN_COUNT;
+
 
 const normalizePuzzle = (crosswordData) => {
   if (!Array.isArray(crosswordData)) return [];
@@ -13,6 +16,7 @@ const normalizePuzzle = (crosswordData) => {
   }
   return crosswordData;
 };
+
 
 const placeWord = (grid, answer, startx, starty, orientation, fillValue) => {
   if (!answer || startx === undefined || starty === undefined || !['across', 'down'].includes(orientation)) return;
@@ -25,7 +29,8 @@ const placeWord = (grid, answer, startx, starty, orientation, fillValue) => {
   }
 };
 
-const generateInitialGrid = (crosswordData) => {
+
+const generateInitialGrid = (crosswordData, isOffline) => {
   const puzzle = normalizePuzzle(crosswordData);
   const initialGrid = Array(ROW_COUNT).fill(0).map(() => Array(COLUMN_COUNT).fill('.'));
 
@@ -35,6 +40,7 @@ const generateInitialGrid = (crosswordData) => {
 
   return initialGrid;
 };
+
 
 const generateAnswerGrid = (crosswordData) => {
   const puzzle = normalizePuzzle(crosswordData);
@@ -47,10 +53,13 @@ const generateAnswerGrid = (crosswordData) => {
   return answerGrid;
 };
 
-const CrosswordGrid = ({ crosswordData }) => {
+
+const CrosswordGrid = ({ crosswordData, isOffline }) => {
   const navigation = useNavigation();
   const puzzle = normalizePuzzle(crosswordData);
+  const [isLoadingAd, setIsLoadingAd] = useState(false);
   const [grid, setGrid] = useState(() => generateInitialGrid(puzzle));
+
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -58,9 +67,80 @@ const CrosswordGrid = ({ crosswordData }) => {
     });
   }, [navigation]);
 
+
   useEffect(() => {
     setGrid(generateInitialGrid(puzzle));
   }, [puzzle]);
+
+
+  const handleAdsInter = async () => {
+    try {
+      if (!isOffline) {
+        setIsLoadingAd(true);
+
+        const interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_A_ID, {
+          requestNonPersonalizedAdsOnly: true
+        });
+        
+        let unsubscribeLoaded = null;
+        let unsubscribeError = null;
+        let unsubscribeClosed = null; 
+        let backupTimer = null;
+
+        const cleanUp = () => {
+          if (backupTimer) clearTimeout(backupTimer);
+          if (unsubscribeLoaded) unsubscribeLoaded();
+          if (unsubscribeError) unsubscribeError();
+          if (unsubscribeClosed) unsubscribeClosed();
+        };
+
+        backupTimer = setTimeout(() => {
+          cleanUp();
+          handleSolve();
+        }, 1900);
+
+      
+        unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+          try {
+            interstitial.show()
+              .then(() => {
+                setIsLoadingAd(false);
+              })
+              .catch(() => {
+                cleanUp();
+                setIsLoadingAd(false);
+                handleSolve();
+              });
+          } catch (showError) {
+            cleanUp();
+            setIsLoadingAd(false);
+            handleSolve();
+          }
+        });
+
+        unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+          cleanUp();
+          setIsLoadingAd(false);
+          handleSolve();
+        });
+
+        unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, () => {
+          cleanUp();
+          setIsLoadingAd(false);
+          handleSolve();
+        });
+
+        interstitial.load();
+      } else {
+        setIsLoadingAd(false);
+        handleSolve();
+      }
+    } catch (globalError) {
+      setIsLoadingAd(false);
+      handleSolve();
+    }
+  };
+
 
   const handleInputChange = (row, col, text) => {
     const newGrid = grid.map((gridRow) => [...gridRow]);
@@ -68,6 +148,7 @@ const CrosswordGrid = ({ crosswordData }) => {
     newGrid[row][col] = normalizedText;
     setGrid(newGrid);
   };
+
 
   const handleVerify = () => {
     const answerGrid = generateAnswerGrid(puzzle);
@@ -79,13 +160,16 @@ const CrosswordGrid = ({ crosswordData }) => {
     }
   };
 
+
   const handleReset = () => {
     setGrid(generateInitialGrid(puzzle));
   };
 
+
   const handleSolve = () => {
     setGrid(generateAnswerGrid(puzzle));
   };
+
 
   const renderQuestions = () => {
     const questions = { across: [], down: [] };
@@ -115,6 +199,7 @@ const CrosswordGrid = ({ crosswordData }) => {
     );
   };
 
+
   if (!puzzle.length) {
     return (
       <View style={styles.emptyState}>
@@ -122,6 +207,7 @@ const CrosswordGrid = ({ crosswordData }) => {
       </View>
     );
   }
+
 
   return (
     <ScrollView style={styles.screenScroll} contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
@@ -161,11 +247,12 @@ const CrosswordGrid = ({ crosswordData }) => {
         <View style={styles.gap} />
         <Button color="#228B22" title="Reset" onPress={handleReset} />
         <View style={styles.gap} />
-        <Button color="#228B22" title="Solve" onPress={handleSolve} />
+        <Button color="#228B22" title="Solve" disabled={isLoadingAd} onPress={handleAdsInter} />
       </View>
     </ScrollView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: { flexGrow: 1, alignItems: 'center', paddingTop: 19, paddingBottom: 80, backgroundColor: '#f8fff6' },

@@ -77,7 +77,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard, isOffline}) {
   const handleAdsInter = async () => {
     try {
       if (!isOffline) {
-        setLoadAd(false);
+        setIsLoadingAd(true);
 
         const interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_A_ID, {
           requestNonPersonalizedAdsOnly: true
@@ -97,49 +97,47 @@ export default function WheeQuizScreen({ data, onBackToDashboard, isOffline}) {
 
         backupTimer = setTimeout(() => {
           cleanUp();
-          setLoadAd(false);
           setQmode("quiz");
         }, 3000);
 
       
         unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
-          setIsLoadingAd(false);
           try {
             interstitial.show()
               .then(() => {
-                
+                setIsLoadingAd(false);
               })
               .catch(() => {
                 cleanUp();
-                setLoadAd(false);
+                setIsLoadingAd(false);
                 setQmode("quiz");
               });
           } catch (showError) {
             cleanUp();
-            setLoadAd(false);
+            setIsLoadingAd(false);
             setQmode("quiz");
           }
         });
 
         unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
           cleanUp();
-          setLoadAd(false);
+          setIsLoadingAd(false);
           setQmode("quiz");
         });
 
         unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, () => {
           cleanUp();
-          setLoadAd(false);
+          setIsLoadingAd(false);
           setQmode("quiz"); 
         });
 
         interstitial.load();
       } else {
-        setLoadAd(false);
+        setIsLoadingAd(false);
         setQmode("quiz");
       }
     } catch (globalError) {
-      setLoadAd(false);
+      setIsLoadingAd(false);
       setQmode("quiz");
     }
   };

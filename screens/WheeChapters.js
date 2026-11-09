@@ -1116,7 +1116,7 @@ export default function WheeChapters() {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
 
       const now = Date.now();
-      if(now - lastBackPress.current < 760) {
+      if(now - lastBackPress.current < 570) {
         return true;
       }
 
@@ -1154,7 +1154,7 @@ export default function WheeChapters() {
         return true;
       }
 
-      if (navigation.canGoBack()) {
+      if (mode === "main" && navigation.canGoBack()) {
         navigation.goBack();
         return true;
       }
@@ -1162,7 +1162,7 @@ export default function WheeChapters() {
       return true;
     });
     return () => backHandler.remove();
-  }, []);
+  }, [mode, prevMode]);
 
 
   const ChapterCard = ({ item }) => (

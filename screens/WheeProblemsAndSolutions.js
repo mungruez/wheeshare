@@ -863,7 +863,7 @@ export default function WheeProblemsAndSolutions() {
         return true;
       }
 
-      if (navigation.canGoBack()) {
+      if (mode === "main" && navigation.canGoBack()) {
         navigation.goBack();
         return true;
       }
@@ -871,7 +871,7 @@ export default function WheeProblemsAndSolutions() {
       return true;
     });
     return () => backHandler.remove();
-  }, []);
+  }, [mode, prevMode]);
 
 
 

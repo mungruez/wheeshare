@@ -972,7 +972,7 @@ export default function WheeCrosswords() {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
 
       const now = Date.now();
-      if(now - lastBackPress.current < 1425) {
+      if(now - lastBackPress.current < 570) {
         return true;
       }
 
@@ -1010,7 +1010,7 @@ export default function WheeCrosswords() {
     });
 
     return () => backHandler.remove();
-  }, []);   
+  }, [mode, prevMode]);   
   
 
   const MyHeader = () => {

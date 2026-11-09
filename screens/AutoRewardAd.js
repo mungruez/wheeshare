@@ -2,9 +2,7 @@ import { View, Text, Image, ActivityIndicator } from 'react-native';
 import React, { useEffect, useRef } from 'react';
 import { RewardedAd, TestIds, RewardedAdEventType, AdEventType } from 'react-native-google-mobile-ads';
 
-
 const rewarded = RewardedAd.createForAdRequest(TestIds.REWARDED);
-
 
 export default function AutoRewardAd({ onAdFinished }) {
   const hasTriggeredCallback = useRef(false);
@@ -12,7 +10,6 @@ export default function AutoRewardAd({ onAdFinished }) {
 
   useEffect(() => {
     let earnedReward = false;
-
 
     const safeExit = (statusObj) => {
       if (!hasTriggeredCallback.current) {
@@ -24,8 +21,6 @@ export default function AutoRewardAd({ onAdFinished }) {
         });
       }
     };
-
-    
 
     const unsubscribeLoaded = rewarded.addAdEventListener(
       RewardedAdEventType.LOADED, 
@@ -54,14 +49,12 @@ export default function AutoRewardAd({ onAdFinished }) {
       }
     );
 
-
     const unsubscribeClosed = rewarded.addAdEventListener(
       AdEventType.CLOSED, 
       () => { 
         safeExit({ success: earnedReward, error: null });
       }
     );
-
 
     const unsubscribeError = rewarded.addAdEventListener(
       AdEventType.ERROR, 
