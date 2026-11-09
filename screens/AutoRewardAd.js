@@ -87,8 +87,8 @@ export default function AutoRewardAd({ onAdFinished }) {
     <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '93%', backgroundColor: 'rgba(19, 19, 19, 0.76)', alignItems: 'center', justifyContent: 'center', zIndex: 19, elevation: 50 }}>
       <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
         <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24, opacity: 1, borderRadius: 12 } } resizeMode='contain' source={require('../assets/icon.png')} />
-        <ActivityIndicator size="large" color="#696308" style={{ transform: [{ scale: 1.9 }], marginBottom: 17 }} />
-        <Text style={{ color: "#504b08", fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7 }}>Please Wait...</Text>
+        <ActivityIndicator size="large" color="#e0d040" style={{ transform: [{ scale: 1.9 }], marginBottom: 17 }} />
+        <Text style={{ color: "#ddc558", fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7, opacity: 1 }}>Please Wait...</Text>
       </View>
     </View>
   );
