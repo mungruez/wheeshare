@@ -15,28 +15,33 @@ export default function Resources() {
 
 
   useEffect(() => {
+
     if (!isFocused) {
       setLoadAd(false);
       return;
     } else {
       setLoadAd(true);
     }
+
   }, [isFocused]);
 
 
   const handlePress = async () => {
     try {
       const supported = await Linking.canOpenURL("https://mungruez.github.io/myPortfolioWebsite/wheeshareprivacy.html");
+      
       if (supported) {
         await Linking.openURL("https://mungruez.github.io/myPortfolioWebsite/wheeshareprivacy.html");
       } else {
         Alert.alert('Error', 'Unable to open browser. Please check your web browser configuration.');
       }
+      
     } catch (error) {
       Alert.alert('Error', 'An unexpected error occurred while trying to launch the policy page.');
     }
   };
   
+
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
@@ -70,35 +75,51 @@ export default function Resources() {
             </TouchableOpacity>
 
             <Text style={styles.title}>
-              Thank you for downloading WheeShare. Your support helps us continue building a connected, knowledge-sharing community and improving the experience for learners, creators, and collaborators alike. We are grateful to everyone who has contributed time, effort, and insight to bring this platform to life. The free version includes ads, while the premium version removes them and includes enhanced crossword and quiz tools, along with a secure hidden password manager.
+              Thank you for downloading WheeShare by DojoSoft! Your support helps us build a connected, knowledge-sharing community for learners, creators, and collaborators worldwide. We are incredibly grateful to everyone who has contributed time, effort, and insight to bring this platform to life. 
             </Text>
 
             <Text style={styles.title}>
-              WheeShare does not collect personal data from your device. The app is designed for efficient battery usage, low memory consumption, and smooth performance. We plan to keep future updates accessible and reliable, with continued improvements at no extra cost.
+              Enjoy the fully-featured free version with ads, or upgrade to Premium to remove ads and unlock enhanced crossword and quiz tools, alongside a secure, hidden password manager.
+            </Text>
+
+            <Text style={styles.title}>
+              Your privacy matters: WheeShare does not collect personal data from your device. Built for efficiency, the app features low memory consumption, smooth performance, and optimized battery usage. We are committed to keeping future updates reliable, accessible, and continuously improved at no extra cost.
             </Text>
 
             <Text style={styles.chapters}>Chapters</Text>
             <Text style={styles.title}>
-              Create, share, edit, view, delete, and import your own chapters in WheeShare. Each chapter can include videos, audio files, images, and PDFs in any order, giving you flexibility to organise lessons, courses, albums, events, and other digital content. You can also share individual assets or entire chapters with other WheeShare users, while external sharing is limited to single media files and supported formats.
+              Create, share, edit, view, delete, and import your own chapters seamlessly. Each chapter can include videos, audio files, images, and PDFs in any order, giving you ultimate flexibility to organize lessons, courses, albums, events, and multimedia content. Share individual assets or entire chapters with other WheeShare users instantly. External sharing is also supported for single media files in compatible formats.
             </Text>
 
             <Text style={styles.problems}>Problems and Solutions</Text>
             <Text style={styles.title}>
-              Add, share, edit, view, delete, and import your own problems and solutions. You can share problem images, videos, or PDFs while reviewing a record, enabling collaborative learning and streamlined knowledge exchange. Problems and solutions can be imported and shared securely within the WheeShare ecosystem, with clear guidance for supported file types and sharing methods.
+              Add, share, edit, view, delete, and import your own problems and solutions to streamline knowledge exchange. You can share problem-related images, videos, or PDFs while reviewing records, making collaborative learning easier than ever. Problems and solutions can be imported and shared securely within the WheeShare ecosystem with clear, guided support for all file types.
             </Text>
 
             <Text style={styles.crosswords}>Crosswords</Text>
             <Text style={styles.title}>
-              Build and manage your own crosswords with ease. Each crossword contains a set of words, and the app supports secure sharing and importing of crossword content within WheeShare. This feature offers an engaging and practical way to strengthen vocabulary, comprehension, and learning.
+              Build and manage custom crosswords with ease. Each puzzle contains a personalized set of words, making it an engaging and practical way to strengthen vocabulary, comprehension, and learning. Share and import your crossword content securely within the WheeShare ecosystem to challenge your friends or students.
             </Text>
 
             <Text style={styles.quizzes}>Quizzes</Text>
             <Text style={styles.title}>
-              Create and manage quizzes in multiple formats and any order. You can add, edit, view, delete, and import quiz content, and share it with other users through the WheeShare platform. Quizzes are designed to support effective learning, assessment, and engagement across a wide range of subjects and content types.
+              Create and manage dynamic quizzes in multiple formats, arranged in any order you choose. Seamlessly add, edit, view, delete, import, and share your quiz content with other users. WheeShare quizzes are designed to support effective learning, quick assessments, and deep engagement across any subject or content type.
             </Text>
 
             <Text style={styles.title}>
-              For the best experience, use the volume control in the top-right corner to manage audio. Videos can be played in slow motion for clearer review. Wi-Fi is primarily used for content sharing, while the premium version removes advertisements for a cleaner experience. If needed, clear the app cache from your device settings. Please avoid clearing app data, as this may remove saved passwords, chapters, quizzes, crosswords, and problems.
+              Tips for the best experience: Use the volume control in the top-right corner to easily manage your audio. For detailed review, you can play videos in slow motion. Content sharing is optimized primarily for Wi-Fi. As a reminder, upgrading to Premium completely removes advertisements for a clean, distraction-free interface.
+            </Text>
+
+            <Text style={styles.title}>
+              Important Note: If you need to optimize space, please clear only the app cache from your device settings. Avoid clearing "App Data," as doing so will permanently remove your securely saved passwords, chapters, quizzes, crosswords, and problems. 
+            </Text>
+
+            <Text style={styles.title}>
+              Discover the DojoSoft Ecosystem: We also create iDojo—the ultimate self-defense training companion, available now on the App Store for $9.99! 
+            </Text>
+
+            <Text style={styles.title}>
+              In a powerful, innovative first, both WheeShare and iDojo feature the exact same intuitive "Chapters" interface. Because they share this unified core, you can seamlessly import and share your custom chapters and media assets between both apps instantly. Upgrade your routine by bringing collaborative learning and tactical training together!
             </Text>
 
             <TouchableOpacity onPress={handlePress} style={styles.linkButton} accessibilityRole="link">
@@ -120,6 +141,7 @@ export default function Resources() {
             />
           </View>
         ) : null }
+
       </SafeAreaView>
     </ImageBackground>
   );
@@ -130,11 +152,18 @@ const styles = StyleSheet.create({
   imgBackground: { flex: 1, width: '100%', backgroundColor: '#07111d' },
   icon: {height: 70,width: '100%',elevation: 3,marginTop: 3,textAlign: 'center'},
   scrollView: { flex: 1, flexDirection: 'column', marginTop: 5, marginBottom: 1, paddingBottom: 5 },
-  eulaButton: {backgroundColor: '#1a331a',borderColor: '#00ff00',borderWidth: 1.5,borderRadius: 8,paddingVertical: 12,paddingHorizontal: 15,marginVertical: 12,alignItems: 'center',shadowColor: '#00ff00',shadowOffset: { width: 0, height: 2 },shadowOpacity: 0.3,shadowRadius: 4,elevation: 4},
-  eulaButtonText: {color: '#00ff00',fontWeight: 'bold',fontSize: 14,textTransform: 'uppercase',letterSpacing: 0.5,},
+  eulaButton: { backgroundColor: 'rgba(142, 203, 255, 0.19)', borderWidth: 1, borderColor: 'rgba(142, 203, 255, 0.38)', borderRadius: 8,paddingVertical: 12,paddingHorizontal: 15,marginVertical: 12,alignItems: 'center',shadowColor: '#00d9ff',shadowOffset: { width: 0, height: 2 },shadowOpacity: 0.3,shadowRadius: 4,elevation: 4},
+  eulaButtonText: {color: '#76b9e4',fontWeight: 'bold',fontSize: 14,textTransform: 'uppercase',letterSpacing: 0.5,},
   scrollContent: {paddingBottom: 24},
   safeArea: { flex: 1 },
   bannerContainer: { alignSelf: 'center', width: '100%' },
+  contentBox: { marginTop: 2, borderColor: 'rgba(255,255,255,0.18)', borderWidth: 1, borderRadius: 16, marginBottom: 19,paddingVertical: 10,backgroundColor: 'rgba(211, 211, 211, 0.1)',shadowColor: '#000',shadowOffset: { width: 0, height: 10 },shadowOpacity: 0.18,shadowRadius: 12},
+  quizzes: {textDecorationLine: 'underline',textDecorationColor: '#dd4848',color: '#ce0a0a',fontSize: 19,fontStyle: 'italic',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
+  chapters: {textDecorationLine: 'underline',textDecorationColor: '#ecd866',fontStyle: 'italic',color: '#bba31c',fontSize: 19,fontWeight: '700',marginLeft: 20, marginTop: 4, letterSpacing: 0.2},
+  crosswords: {textDecorationLine: 'underline',textDecorationColor: '#4ee97a',fontStyle: 'italic',color: '#0e8d32',fontSize: 19,fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
+  problems: {textDecorationLine: 'underline',textDecorationColor: '#9e5ad6', fontStyle: 'italic', fontSize: 19,color: '#7f28c7',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
+  linkButton: {paddingVertical: 12,paddingHorizontal: 18,alignItems: 'center',justifyContent: 'center',alignSelf: 'center',marginTop: 8,marginBottom: 14,borderRadius: 14,backgroundColor: 'rgba(142, 203, 255, 0.10)',borderWidth: 1,borderColor: 'rgba(142, 203, 255, 0.38)'},
+  linkText: {color: '#9ecef8',fontSize: 15,textDecorationLine: 'underline',fontStyle: 'italic',fontWeight: '700'},
   tintOverlay: {
     ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(7, 15, 24, 0.58)',
@@ -176,24 +205,5 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12,
     shadowRadius: 8,
-  },
-  contentBox: {
-    marginTop: 2,
-    borderColor: 'rgba(255,255,255,0.18)',
-    borderWidth: 1,
-    borderRadius: 16,
-    marginBottom: 19,
-    paddingVertical: 10,
-    backgroundColor: 'rgba(211, 211, 211, 0.1)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-  },
-  quizzes: {textDecorationLine: 'underline',textDecorationColor: '#dd4848',color: '#ce0a0a',fontSize: 19,fontStyle: 'italic',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
-  chapters: {textDecorationLine: 'underline',textDecorationColor: '#ecd866',fontStyle: 'italic',color: '#bba31c',fontSize: 19,fontWeight: '700',marginLeft: 20, marginTop: 4, letterSpacing: 0.2},
-  crosswords: {textDecorationLine: 'underline',textDecorationColor: '#4ee97a',fontStyle: 'italic',color: '#0e8d32',fontSize: 19,fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
-  problems: {textDecorationLine: 'underline',textDecorationColor: '#9e5ad6', fontStyle: 'italic', fontSize: 19,color: '#7f28c7',fontWeight: '700',marginLeft: 20,marginTop: 4,letterSpacing: 0.2},
-  linkButton: {paddingVertical: 12,paddingHorizontal: 18,alignItems: 'center',justifyContent: 'center',alignSelf: 'center',marginTop: 8,marginBottom: 14,borderRadius: 14,backgroundColor: 'rgba(142, 203, 255, 0.10)',borderWidth: 1,borderColor: 'rgba(142, 203, 255, 0.38)'},
-  linkText: {color: '#9ecef8',fontSize: 15,textDecorationLine: 'underline',fontStyle: 'italic',fontWeight: '700'},
+  }
 });
