@@ -12,11 +12,9 @@ import WheeQuizScreen from "./WheeQuizScreen";
 import * as Sharing from 'expo-sharing';
 import { AdTimer } from './AdTimer';
 
-
 const { height, width } = Dimensions.get('window');
 const REWARDED_A_ID = TestIds.REWARDED;
 const CARD_WIDTH = width * 0.76;
-
 
 export default function WheeQuizzes() {
   const [questionsList, setQuestionsList] = useState([{ id: Date.now().toString()+"q1", question: "", options: ["", "", "", ""], correctAnswerIndex: 0, explanation: "" }]);
@@ -254,7 +252,6 @@ export default function WheeQuizzes() {
       const trackingUri = `${FileSystem.documentDirectory}.quizzes_user_initialized`;
       await FileSystem.writeAsStringAsync(trackingUri, "true");
       await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(quizzesData));
-
       setQuizzes(quizzesData);
       parseCategories(quizzesData, null);
       if (mode !== "main") setHquizzes(getQuizzes(prevCategory, quizzesData)); 
@@ -273,7 +270,6 @@ export default function WheeQuizzes() {
 
       const incomingQuizzes = Array.isArray(newData) ? newData : [newData];
       const updatedList = [...quizzes];
-      
       incomingQuizzes.forEach(quizData => {
         const index = updatedList.findIndex(q => String(q.id).trim() === String(quizData.id).trim());
         if (index > -1) {
@@ -461,7 +457,6 @@ export default function WheeQuizzes() {
     }
 
     if (!quizIds?.length) return;
-    
     let shareDir = null;
     let zipPath = null;
     let shareSuccess = false;
@@ -549,7 +544,7 @@ export default function WheeQuizzes() {
                       setPrevMode("main");
                     }
                   } else {
-                    if(qcat === "VniojlzmWheeSharemzljoinV") {
+                    if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
                       setCurrentQuiz(pendingTargetQuiz);
                       setMode("play_active");
                     } else {
@@ -575,13 +570,11 @@ export default function WheeQuizzes() {
 
           unsubscribeError = rewarded.addAdEventListener(AdEventType.ERROR, (error) => {
             isAdReadyRef.current = false;
-            Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
           });
 
           rewarded.load();
           rewardedAdRef.current = rewarded; 
         } catch (error) {
-          Alert.alert('Failed to prepare rewarded ad', error?.message || String(error));
         }
       };
       prepareRewardedAd();
@@ -600,10 +593,8 @@ export default function WheeQuizzes() {
 
   const handleAds = async (quizItem, qcat) => {
     if (isAdActive) return;
-
     try {
       const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
-
       if (!isEligible) {
         if (mode === "main") {
           if(quizItem === null) {

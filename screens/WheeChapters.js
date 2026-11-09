@@ -109,7 +109,7 @@ export default function WheeChapters() {
                   setPrevMode("main");
                 }
               } else {
-                if(qcat === "VniojlzmWheeSharemzljoinV") {
+                if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
                   viewChapter(pendingTargetChapt);
                 } else {
                   populateForEdit(pendingTargetChapt, pendingTargetCat);
@@ -1067,7 +1067,6 @@ export default function WheeChapters() {
           }
         }
       } catch (cleanupErr) {
-
       }      
 
       if(prevCategory==="allcategories") {
@@ -1162,6 +1161,7 @@ export default function WheeChapters() {
 
       return true;
     });
+    
     return () => backHandler.remove();
   }, [mode, prevMode]);
 

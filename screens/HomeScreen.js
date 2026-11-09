@@ -7,7 +7,7 @@ import React, { useLayoutEffect, useState, useEffect, useCallback } from 'react'
 import AutoRewardAd from './AutoRewardAd';
 import { AdTimer } from './AdTimer';
 
-  
+ 
 const BANNER_A_ID = TestIds.BANNER; 
 const INTERSTITIAL_A_ID = TestIds.INTERSTITIAL;
 
@@ -99,6 +99,7 @@ export default function HomeScreen() {
         });
 
         interstitial.load();
+        
       } else {
         setLoadAd(false);
         navigation.navigate(scrname);
@@ -218,7 +219,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
             
           <TouchableOpacity
-            style={styles.buttonimage}
+            style={[styles.buttonimage, isLoadingAd && styles.disabledButton]}
             onPress={()=> handleNavigateInterstitial('About')}
             disabled={isLoadingAd}>
               <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>

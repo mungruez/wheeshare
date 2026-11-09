@@ -351,7 +351,7 @@ export default function WheeQuizScreen({ data, onBackToDashboard, isOffline}) {
           </View>
 
           { isLoadingAd ? ( <ActivityIndicator size="small" color="#FFFFFF" /> )
-            : ( <Pressable disabled={isLoadingAd} onPress={() => initializeQuizArray(getQnum(), sanitizeTimerSeconds(timerInput))} style={styles.startQuizBtn}>
+            : ( <Pressable disabled={isLoadingAd} onPress={() => initializeQuizArray(getQnum(), sanitizeTimerSeconds(timerInput))} style={[styles.startQuizBtn, isLoadingAd && { opacity: 0.6 } ]}>
               <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Start Quiz</Text>
             </Pressable> ) }
         </SafeAreaView>
