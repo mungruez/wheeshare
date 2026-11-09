@@ -1376,13 +1376,13 @@ export default function WheeCrosswords() {
                 <View style={styles.card}>
                   { item && item.category && 
                     ( <TouchableOpacity
-                    style={{ width: "67%", height: 57 }}
+                    style={{ width: "67%", height: 61 }}
                     onPress={() => { setHcrosswords(getCrosswords(item.category, crosswords)); setCrosswordCategory(item.category); setPrevCategory(item.category); handleRewardAds(item, item.category); }}>
                     <ImageBackground style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} resizeMode='stretch' source={require('../assets/crosswords/greenbtnbg.png')}>
                       {item.id === 'c-all' ? 
                         ( <Image
                           resizeMode="contain"
-                          style={{height:"51%", width:"57%", alignSelf:"center"}}
+                          style={{height:"49%", width:"53%", alignSelf:"center"}}
                           source={require('../assets/allstyles.png')}
                         /> ) : (
                             <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>{ item.category.length > 20 ? item.category.substring(0, 20) : item.category }</Text>
@@ -1411,7 +1411,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'column', width: "95%", minHeight: 76, backgroundColor: 'rgba(195, 209, 223, 0.4)', borderWidth: 1, borderColor: '#c2cdd4',justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: 5, borderRadius: 9},
   myDojoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 15, backgroundColor: 'rgba(0,0,0,0.76)', opacity: 1 },
   title: { fontSize: 17, fontWeight: 'bold', color: '#15943b', height: 38, width: '100%', textAlign: 'center', marginBottom: 2 },
-  card: {  marginVertical: -4, alignSelf: 'center', borderRadius: 10, width: "100%", opacity: 1, alignItems: "center", justifyContent: "center", flex: 1 },
+  card: {  marginVertical: -3, alignSelf: 'center', borderRadius: 10, width: "100%", opacity: 1, alignItems: "center", justifyContent: "center", flex: 1 },
   cardText: { width: "100%", fontSize: 15, fontWeight: '800', color: '#e7e7eb', paddingHorizontal: 5, opacity: 1, textAlign: "center", textShadowColor: '#a3a186', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 7 },
   infoText: { fontSize: 14, fontWeight: 'bold', color: '#0e8644', minHeight: 76, width: '94%', textAlign: 'center', marginTop: -95, paddingHorizontal: 19, backgroundColor: 'rgba(0,0,0,0.5)' },
   icon: { height: 57, width: '89%', alignSelf: 'center', textAlign: 'center', marginLeft: 19, marginBottom: 3, opacity: 1 },

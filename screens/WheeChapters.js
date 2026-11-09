@@ -1657,10 +1657,10 @@ export default function WheeChapters() {
             <View style={styles.card}>
               { item && item.category && 
                 ( <TouchableOpacity
-                  style={{width: "67%", flex: 1, height: 67, alignItems: "center", justifyContent: "center", opacity: 1, alignSelf:"center" }}
+                  style={{width: "69%", flex: 1, height: 67, alignItems: "center", justifyContent: "center", opacity: 1, alignSelf:"center" }}
                   onPress={() => { setPrevCategory(item.category); setHchapters(getChapters(item.category, chapters)); setChapterCategory(item.category); handleAds(item, item.category) }}>
                   {item.id === 'c-all' ? 
-                    ( <ImageBackground style={{ width: "100%", height: "100%", alignSelf: "center", justifyContent: "center", alignItems: "center" }} resizeMode='contain' source={require('../assets/allcategoriesbtn.png')} />
+                    ( <ImageBackground style={{ width: "90%", height: "90%", alignSelf: "center", justifyContent: "center", alignItems: "center" }} resizeMode='contain' source={require('../assets/allcategoriesbtn.png')} />
                     ) : (
                       <ImageBackground style={{ width: "100%", height: "98%", alignSelf: "center", justifyContent: "center", alignItems: "center", flex: 1 }} resizeMode='contain' source={require('../assets/goldwhitebtn.png')}>
                           <Text numberOfLines={1} ellipsizeMode="clip" style={[styles.cardText, { width: '95%', textAlign: 'center' }]}>{ item.category.length > 20 ? item.category.substring(0, 20) : item.category }</Text>
