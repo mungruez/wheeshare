@@ -96,9 +96,10 @@ export default function WheeChapters() {
       });
 
       const unsubscribeReward = instance.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
-        Alert.alert('Thank you.','You have earned another 10 mins without ads! Enjoy wheeShare.', 
-          [{ 
-            text: 'OK',
+        Alert.alert('Thank you. Click to Claim !', 
+            'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
+            [{ 
+            text: 'CLAIM',
             onPress: () => {
               if (mode === "main") {
                 if(pendingTargetChapt === null) {

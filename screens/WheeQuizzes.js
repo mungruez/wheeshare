@@ -536,9 +536,10 @@ export default function WheeQuizzes() {
           });
 
           unsubscribeReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-            Alert.alert('Thank you.','You have earned another 10 mins without ads! Enjoy wheeShare.', 
+            Alert.alert('Thank you. Click to Claim !', 
+              'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
               [{ 
-                text: 'OK',
+                text: 'CLAIM',
                 onPress: () => {
                   if (mode === "main") {
                     if(pendingTargetQuiz === null) {

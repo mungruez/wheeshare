@@ -117,10 +117,10 @@ export default function HomeScreen() {
       AdTimer.saveTimestamp();
 
       Alert.alert(
-        'Thank you.', 
-        'You have earned another 10 mins without ads! Enjoy wheeShare.', 
+        'Thank you. Click to Claim !', 
+        'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
         [{ 
-          text: 'OK',
+          text: 'CLAIM',
           onPress: () => {
             if (pendingTargetScreen) {
               navigation.navigate(pendingTargetScreen);
@@ -130,10 +130,6 @@ export default function HomeScreen() {
         }]
       );
     } else {
-      if (result.error) {
-        Alert.alert("Unavailable", "Ad could not be loaded right now.");
-      }
-      
       if (pendingTargetScreen) {
         navigation.navigate(pendingTargetScreen);
         setPendingTargetScreen(null);
@@ -158,6 +154,7 @@ export default function HomeScreen() {
       setIsAdActive(true);
 
     } catch (globalError) {
+      setLoadAd(false);
       navigation.navigate(scrname);
     }
   };
