@@ -354,8 +354,10 @@ export default function WheeChapters() {
     try {
       const fileUri = `${FileSystem.documentDirectory}chapters.json`;
       const trackingUri = `${FileSystem.documentDirectory}.user_initialized`;
+      
       await FileSystem.writeAsStringAsync(trackingUri, "true");
       await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(chaptersData));
+
       setChapters(chaptersData);
       parseCategories(chaptersData, null);
       setHchapters(getChapters(prevCategory, chaptersData));
@@ -397,6 +399,7 @@ export default function WheeChapters() {
   const deleteChapters = async (idsFromArg = []) => {
     const actualIds = Array.isArray(idsFromArg) && idsFromArg.length > 0 ? idsFromArg : (selectedIds || []);
     const cleanIdsToDelete = actualIds.map(id => String(id).trim());
+
     if (cleanIdsToDelete.length === 0) return;
     
     const isDeletingAll = actualIds.length === hchapters.length;

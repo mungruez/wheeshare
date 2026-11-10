@@ -27,7 +27,6 @@ export default function WheeQuizzes() {
   const [prevCategory, setPrevCategory] = useState("");
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [longanswer, setLongAnswer] = useState(false);
-  const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [isAdActive, setIsAdActive] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -508,144 +507,68 @@ export default function WheeQuizzes() {
   };
 
 
-  
-  useFocusEffect(
-    useCallback(() => {
-      if ( mode !== "view" ) clearAppCache();
-      if (mode === "main" || mode === "list") loadQuizzes();
+  const loadNewRewardedAd = () => {
+    if (isAdReadyRef.current) return;
 
-      if(isOffline || isAdReadyRef.current) return;
-      let isActive = true;
-      let unsubscribeLoaded = null;
-      let unsubscribeError = null;
-      let unsubscribeReward = null;
-      let unsubscribeClosed = null;
-
-      const prepareRewardedAd = async () => {
-        try {
-          const isEligible = await AdTimer.shouldShowAd();
-          if (!isEligible || !isActive) return;
-
-          const rewarded = RewardedAd.createForAdRequest(REWARDED_A_ID, {
-            requestNonPersonalizedAdsOnly: true,
-          });
-
-          unsubscribeReward = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-            Alert.alert('Thank you. Click to Claim !', 
-              'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
-              [{ 
-                text: 'CLAIM',
-                onPress: () => {
-                  if (mode === "main") {
-                    if(pendingTargetQuiz === null) {
-                      populateForEdit(null, pendingTargetCat);
-                    } else {
-                      setMode("list"); 
-                      setPrevMode("main");
-                    }
-                  } else {
-                    if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
-                      setCurrentQuiz(pendingTargetQuiz);
-                      setMode("play_active");
-                    } else {
-                      populateForEdit(pendingTargetQuiz, pendingTargetCat);
-                    }
-                  }
-                } 
-              }]
-            );
-          });
-
-          unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-            if (!isActive) return;
-            isAdReadyRef.current = true;
-          });
-
-          unsubscribeClosed = rewarded.addAdEventListener(AdEventType.CLOSED, () => {
-            isAdReadyRef.current = false;
-            if (isActive) {
-              prepareRewardedAd(); 
-            }
-          });
-
-          unsubscribeError = rewarded.addAdEventListener(AdEventType.ERROR, (error) => {
-            isAdReadyRef.current = false;
-          });
-
-          rewarded.load();
-          rewardedAdRef.current = rewarded; 
-        } catch (error) {
-          
-        }
-      };
-      prepareRewardedAd();
-
-      return () => {
-        isActive = false;
-        if (unsubscribeLoaded) unsubscribeLoaded();
-        if (unsubscribeError) unsubscribeError();
-        if (unsubscribeReward) unsubscribeReward();
-        if (unsubscribeClosed) unsubscribeClosed();
-        setIsAdLoaded(false);
-      };
-    }, [])
-  );
-
-
-  const handleAds = async (quizItem, qcat) => {
-    if (isAdActive) return;
     try {
-      const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
-      if (!isEligible) {
-        if (mode === "main") {
-          if(quizItem === null) {
-            populateForEdit(quizItem, qcat);
-          } else {
-            setMode("list"); 
-            setPrevMode("main");
-          }
-        } else {
-          if(qcat === "VniojlzmWheeSharemzljoinV") {
-            setCurrentQuiz(quizItem);
-            setMode("play_active");
-          } else {
-            populateForEdit(quizItem, qcat);
-          }
-        }
-        return;
-      }
+      const instance = RewardedAd.createForAdRequest(REWARDED_A_ID, {
+        requestNonPersonalizedAdsOnly: true,
+      });
 
-      setPendingTargetQuiz(quizItem);
-      setPendingTargetCat(qcat);
-      setIsAdActive(true);
+      const unsubscribeLoaded = instance.addAdEventListener(RewardedAdEventType.LOADED, () => {
+        isAdReadyRef.current = true;
+      });
+      
+      const unsubscribeReward = instance.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+        isAdReadyRef.current = false;
+      });
+      
+      const unsubscribeClosed = instance.addAdEventListener(AdEventType.CLOSED, () => {
+        isAdReadyRef.current = false;
+        rewardedAdRef.current = null;
 
-      if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {
-        await rewardedAdRef.current.show();
-        await AdTimer.saveTimestamp();
-      }
+        Alert.alert('Thank you. Click to Claim !', 
+          'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
+          [{ text: 'CLAIM', 
+            onPress: () => { 
+              launchPendingTarget(); 
+            } 
+          }]
+        );
 
-      setIsAdActive(false);
+        unsubscribeLoaded();
+        unsubscribeReward();
+        unsubscribeClosed();
+        unsubscribeError();
+        loadNewRewardedAd(); 
+      });
 
-    } catch (globalError) {
-        if (mode === "main") {
-          if(quizItem === null) {
-            populateForEdit(null, qcat);
-          } else {
-            setMode("list"); 
-            setPrevMode("main");
-          }
-        } else {
-          if(qcat === "VniojlzmWheeSharemzljoinV") {
-            setCurrentQuiz(quizItem);
-            setMode("play_active");
-          } else {
-            populateForEdit(quizItem, qcat);
-          }
-        }
+      const unsubscribeError = instance.addAdEventListener(AdEventType.ERROR, (error) => {
+        Alert.alert("Ad Load Error", error.message || "Could not load rewarded ad.");
 
-        setIsAdActive(false);
+        isAdReadyRef.current = false;
+        rewardedAdRef.current = null;
+
+        launchPendingTarget();
+      });
+
+      instance.load();
+      rewardedAdRef.current = instance;
+
+    } catch (e) {
+      Alert.alert("Ad Load Error", e.message || "Could not load ad.");
+
+      launchPendingTarget();
     }
   };
+
+
+  useEffect(() => {
+    if (mode !== "view" && !isOffline && !isAdReadyRef.current) loadNewRewardedAd();
+    
+    return () => {
+    };
+  }, [mode]);
 
 
   const populateForEdit = (quizItem, mvcat) => {
@@ -677,6 +600,62 @@ export default function WheeQuizzes() {
       setQuestionsList(quizItem.quiz || []);
       setPrevMode("list");
       setMode("add");
+    }
+  };
+
+
+  useFocusEffect(
+    useCallback(() => {
+      if ( mode !== "view" ) clearAppCache();
+      if (mode === "main" || mode === "list") loadQuizzes();
+    }, [])
+  );
+
+
+  const launchPendingTarget = () => {
+    if (mode === "main") {
+      if(pendingTargetQuiz === null) {
+        populateForEdit(null, pendingTargetCat);
+      } else {
+        setMode("list"); 
+        setPrevMode("main");
+      }
+    } else {
+      if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
+        setCurrentQuiz(pendingTargetQuiz);
+        setMode("play_active");
+      } else {
+        populateForEdit(pendingTargetQuiz, pendingTargetCat);
+      }
+    }
+  }
+
+
+  const handleAds = async (quizItem, qcat) => {
+    if (isAdActive) return;
+
+    try {
+      const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
+
+      if (!isEligible) {
+        launchPendingTarget();
+        return;
+      }
+
+      setPendingTargetQuiz(quizItem);
+      setPendingTargetCat(qcat);
+      setIsAdActive(true);
+
+      if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {
+        await rewardedAdRef.current.show();
+        await AdTimer.saveTimestamp();
+      }
+
+      setIsAdActive(false);
+
+    } catch (globalError) {
+        launchPendingTarget();
+        setIsAdActive(false);
     }
   };
 
@@ -715,7 +694,7 @@ export default function WheeQuizzes() {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
 
       const now = Date.now();
-      if(now - lastBackPress.current < 1140) {
+      if(now - lastBackPress.current < 570) {
         return true;
       }
 
@@ -751,6 +730,7 @@ export default function WheeQuizzes() {
     });
     
     return () => backHandler.remove();
+
   }, [mode, prevMode]);  
 
 
