@@ -44,7 +44,7 @@ export default function AutoRewardAd({ onAdFinished }) {
 
     const unsubscribeEarned = rewarded.addAdEventListener(
       RewardedAdEventType.EARNED_REWARD, 
-      () => { 
+      (reward) => { 
         earnedReward = true; 
       }
     );

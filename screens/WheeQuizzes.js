@@ -575,6 +575,7 @@ export default function WheeQuizzes() {
           rewarded.load();
           rewardedAdRef.current = rewarded; 
         } catch (error) {
+          
         }
       };
       prepareRewardedAd();

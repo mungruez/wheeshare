@@ -94,8 +94,15 @@ export default function WheeChapters() {
       const unsubscribeLoaded = instance.addAdEventListener(RewardedAdEventType.LOADED, () => {
         isAdReadyRef.current = true;
       });
+      
+      const unsubscribeReward = instance.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+        isAdReadyRef.current = false;
+      });
+      
+      const unsubscribeClosed = instance.addAdEventListener(AdEventType.CLOSED, () => {
+        isAdReadyRef.current = false;
+        rewardedAdRef.current = null;
 
-      const unsubscribeReward = instance.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
         Alert.alert('Thank you. Click to Claim !', 
             'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
             [{ 
@@ -118,11 +125,7 @@ export default function WheeChapters() {
             } 
           }]
         );
-      });
-      
-      const unsubscribeClosed = instance.addAdEventListener(AdEventType.CLOSED, () => {
-        isAdReadyRef.current = false;
-        rewardedAdRef.current = null;
+
         unsubscribeLoaded();
         unsubscribeReward();
         unsubscribeClosed();
@@ -134,13 +137,43 @@ export default function WheeChapters() {
         Alert.alert("Ad Error", error.message || "Could not load rewarded ad.");
         isAdReadyRef.current = false;
         rewardedAdRef.current = null;
+
+        if (mode === "main") {
+          if(pendingTargetChapt === null) {
+            populateForEdit(null, pendingTargetCat);
+          } else {
+            setMode("list"); 
+            setPrevMode("main");
+          }
+        } else {
+          if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
+            viewChapter(pendingTargetChapt);
+          } else {
+            populateForEdit(pendingTargetChapt, pendingTargetCat);
+          }
+        }                
       });
 
       instance.load();
       rewardedAdRef.current = instance;
 
     } catch (e) {
-      Alert.alert("Save Error", e.message || "Could not load ad.");
+      Alert.alert("Ad Load Error", e.message || "Could not load ad.");
+
+      if (mode === "main") {
+        if(pendingTargetChapt === null) {
+          populateForEdit(null, pendingTargetCat);
+        } else {
+          setMode("list"); 
+          setPrevMode("main");
+        }
+      } else {
+        if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
+          viewChapter(pendingTargetChapt);
+        } else {
+          populateForEdit(pendingTargetChapt, pendingTargetCat);
+        }
+      }
     }
   };
 

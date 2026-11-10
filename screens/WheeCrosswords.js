@@ -73,9 +73,10 @@ export default function WheeCrosswords() {
     if (result.success) {
       AdTimer.saveTimestamp();
       
-      Alert.alert('Thank you.','You have earned another 10 mins without ads! Enjoy wheeShare.', 
+      Alert.alert('Thank you. Click to Claim !', 
+        'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
         [{ 
-          text: 'OK',
+          text: 'CLAIM',
           onPress: () => {
             if (mode === "main") {
               if(pendingTargetCwrd === null) {
@@ -95,10 +96,6 @@ export default function WheeCrosswords() {
         }]
       );
     } else {
-      if (result.error) {
-        Alert.alert("Unavailable", "Ad could not be loaded right now.");
-      }
-      
       if (mode === "main") {
         if(pendingTargetCwrd === null) {
           populateForEdit(null, pendingTargetCat);
