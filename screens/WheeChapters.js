@@ -17,7 +17,6 @@ import PdfMove from './PdfMove';
 const SECTION_TYPES = { VIDEO: "video", PDF: "pdf", IMAGE: "image", AUDIO: "audio"};
 const { height, width } = Dimensions.get('window');
 const REWARDED_A_ID = TestIds.REWARDED;
-const CARD_WIDTH = width * 0.76;
 
 
 export default function WheeChapters() {
@@ -77,10 +76,26 @@ export default function WheeChapters() {
           await FileSystem.deleteAsync(itemPath, { idempotent: true });
         }
       }
-    } catch (error) {
-
-    }
+    } catch (error) { }
   };
+
+
+  const launchPendingTarget = () => {
+    if (mode === "main") {
+      if(pendingTargetChapt === null) {
+        populateForEdit(null, pendingTargetCat);
+      } else {
+        setMode("list"); 
+        setPrevMode("main");
+      }
+    } else {
+      if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
+        viewChapter(pendingTargetChapt);
+      } else {
+        populateForEdit(pendingTargetChapt, pendingTargetCat);
+      }
+    }
+  }
 
 
   const loadNewRewardedAd = () => {
@@ -104,26 +119,8 @@ export default function WheeChapters() {
         rewardedAdRef.current = null;
 
         Alert.alert('Thank you. Click to Claim !', 
-            'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
-            [{ 
-            text: 'CLAIM',
-            onPress: () => {
-              if (mode === "main") {
-                if(pendingTargetChapt === null) {
-                  populateForEdit(null, pendingTargetCat);
-                } else {
-                  setMode("list"); 
-                  setPrevMode("main");
-                }
-              } else {
-                if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
-                  viewChapter(pendingTargetChapt);
-                } else {
-                  populateForEdit(pendingTargetChapt, pendingTargetCat);
-                }
-              }
-            } 
-          }]
+          'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
+          [{ text: 'CLAIM', onPress: () => { launchPendingTarget(); } }]
         );
 
         unsubscribeLoaded();
@@ -134,24 +131,12 @@ export default function WheeChapters() {
       });
 
       const unsubscribeError = instance.addAdEventListener(AdEventType.ERROR, (error) => {
-        Alert.alert("Ad Error", error.message || "Could not load rewarded ad.");
+        Alert.alert("Ad Load Error", error.message || "Could not load rewarded ad.");
+
         isAdReadyRef.current = false;
         rewardedAdRef.current = null;
 
-        if (mode === "main") {
-          if(pendingTargetChapt === null) {
-            populateForEdit(null, pendingTargetCat);
-          } else {
-            setMode("list"); 
-            setPrevMode("main");
-          }
-        } else {
-          if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
-            viewChapter(pendingTargetChapt);
-          } else {
-            populateForEdit(pendingTargetChapt, pendingTargetCat);
-          }
-        }                
+        launchPendingTarget();
       });
 
       instance.load();
@@ -160,20 +145,7 @@ export default function WheeChapters() {
     } catch (e) {
       Alert.alert("Ad Load Error", e.message || "Could not load ad.");
 
-      if (mode === "main") {
-        if(pendingTargetChapt === null) {
-          populateForEdit(null, pendingTargetCat);
-        } else {
-          setMode("list"); 
-          setPrevMode("main");
-        }
-      } else {
-        if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
-          viewChapter(pendingTargetChapt);
-        } else {
-          populateForEdit(pendingTargetChapt, pendingTargetCat);
-        }
-      }
+      launchPendingTarget();
     }
   };
 
@@ -193,20 +165,7 @@ export default function WheeChapters() {
       const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
 
       if (!isEligible) {
-        if (mode === "main") {
-          if(chaptItem === null) {
-            populateForEdit(chaptItem, chaptcat);
-          } else {
-            setMode("list"); 
-            setPrevMode("main");
-          }
-        } else {
-          if(chaptcat === "VbniojlzmWheeSharemzljoinbV") {
-            viewChapter(chaptItem);
-          } else {
-            populateForEdit(chaptItem, chaptcat);
-          }
-        }
+        launchPendingTarget();
         return;
       }
 
@@ -222,21 +181,7 @@ export default function WheeChapters() {
       setIsAdActive(false);
 
     } catch (globalError) {
-        if (mode === "main") {
-          if(chaptItem === null) {
-            populateForEdit(null, chaptcat);
-          } else {
-            setMode("list"); 
-            setPrevMode("main");
-          }
-        } else {
-          if(chaptcat === "VniojlzmWheeSharemzljoinV") {
-            viewChapter(chaptItem);
-          } else {
-            populateForEdit(chaptItem, chaptcat);
-          }
-        }
-        
+        launchPendingTarget();
         setIsAdActive(false);
     }
   };
