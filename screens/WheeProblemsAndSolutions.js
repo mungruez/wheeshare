@@ -21,40 +21,38 @@ const CARD_WIDTH = width * 0.76;
 
 
 export default function WheeProblemsAndSolutions() {
-  const [pendingTargetQuiz, setPendingTargetQuiz] = useState(null);
+  const [vcDropdownVisible, setVcDropdownVisible] = useState(true);
   const [pendingTargetCat, setPendingTargetCat] = useState(null);
+  const [pDropdownVisible, setPDropdownVisible] = useState(true);
+  const [sDropdownVisible, setSDropdownVisible] = useState(true);
+  const [pendingTargetPS, setPendingTargetPS] = useState(null);
+  const [solutionSections, setSolutionSections] = useState([]);
+  const [activeSectionId, setActiveSectionId] = useState(null);
+  const [problemSections, setProblemSections] = useState([]);
+  const [psItemCategory, setPsItemCategory] = useState("");
+  const [openpdfViewer, setOpenpdfViewer] = useState(null);
   const [currentPSItem, setCurrentPSItem] = useState(null);
+  const isOffline = useNetInfo().isConnected === false;
+  const [prevCategory, setPrevCategory] = useState("");
+  const [isAdActive, setIsAdActive] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [psItemTitle, setPsItemTitle] = useState("");
+  const [isPicking, setIsPicking] = useState(false);
+  const [psItemDesc, setPsItemDesc] = useState("");
   const [prevMode, setPrevMode] = useState("main");
+  const [psItemId, setPsItemId] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [sPsItems, setSPsItems] = useState([]); 
   const [hPsItems, setHPsItems] = useState([]); 
   const [psItems, setPsItems] = useState([]);
   const [mode, setMode] = useState("main");
-
-  const lastBackPress = useRef(0);
   const navigation = useNavigation();
   const isPickingRef = useRef(false);
   const isLoadingRef = useRef(false);
-
-  const [loading, setLoading] = useState(false);
-  const [loadedAd, setLoadedAd] = useState(null);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [openpdfViewer, setOpenpdfViewer] = useState(null);
-  const [pDropdownVisible, setPDropdownVisible] = useState(true);
-  const [sDropdownVisible, setSDropdownVisible] = useState(true);
-  const [vcDropdownVisible, setVcDropdownVisible] = useState(true);
-
-  const [psItemCategory, setPsItemCategory] = useState("");
-  const [prevCategory, setPrevCategory] = useState("");
-  const [psItemTitle, setPsItemTitle] = useState("");
-  const [psItemDesc, setPsItemDesc] = useState("");
-  const [psItemId, setPsItemId] = useState(null);
-
-  const [solutionSections, setSolutionSections] = useState([]);
-  const [activeSectionId, setActiveSectionId] = useState(null);
-  const [problemSections, setProblemSections] = useState([]);
-  const isOffline = useNetInfo().isConnected === false;
-  const [isPicking, setIsPicking] = useState(false);
+  const rewardedAdRef = useRef(null);
+  const isAdReadyRef = useRef(false);
+  const lastBackPress = useRef(0);
 
 
   const showInstructions = () => {
@@ -209,6 +207,70 @@ export default function WheeProblemsAndSolutions() {
   };
 
 
+  const loadNewRewardedAd = () => {
+    if (isAdReadyRef.current) return;
+
+    try {
+      const instance = RewardedAd.createForAdRequest(REWARDED_A_ID, {
+        requestNonPersonalizedAdsOnly: true,
+      });
+
+      const unsubscribeLoaded = instance.addAdEventListener(RewardedAdEventType.LOADED, () => {
+        isAdReadyRef.current = true;
+      });
+      
+      const unsubscribeReward = instance.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+        isAdReadyRef.current = false;
+      });
+      
+      const unsubscribeClosed = instance.addAdEventListener(AdEventType.CLOSED, () => {
+        isAdReadyRef.current = false;
+        rewardedAdRef.current = null;
+
+        Alert.alert('Thank you. Click to Claim !', 
+          'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
+          [{ text: 'CLAIM', 
+            onPress: () => { 
+              launchPendingTarget(); 
+            } 
+          }]
+        );
+
+        unsubscribeLoaded();
+        unsubscribeReward();
+        unsubscribeClosed();
+        unsubscribeError();
+        loadNewRewardedAd(); 
+      });
+
+      const unsubscribeError = instance.addAdEventListener(AdEventType.ERROR, (error) => {
+        Alert.alert("Ad Load Error", error.message || "Could not load rewarded ad.");
+
+        isAdReadyRef.current = false;
+        rewardedAdRef.current = null;
+
+        launchPendingTarget();
+      });
+
+      instance.load();
+      rewardedAdRef.current = instance;
+
+    } catch (e) {
+      Alert.alert("Ad Load Error", e.message || "Could not load ad.");
+
+      launchPendingTarget();
+    }
+  };
+
+
+  useEffect(() => {
+    if (mode !== "view" && !isOffline && !isAdReadyRef.current) loadNewRewardedAd();
+    
+    return () => {
+    };
+  }, [mode]);
+
+
   const populateForEdit = (psItem, mvcat, sourceMode = mode) => {
     if (psItem === null) {
       const nextPrevMode = sourceMode === "list" ? "list" : "main";
@@ -245,6 +307,51 @@ export default function WheeProblemsAndSolutions() {
     setPrevMode("list");
     setMode("add");
   };
+
+
+  const launchPendingTarget = () => {
+    if (mode === "main") {
+      if(pendingTargetPS === null) {
+        populateForEdit(null, "", "main");
+      } else {
+        setMode("list"); 
+        setPrevMode("main");
+      }
+    } else {
+      if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
+        setCurrentQuiz(pendingTargetPS);
+        setMode("play_active");
+      } else {
+        populateForEdit(pendingTargetPS, pendingTargetCat, "list");
+      }
+    }
+  }
+
+
+  const handleAds = async (psItem, pscat) => {
+    if (isAdActive) return;
+    setPendingTargetPS(psItem);
+    setPendingTargetCat(pscat);
+
+    try {
+      const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
+      if (!isEligible) {
+        launchPendingTarget();
+        return;
+      }
+
+      setIsAdActive(true);
+      if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {
+        await rewardedAdRef.current.show();
+        await AdTimer.saveTimestamp();
+      }
+      setIsAdActive(false);
+
+    } catch (globalError) {
+        launchPendingTarget();
+        setIsAdActive(false);
+    }
+  };  
 
 
   const resetForm = () => {
@@ -1053,7 +1160,7 @@ export default function WheeProblemsAndSolutions() {
         <Text style={styles.psCardTitle} numberOfLines={1}>{item.title}</Text>
         <Text style={styles.psCardCount}>{`${item.problemSections?.length || 0} Problems / ${item.solutionSections?.length || 0} Solutions`}</Text>
         { selectedIds.includes(item.id) && selectedIds.length === 1 && ( <View style={styles.psCardFooter}>
-          <TouchableOpacity style={styles.editBtnCard} onPress={() => populateForEdit(item, item.category, "list")}>
+          <TouchableOpacity style={styles.editBtnCard} onPress={() => handleAds(item, item.category)}>
             <Text style={styles.editBtnText}>EDIT</Text>
           </TouchableOpacity>
         </View> ) }
@@ -1311,7 +1418,7 @@ export default function WheeProblemsAndSolutions() {
               <TouchableOpacity onPress={() => { setSelectedIds([]); setMode("main"); }} style={styles.plusIconAM}>
                 <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/problems/backpurple.png')}/>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => populateForEdit(null, psItemCategory, "list")} style={styles.plusIcon}>
+              <TouchableOpacity onPress={() => handleAds(null, psItemCategory)} style={styles.plusIcon}>
                 <ImageBackground style={{ height: "100%", width: "100%" }} resizeMode='contain' source={require('../assets/problems/addproblembtn.png')}/>         
               </TouchableOpacity>
             </View>
@@ -1517,7 +1624,7 @@ export default function WheeProblemsAndSolutions() {
           </View>
 
           <View style={styles.dashboardIconsControlsRow}>
-            <TouchableOpacity onPress={() => populateForEdit(null, "", "main")} style={styles.plusIcon}>
+            <TouchableOpacity onPress={() => handleAds(null, "")} style={styles.plusIcon}>
               <ImageBackground style={{ height:"100%", width:"100%"}} resizeMode='contain' source={require('../assets/problems/addproblembtn.png')}/>         
             </TouchableOpacity> 
             <TouchableOpacity onPress={handleImportPSItems} style={styles.importIcon}>
@@ -1546,7 +1653,7 @@ export default function WheeProblemsAndSolutions() {
                       setHPsItems(getPsItems(item.category, psItems));
                       setPsItemCategory(item.category);
                       setPrevCategory(item.category);
-                      setMode("list");
+                      handleAds(item, item.category);
                     }}
                   >
                     <ImageBackground

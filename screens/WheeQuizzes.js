@@ -634,6 +634,9 @@ export default function WheeQuizzes() {
   const handleAds = async (quizItem, qcat) => {
     if (isAdActive) return;
 
+    setPendingTargetQuiz(quizItem);
+    setPendingTargetCat(qcat);
+
     try {
       const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
 
@@ -642,8 +645,6 @@ export default function WheeQuizzes() {
         return;
       }
 
-      setPendingTargetQuiz(quizItem);
-      setPendingTargetCat(qcat);
       setIsAdActive(true);
 
       if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {

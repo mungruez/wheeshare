@@ -161,23 +161,23 @@ export default function WheeChapters() {
   const handleAds = async (chaptItem, chaptcat) => {
     if (isAdActive) return;
 
+    setPendingTargetChapt(chaptItem);
+    setPendingTargetCat(chaptcat);
+
     try {
       const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
-
       if (!isEligible) {
         launchPendingTarget();
         return;
       }
 
-      setPendingTargetChapt(chaptItem);
-      setPendingTargetCat(chaptcat);
       setIsAdActive(true);
 
       if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {
         await rewardedAdRef.current.show();
         await AdTimer.saveTimestamp();
       }
-
+      
       setIsAdActive(false);
 
     } catch (globalError) {
