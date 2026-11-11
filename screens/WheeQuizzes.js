@@ -53,7 +53,7 @@ export default function WheeQuizzes() {
   const showInstructions = () => {
     Alert.alert(
       "WheeShare Quizzes",
-      "Instructions: Save, edit, view, share, delete, and import quizzes in WheeShare. You can add as many quizzes as your device storage allows. Use the binoculars icon to search by title or keyword. After a search, press backspace to refine the query instead of using the reload icon.\n\n1. Use the green + button in the top menu to add a quiz. Each quiz should include a title, category, and valid set of questions.\n2. Tap a category button to view quizzes in that group. The first option, All Categories, displays every quiz available.\n3. On the list screen, press and hold a quiz card to reveal batch actions. Select quizzes, then choose Share or Delete to manage them. Use the green edit button to update a quiz, or tap the card to open it.\n4. Scroll the category list to browse your quizzes. On the add-quiz screen, complete the form and tap Save to keep your changes. Thank you for using WheeShare.",
+      "Instructions: Save, edit, view, share, delete, and import quizzes in WheeShare. You can add as many quizzes as your device storage allows. Use the binoculars icon to search by title or keyword. After a search, press backspace to refine the query instead of using the reload icon.\n\n1. Use the green + button in the top menu to add a quiz. Each quiz should include a title, category, and valid set of questions.\n2. Tap a category button to view quizzes in that group. The first option, All Categories, displays every quiz available.\n3. On the list screen, press and hold a quiz card to reveal batch actions. Select quizzes, then choose Share or Delete to manage them. Only when one quiz is selected the edit button will show up. Use the red edit button to update a quiz, or tap the card to open it.\n4. Scroll the category list to browse your quizzes. On the add-quiz screen, complete the form and tap Save to keep your changes. Thank you for using WheeShare.",
       [ { text: "OK",
         onPress: () => setMode("main"),
         style: "cancel" 
@@ -1066,7 +1066,7 @@ export default function WheeQuizzes() {
     <View style={styles.loadingOverlay}>
       <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
         <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24, opacity: 1, borderRadius: 12 } } resizeMode='contain' source={require('../assets/icon.png')} />
-        <ActivityIndicator size="large" color="#b41919" style={{ transform: [{ scale: 1.9 }], marginBottom: 17 }} />
+        <ActivityIndicator size="large" color="#f59797" style={{ transform: [{ scale: 1.9 }], marginBottom: 17 }} />
         <Text style={styles.loadingText}>Please Wait...</Text>
       </View>
     </View>
@@ -1420,5 +1420,5 @@ const styles = StyleSheet.create({
   explanationBodyText: { color: '#cbd5e1', fontSize: 12, marginTop: 4 },
   saveBtnFullBlock: { width: 133, height: 114, borderRadius: 15, marginTop: 7, alignSelf:'center', alignItems: 'center', justifyContent:'center', },
   loadingOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '93%', backgroundColor: 'rgba(19, 19, 19, 0.76)', alignItems: 'center', justifyContent: 'center', zIndex: 19, elevation: 50 },
-  loadingText: { color: '#c20f0f', fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7 },
+  loadingText: { color: '#f15959', fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7 },
  });

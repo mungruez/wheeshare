@@ -59,7 +59,7 @@ export default function WheeProblemsAndSolutions() {
   const showInstructions = () => {
     Alert.alert(
       "Problems & Solutions",
-      "Instructions: Save, edit, view, share, delete, and import problems and solutions in WheeShare. You can add as many items as your device storage allows. Use the binoculars icon to search by keyword.\n\n1. Tap the + button to add an item. Each entry creates both a problem section and a solution section, and both a category and a title are required.\n2. Select a category button to filter your items. Press and hold an item to enable batch actions.\n3. Use the actions in the batch bar to share or delete selected items.\nThank you for using WheeShare.",
+      "Instructions: Save, edit, view, share, delete, and import problems and solutions in WheeShare. You can add as many items as your device storage allows. Use the binoculars icon to search by keyword.\n\n1. Tap the + button to add an item. Each entry creates both a problem section and a solution section, and both a category and a title are required.\n2. Select a category button to filter your items. Press and hold an item to enable batch actions. Only when one item is selected the edit button will show up.\n3. Use the actions in the batch bar to share or delete selected items.\nThank you for using WheeShare.",
       [{ text: "OK", onPress: () => setMode("main"), style: "cancel" }],
       { cancelable: false }
     );
@@ -1439,7 +1439,7 @@ export default function WheeProblemsAndSolutions() {
       <View style={styles.loadingOverlay}>
         <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}>
           <Image style={{ height: 76, width: 76, elevation: 4, marginBottom: 24,  borderRadius: 12, opacity: 1 } } resizeMode='contain' source={require('../assets/icon.png')} />
-          <ActivityIndicator size="large" color="#7a0891" style={{ transform: [{ scale: 1.9 }], marginBottom: 17 }} />
+          <ActivityIndicator size="large" color="#d661ee" style={{ transform: [{ scale: 1.9 }], marginBottom: 17 }} />
           <Text style={styles.loadingText}>Please Wait...</Text>
         </View>
       </View> 
@@ -1834,5 +1834,5 @@ const styles = StyleSheet.create({
   saveBtnBlock: { width: 171, height: 76, borderRadius: 10, alignSelf:'center', marginTop: 25, marginBottom: 19 },
   saveBtnTextInternal: { color: '#c89eeb', fontWeight: 'bold', fontSize: 14, letterSpacing: 1 },
   loadingOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '93%', backgroundColor: 'rgba(19, 19, 19, 0.76)', alignItems: 'center', justifyContent: 'center', zIndex: 19, elevation: 50 },
-  loadingText: { color: '#9e37f3', fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7 },
+  loadingText: { color: '#ca8efc', fontWeight: '700', fontSize: 11, letterSpacing: 0.8, textAlign: 'center', textTransform: 'uppercase', marginTop: 7 },
 });
