@@ -9,6 +9,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import { zip, unzip } from 'react-native-zip-archive';
 import WheeQuizScreen from "./WheeQuizScreen";
+import AutoRewardAd from './AutoRewardAd';
 import * as Sharing from 'expo-sharing';
 import { AdTimer } from './AdTimer';
 
@@ -26,6 +27,7 @@ export default function WheeQuizzes() {
   const [quizCategory, setQuizCategory] = useState("");
   const [prevCategory, setPrevCategory] = useState("");
   const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [isAdLoading, setIsAdLoading] = useState(false);
   const [longanswer, setLongAnswer] = useState(false);
   const [isAdActive, setIsAdActive] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -612,23 +614,48 @@ export default function WheeQuizzes() {
   );
 
 
-  const launchPendingTarget = () => {
+  const launchPendingTarget = (quizItem = pendingTargetQuiz, qcat = pendingTargetCat) => {
     if (mode === "main") {
-      if(pendingTargetQuiz === null) {
-        populateForEdit(null, pendingTargetCat);
+      if(quizItem === null) {
+        populateForEdit(null, qcat);
       } else {
         setMode("list"); 
         setPrevMode("main");
       }
     } else {
-      if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
-        setCurrentQuiz(pendingTargetQuiz);
+      if(qcat === "VniojlzmWheeSharemzljoinV") {
+        setCurrentQuiz(quizItem);
         setMode("play_active");
       } else {
-        populateForEdit(pendingTargetQuiz, pendingTargetCat);
+        populateForEdit(quizItem, qcat);
       }
     }
   }
+
+
+  const handleAdResult = useCallback((result) => {
+    setIsAdLoading(false);
+
+    if (result.success) {
+      AdTimer.saveTimestamp();
+      
+      Alert.alert('Thank you. Click to Claim !', 
+        'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
+        [{ 
+          text: 'CLAIM',
+          onPress: () => { 
+            launchPendingTarget();
+           } 
+        }]
+      );
+      
+    } else {
+      launchPendingTarget();
+      setPendingTargetQuiz(null);
+      setPendingTargetCat(null);
+    }
+
+  }, [pendingTargetQuiz, pendingTargetCat]);
 
 
   const handleAds = async (quizItem, qcat) => {
@@ -641,21 +668,23 @@ export default function WheeQuizzes() {
       const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
 
       if (!isEligible) {
-        launchPendingTarget();
+        launchPendingTarget(quizItem, qcat);
         return;
       }
 
       setIsAdActive(true);
 
-      if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {
+      if (isAdReadyRef.current && rewardedAdRef.current) {
         await rewardedAdRef.current.show();
         await AdTimer.saveTimestamp();
+        setIsAdActive(false);
+      } else {
+        setIsAdActive(false);
+        setIsAdLoading(true);
       }
 
-      setIsAdActive(false);
-
     } catch (globalError) {
-        launchPendingTarget();
+        launchPendingTarget(quizItem, qcat);
         setIsAdActive(false);
     }
   };
@@ -1008,6 +1037,13 @@ export default function WheeQuizzes() {
 
   if(isAdActive) {
     return null;
+  }
+
+
+  if(isAdLoading) {
+    return (
+      <AutoRewardAd onAdFinished={handleAdResult} />
+    )
   }
   
     

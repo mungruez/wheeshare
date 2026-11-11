@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator } from 'react-native';
+import { RewardedAd, TestIds, RewardedAdEventType, AdEventType } from 'react-native-google-mobile-ads';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
 import * as FileSystem from 'expo-file-system/legacy';
@@ -14,6 +15,7 @@ import { AdTimer } from './AdTimer';
 
 const { height, width } = Dimensions.get('window');
 const SCREEN_WIDTH = Dimensions.get('window').width;
+const REWARDED_A_ID = TestIds.REWARDED;
 const CARD_WIDTH = width * 0.76;
 const MAX_ANSWER_LENGTH = 10;
 const GRID_PADDING = 3; 
@@ -41,6 +43,7 @@ export default function WheeCrosswords() {
   const [isGridVisible, setIsGridVisible] = useState(false);
   const [gridWordCount, setGridWordCount] = useState(0);
   const [isAdActive, setIsAdActive] = useState(false);
+  const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [hcrosswords, setHcrosswords] = useState([]);
   const [scrosswords, setScrosswords] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -49,9 +52,11 @@ export default function WheeCrosswords() {
   const [loading, setLoading] = useState(false);
 
   const isOffline = useNetInfo().isConnected === false;
-  const lastBackPress = useRef(0);
+  const rewardedAdRef = useRef(null);
+  const isAdReadyRef = useRef(false);
   const isLoadingRef = useRef(false);
   const navigation = useNavigation();
+  const lastBackPress = useRef(0);
 
 
   const showInstructions = () => {
@@ -67,6 +72,114 @@ export default function WheeCrosswords() {
   };
 
 
+  const loadNewRewardedAd = () => {
+    if (isAdReadyRef.current) return;
+
+    try {
+      const instance = RewardedAd.createForAdRequest(REWARDED_A_ID, {
+        requestNonPersonalizedAdsOnly: true,
+      });
+
+      const unsubscribeLoaded = instance.addAdEventListener(RewardedAdEventType.LOADED, () => {
+        isAdReadyRef.current = true;
+      });
+      
+      const unsubscribeReward = instance.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+        isAdReadyRef.current = false;
+      });
+      
+      const unsubscribeClosed = instance.addAdEventListener(AdEventType.CLOSED, () => {
+        isAdReadyRef.current = false;
+        rewardedAdRef.current = null;
+
+        Alert.alert('Thank you. Click to Claim !', 
+          'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
+          [{ text: 'CLAIM', onPress: () => { launchPendingTarget(); }}]
+        );
+
+        unsubscribeLoaded();
+        unsubscribeReward();
+        unsubscribeClosed();
+        unsubscribeError();
+        loadNewRewardedAd(); 
+      });
+
+      const unsubscribeError = instance.addAdEventListener(AdEventType.ERROR, (error) => {
+        Alert.alert("Ad Load Error", error.message || "Could not load rewarded ad.");
+
+        isAdReadyRef.current = false;
+        rewardedAdRef.current = null;
+
+        launchPendingTarget();
+      });
+
+      instance.load();
+      rewardedAdRef.current = instance;
+
+    } catch (e) {
+      Alert.alert("Ad Load Error", e.message || "Could not load ad.");
+
+      launchPendingTarget();
+    }
+  };
+
+
+  useEffect(() => {
+    if (mode !== "view" && !isOffline && !isAdReadyRef.current) loadNewRewardedAd();
+    
+    return () => {
+    };
+  }, [mode]);
+
+
+  const launchPendingTarget = (cwrd = pendingTargetCwrd, cwrdcat = pendingTargetCat) => {
+    if (mode === "main") {
+      if(cwrd === null) {
+        populateForEdit(null, cwrdcat);
+      } else {
+        setMode("list"); 
+        setPrevMode("main");
+      }
+    } else {
+      if(cwrdcat === "ZljimvznotWheeSharetonzvtmijlZ") {
+        viewCrossword(cwrd);
+      } else {
+        populateForEdit(cwrd, cwrdcat);
+      }
+    }
+  }
+
+
+  const handleRewardAds = async (cwrd, cwrdcat) => {
+    if (isAdLoaded || isAdActive) return;
+
+    try {
+      const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
+      if (!isEligible) {
+        launchPendingTarget(cwrd, cwrdcat);
+        return;
+      }
+
+      setPendingTargetCat(cwrdcat);
+      setPendingTargetCwrd(cwrd);
+      setIsAdLoaded(true);
+
+      if (isAdReadyRef.current && rewardedAdRef.current) {
+        await rewardedAdRef.current.show();
+        await AdTimer.saveTimestamp();
+        setIsAdLoaded(false);
+      } else {
+        setIsAdLoaded(false);
+        setIsAdActive(true);
+      }
+    } catch (globalError) {
+        setIsAdLoaded(false);
+        setIsAdActive(false);
+        launchPendingTarget(cwrd, cwrdcat);
+    }
+  };
+
+
   const handleAdResult = useCallback((result) => {
     setIsAdActive(false);
 
@@ -77,93 +190,19 @@ export default function WheeCrosswords() {
         'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
         [{ 
           text: 'CLAIM',
-          onPress: () => {
-            if (mode === "main") {
-              if(pendingTargetCwrd === null) {
-                populateForEdit(pendingTargetCwrd, pendingTargetCat);
-              } else {
-                setMode("list"); 
-                setPrevMode("main");
-              }
-            } else {
-              if(pendingTargetCat === "ZljimvznotWheeSharetonzvtmijlZ") {
-                viewCrossword(pendingTargetCwrd);
-              } else {
-                populateForEdit(pendingTargetCwrd, pendingTargetCat);
-              }
-            }
-          } 
+          onPress: () => { 
+            launchPendingTarget();
+           } 
         }]
       );
+      
     } else {
-      if (mode === "main") {
-        if(pendingTargetCwrd === null) {
-          populateForEdit(null, pendingTargetCat);
-        } else {
-          setMode("list"); 
-          setPrevMode("main");
-        }
-      } else {
-        if(pendingTargetCat === "ZljimvznotWheeSharetonzvtmijlZ") {
-            viewCrossword(pendingTargetCwrd);
-        } else {
-          populateForEdit(pendingTargetCwrd, pendingTargetCat);
-        }
-      }
-
+      launchPendingTarget();
       setPendingTargetCwrd(null);
       setPendingTargetCat(null);
     }
+
   }, [pendingTargetCwrd, pendingTargetCat]);
-
-
-  
-  const handleRewardAds = async (cwrd, cwrdcat) => {
-    if (isAdActive) return;
-
-    try {
-      const isEligible = isOffline ? false : await AdTimer.shouldShowAd();
-
-      if (!isEligible) {
-        if (mode === "main") {
-          if(cwrd === null) {
-            populateForEdit(cwrd, cwrdcat);
-          } else {
-            setMode("list"); 
-            setPrevMode("main");
-          }
-        } else {
-          if(cwrdcat === "ZljimvznotWheeSharetonzvtmijlZ") {
-            viewCrossword(cwrd);
-          } else {
-            populateForEdit(cwrd, cwrdcat);
-          }
-        }
-        return;
-      }
-
-      setPendingTargetCwrd(cwrd);
-      setPendingTargetCat(cwrdcat);
-      setIsAdActive(true);
-
-    } catch (globalError) {
-        if (mode === "main") {
-          if(cwrd === null) {
-            populateForEdit(null, cwrdcat);
-          } else {
-            setMode("list"); 
-            setPrevMode("main");
-          }
-        } else {
-          if(cwrdcat === "ZljimvznotWheeSharetonzvtmijlZ") {
-            viewCrossword(cwrd);
-          } else {
-            populateForEdit(cwrd, cwrdcat);
-          }
-        }
-        setIsAdActive(false);
-    }
-  };
   
 
   const canPlaceWord = (word, gridT, startX, startY, orientation, requireCrossing) => {
@@ -1047,6 +1086,11 @@ export default function WheeCrosswords() {
   };
 
 
+  if(isAdLoaded) {
+    return null;
+  }
+
+
   if(isAdActive) {
     return (
       <AutoRewardAd onAdFinished={handleAdResult} />
@@ -1398,6 +1442,7 @@ export default function WheeCrosswords() {
     </ImageBackground>
   ); 
 };
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, margin: 4 },
