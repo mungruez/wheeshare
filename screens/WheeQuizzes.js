@@ -23,11 +23,11 @@ export default function WheeQuizzes() {
   const [pendingTargetCat, setPendingTargetCat] = useState(null);
   const [multipleanswers, setMultipleAnswers] = useState(false);
   const [multiplechoice, setMultipleChoice] = useState(true);
+  const [isAdLoading, setIsAdLoading] = useState(false);
   const isOffline = useNetInfo().isConnected === false;
   const [quizCategory, setQuizCategory] = useState("");
   const [prevCategory, setPrevCategory] = useState("");
   const [currentQuiz, setCurrentQuiz] = useState(null);
-  const [isAdLoading, setIsAdLoading] = useState(false);
   const [longanswer, setLongAnswer] = useState(false);
   const [isAdActive, setIsAdActive] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);

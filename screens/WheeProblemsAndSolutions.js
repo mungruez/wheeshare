@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, Alert, ImageBackground, KeyboardAvoidingView, Platform, StatusBar, FlatList, Dimensions, BackHandler, ActivityIndicator } from 'react-native';
 import { RewardedAd, TestIds, RewardedAdEventType, AdEventType } from 'react-native-google-mobile-ads';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNetInfo } from "@react-native-community/netinfo";
 import * as DocumentPicker from 'expo-document-picker';
@@ -32,6 +32,7 @@ export default function WheeProblemsAndSolutions() {
   const [psItemCategory, setPsItemCategory] = useState("");
   const [openpdfViewer, setOpenpdfViewer] = useState(null);
   const [currentPSItem, setCurrentPSItem] = useState(null);
+  const [isAdLoading, setIsAdLoading] = useState(false);
   const isOffline = useNetInfo().isConnected === false;
   const [prevCategory, setPrevCategory] = useState("");
   const [isAdActive, setIsAdActive] = useState(false);
@@ -157,9 +158,11 @@ export default function WheeProblemsAndSolutions() {
     if (!item || typeof item !== 'object') return null;
 
     const normalized = { ...item };
+
     const problemSections = Array.isArray(item.problemSections)
       ? item.problemSections
       : Array.isArray(item.problem) ? item.problem : [];
+
     const solutionSections = Array.isArray(item.solutionSections)
       ? item.solutionSections
       : Array.isArray(item.solution) ? item.solution : [];
@@ -174,6 +177,7 @@ export default function WheeProblemsAndSolutions() {
   const parseHPsItems = (itemsList) => {
     let hItemsList = [];
     let categoriesSeen = [];
+
     for (let mNum = 0; mNum < itemsList.length; mNum++) {
       const psItem = itemsList[mNum];
       const currentCategory = psItem.category || "Enter Category";
@@ -319,8 +323,7 @@ export default function WheeProblemsAndSolutions() {
       }
     } else {
       if(pendingTargetCat === "VniojlzmWheeSharemzljoinV") {
-        setCurrentQuiz(pendingTargetPS);
-        setMode("play_active");
+        viewPSItem(pendingTargetPS);
       } else {
         populateForEdit(pendingTargetPS, pendingTargetCat, "list");
       }
@@ -328,8 +331,34 @@ export default function WheeProblemsAndSolutions() {
   }
 
 
+  const handleAdResult = useCallback((result) => {
+    setIsAdLoading(false);
+
+    if (result.success) {
+      AdTimer.saveTimestamp();
+      
+      Alert.alert('Thank you. Click to Claim !', 
+        'Thank You Reward Earned! Click Claim for another 10 mins without ads! Enjoy wheeShare.', 
+        [{ 
+          text: 'CLAIM',
+          onPress: () => { 
+            launchPendingTarget();
+           } 
+        }]
+      );
+      
+    } else {
+      launchPendingTarget();
+      setPendingTargetPS(null);
+      setPendingTargetCat(null);
+    }
+
+  }, [pendingTargetPS, pendingTargetCat]);
+  
+  
   const handleAds = async (psItem, pscat) => {
     if (isAdActive) return;
+
     setPendingTargetPS(psItem);
     setPendingTargetCat(pscat);
 
@@ -341,12 +370,15 @@ export default function WheeProblemsAndSolutions() {
       }
 
       setIsAdActive(true);
-      if (isEligible && isAdReadyRef.current && rewardedAdRef.current) {
+      if (isAdReadyRef.current && rewardedAdRef.current) {
         await rewardedAdRef.current.show();
         await AdTimer.saveTimestamp();
+        setIsAdActive(false);
+      } else {
+        setIsAdActive(false);
+        setIsAdLoading(true);
       }
-      setIsAdActive(false);
-
+      
     } catch (globalError) {
         launchPendingTarget();
         setIsAdActive(false);
@@ -1154,7 +1186,7 @@ export default function WheeProblemsAndSolutions() {
     return (
       <TouchableOpacity 
         onLongPress={() => toggleSelect(item.id)}
-        onPress={() => selectedIds.length > 0 ? toggleSelect(item.id) : viewPSItem(item)}
+        onPress={() => selectedIds.length > 0 ? toggleSelect(item.id) : handleAds(item, "VniojlzmWheeSharemzljoinV")}
         style={[styles.psitemCard, isSelected && styles.selectedCard]}
       >
         <Text style={styles.psCardTitle} numberOfLines={1}>{item.title}</Text>
@@ -1390,6 +1422,18 @@ export default function WheeProblemsAndSolutions() {
   }
 
 
+  if(isAdActive) {
+    return null;
+  }
+
+
+  if(isAdLoading) {
+    return (
+      <AutoRewardAd onAdFinished={handleAdResult} />
+    )
+  }
+
+
   if(loading) { 
     return ( 
       <View style={styles.loadingOverlay}>
@@ -1602,6 +1646,7 @@ export default function WheeProblemsAndSolutions() {
     <ImageBackground style={styles.imgBackground} resizeMode='cover' source={require('../assets/problems/problemsbg.png')}>
       <StatusBar barStyle="light-content"/>
       <SafeAreaView style={{flex: 1}}>
+      
         <View style={styles.centerLogoWrapper}>
           <ImageBackground style={styles.iconmain} resizeMode='contain' source={require('../assets/problems/problemstitle.png')} /> 
         </View>
